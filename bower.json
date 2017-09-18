@@ -1,0 +1,22 @@
+{
+  "name": "d-nor",
+  "description": "Distributed Noracle",
+  "main": "",
+  "authors": [
+    "bgoeschi <bernhard.goeschlberger@researchstudio.at>"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^2.0.2",
+    "openidconnect-signin": "https://github.com/rwth-acis/openidconnect-signin.git#^1.0.1"
+  }
+}
