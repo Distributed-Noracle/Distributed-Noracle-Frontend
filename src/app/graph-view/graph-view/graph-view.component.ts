@@ -1,9 +1,12 @@
-import {AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
-import {DataSet, Network} from 'vis';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {TextlayoutService} from '../textlayout.service';
 import {SpaceService} from '../space.service';
 import {QuestionService} from '../question.service';
 import {RelationService} from '../relation.service';
+import {D3, D3Service} from 'd3-ng2-service';
+import {ForceLink} from 'd3-force';
+import {GraphNode} from './graph-data-model/graph-node';
+import {Edge} from './graph-data-model/edge';
 
 @Component({
   selector: 'app-graph-view',
@@ -11,108 +14,117 @@ import {RelationService} from '../relation.service';
   styleUrls: ['./graph-view.component.css']
 })
 export class GraphViewComponent implements OnInit, AfterViewInit {
-  @ViewChild('graphview') private graphView;
-  private networkData;
-  private networkOptions;
-  private network;
+  @ViewChild('d3root') private d3Root;
+  private d3: D3;
+  private nodes: GraphNode[];
+  private edges: Edge[];
+
 
   constructor(private TextlayoutService: TextlayoutService, private SpaceService: SpaceService,
-              private QuestionService: QuestionService, private RelationService: RelationService) {
+              private QuestionService: QuestionService, private RelationService: RelationService,
+              private D3Service: D3Service) {
+    this.d3 = D3Service.getD3();
   }
 
   ngOnInit() {
-    this.initData();
+    // TODO: load data
+    // this.SpaceService.getSpace().then((resp) => {
+    //   console.log(resp);
+    //   // TODO: process and push data
+    // });
   }
 
   ngAfterViewInit() {
-    // initialize your network!
-    this.network = new Network(this.graphView.nativeElement, this.networkData, this.networkOptions);
-    this.network.on('stabilizationIterationsDone', () => {
-      this.network.setOptions({physics: false});
-    });
-    this.network.setSelection({nodes: [1]});
+    this.initVisualization();
   }
 
-  initData() {
-    this.SpaceService.getSpace().then((resp) => {
-      console.log(resp);
-    });
-    const nodes = new DataSet([
+  initVisualization() {
+    const canvas = this.d3Root.nativeElement;
+    const context = canvas.getContext('2d');
+    // TODO: eventually handle changes in size (currently static)
+    const width = canvas.width;
+    const height = canvas.height;
+
+    const d3Sim = this.d3.forceSimulation()
+      .force('link', this.d3.forceLink<GraphNode, Edge>().id((n, i, d) => n.id.toString()))
+      .force('charge', this.d3.forceManyBody())
+      .force('center', this.d3.forceCenter(width / 2, height / 2));
+
+    this.nodes = [
       {
         id: 1,
-        label: this.TextlayoutService.wrapTextCircular('What is the most imporatant challenge for European Youth Workers?'),
+        label: 'What is the most imporatant challenge for European Youth Workers?',
         title: 'asked by Bernhard'
       },
       {
         id: 11,
-        label: this.TextlayoutService.wrapTextCircular('How do we finance our work'),
+        label: 'How do we finance our work',
         title: 'asked by Bernhard'
       },
       {
         id: 111,
-        label: this.TextlayoutService.wrapTextCircular('Are we administrators or pedagogues?'),
+        label: 'Are we administrators or pedagogues?',
         title: 'asked by Bernhard'
       },
       {
         id: 112,
-        label: this.TextlayoutService.wrapTextCircular('How do we finance our lives?'),
+        label: 'How do we finance our lives?',
         title: 'asked by Bernhard'
       },
       {
         id: 12,
-        label: this.TextlayoutService.wrapTextCircular('Do our intentions match our actions?'),
+        label: 'Do our intentions match our actions?',
         title: 'asked by Bernhard'
       },
       {
         id: 121,
-        label: this.TextlayoutService.wrapTextCircular('Do we have the same intentions?'),
+        label: 'Do we have the same intentions?',
         title: 'asked by Bernhard'
       },
       {
         id: 122,
-        label: this.TextlayoutService.wrapTextCircular('How can you evaluate the connection between ideology and practice?'),
+        label: 'How can you evaluate the connection between ideology and practice?',
         title: 'asked by Bernhard'
       },
       {
         id: 13,
-        label: this.TextlayoutService.wrapTextCircular(
-          'If you have an answer, what question have you asked yourself to arrive at that answer?'),
+        label: 'If you have an answer, what question have you asked yourself to arrive at that answer?',
         title: 'asked by Bernhard'
       },
       {
         id: 131,
-        label: this.TextlayoutService.wrapTextCircular('What are the barriers to participation?'),
+        label: 'What are the barriers to participation?',
         title: 'asked by Bernhard'
       },
       {
         id: 1311,
-        label: this.TextlayoutService.wrapTextCircular('Which barriers do we think we can address?'),
+        label: 'Which barriers do we think we can address?',
         title: 'asked by Bernhard'
       },
       {
         id: 1312,
-        label: this.TextlayoutService.wrapTextCircular('Do we even know who we are serving?'),
+        label: 'Do we even know who we are serving?',
         title: 'asked by Bernhard'
       },
       {
         id: 14,
-        label: this.TextlayoutService.wrapTextCircular('Why am I doing this'),
+        label: 'Why am I doing this',
         title: 'asked by Bernhard'
       },
       {
         id: 15,
-        label: this.TextlayoutService.wrapTextCircular('How do I know what I do is effective?'),
+        label: 'How do I know what I do is effective?',
         title: 'asked by Bernhard'
       },
       {
         id: 16,
-        label: this.TextlayoutService.wrapTextCircular('Who is actually benefiting from our work'),
+        label: 'Who is actually benefiting from our work',
         title: 'asked by Bernhard'
       }
-    ]);
+    ].map((d) => new GraphNode(d.id, d.label));
 
     // create an array with edges
-    const edges = new DataSet([
+    this.edges = [
       {from: 1, to: 11, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
       {from: 1, to: 12, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
       {from: 1, to: 13, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
@@ -126,58 +138,55 @@ export class GraphViewComponent implements OnInit, AfterViewInit {
       {from: 13, to: 131, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
       {from: 131, to: 1311, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
       {from: 131, to: 1312, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-    ]);
+    ].map((e) => new Edge(e.from, e.to));
 
-    // create a network
-    const container = this.graphView.nativeElement;
 
-    // provide the data in the vis format
-    this.networkData = {
-      nodes: nodes,
-      edges: edges
-    };
-    this.networkOptions = {
-      width: (window.innerWidth - 25) + 'px',
-      height: (window.innerHeight - 100) + 'px',
-      manipulation: {
-        enabled: true,
-        addNode: (nodeData, callback) => {
-          nodeData.label = this.TextlayoutService.wrapTextCircular(prompt('Please enter the name of the node', 'new node'));
-          callback(nodeData);
-        },
-        addEdge: (edgeData, callback) => {
-          if (edgeData.from === edgeData.to) {
-            return alert('Self relations are not supported');
-          } else {
-            edgeData.label = this.TextlayoutService.wrapTextCircular(prompt('Please enter the name of the edge', 'new relation'));
-            callback(edgeData);
+    d3Sim.nodes(this.nodes).on('tick', () => {
+      context.clearRect(0, 0, width, height);
+      // TODO: draw stuff independently so we can use different colors etc. for different parts of the graph
+      context.beginPath();
+      this.edges.forEach((e: Edge) => {
+        // draw edge
+        e.draw(context as CanvasRenderingContext2D);
+      });
+      context.strokeStyle = '#aaa';
+      context.stroke();
+      context.beginPath();
+      this.nodes.forEach((n) => {
+        // draw node
+        n.draw(context as CanvasRenderingContext2D);
+      });
+      context.fill();
+      context.strokeStyle = '#fff';
+      context.stroke();
+    });
+    d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges);
+
+    // drag behavior
+    this.d3.select(canvas)
+      .call(this.d3.drag()
+        .container(canvas)
+        .subject(() => d3Sim.find(this.d3.event.x, this.d3.event.y))
+        .on('start', () => {
+          if (!this.d3.event.active) {
+            d3Sim.alphaTarget(0.3).restart();
           }
-        },
-        editNode: (nodeData, callback) => {
-          nodeData.label = this.TextlayoutService.wrapTextCircular(prompt('Please enter the name of the node', nodeData.label));
-          callback(nodeData);
-        },
-        editEdge: {
-          editWithoutDrag: (edgeData, callback) => {
-            edgeData.label = this.TextlayoutService.wrapTextCircular(prompt('Please enter the name of the edge', edgeData.label));
-            edgeData.to = edgeData.to.id;
-            edgeData.from = edgeData.from.id;
-            callback(edgeData);
+          this.d3.event.subject.fx = this.d3.event.x;
+          this.d3.event.subject.fy = this.d3.event.y;
+        })
+        .on('drag', () => {
+          this.d3.event.subject.fx = this.d3.event.x;
+          this.d3.event.subject.fy = this.d3.event.y;
+        })
+        .on('end', () => {
+          if (!this.d3.event.active) {
+            d3Sim.alphaTarget(0);
           }
-        }
-      },
-      physics: {
-        forceAtlas2Based: {
-          avoidOverlap: 1
-        },
-        solver: 'forceAtlas2Based'
-      }
-    };
-  }
-
-  autolayout() {
-    this.network.setOptions({physics: true});
-    this.network.stabilize();
+          this.d3.event.subject.fx = null;
+          this.d3.event.subject.fy = null;
+        })
+      );
+    // TODO: add zoom behavior
   }
 
 }

@@ -22,7 +22,7 @@ let ShadyDOM = {
   inUse: false,
   flush(){},
   /**
-   * @param {!Node} target
+   * @param {!GraphNode} target
    * @param {function(Array<MutationRecord>, MutationObserver)} callback
    * @return {MutationObserver}
    */
@@ -32,7 +32,7 @@ let ShadyDOM = {
    */
   unobserveChildren(observer){},
   /**
-   * @param {Node} node
+   * @param {GraphNode} node
    */
   patch(node){}
 };

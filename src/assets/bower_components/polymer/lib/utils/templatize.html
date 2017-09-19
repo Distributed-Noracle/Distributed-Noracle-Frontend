@@ -155,7 +155,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           let n = c[i];
           // Ignore non-changes
           if (Boolean(hide) != Boolean(n.__hideTemplateChildren__)) {
-            if (n.nodeType === Node.TEXT_NODE) {
+            if (n.nodeType === GraphNode.TEXT_NODE) {
               if (hide) {
                 n.__polymerTextContent__ = n.textContent;
                 n.textContent = '';
@@ -186,7 +186,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        */
       _setUnmanagedPropertyToNode(node, prop, value) {
         if (node.__hideTemplateChildren__ &&
-            node.nodeType == Node.TEXT_NODE && prop == 'textContent') {
+            node.nodeType == GraphNode.TEXT_NODE && prop == 'textContent') {
           node.__polymerTextContent__ = value;
         } else {
           super._setUnmanagedPropertyToNode(node, prop, value);
@@ -486,7 +486,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * @memberof Polymer.Templatize
        * @param {HTMLTemplateElement} template The model will be returned for
        *   elements stamped from this template
-       * @param {Node} node Node for which to return a template model.
+       * @param {GraphNode} node Node for which to return a template model.
        * @return {TemplateInstanceBase} Template instance representing the
        *   binding scope for the element
        */

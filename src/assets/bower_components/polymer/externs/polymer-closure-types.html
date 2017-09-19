@@ -17,9 +17,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   function StampedTemplate(){}
   /** @type {boolean} */
   StampedTemplate.prototype.__noInsertionPoint;
-  /** @type {!Array<!Node>} */
+  /** @type {!Array<!GraphNode>} */
   StampedTemplate.prototype.nodeList;
-  /** @type {!Object<string, !Node>} */
+  /** @type {!Object<string, !GraphNode>} */
   StampedTemplate.prototype.$;
   /** @type {!TemplateInfo | undefined} */
   StampedTemplate.prototype.templateInfo;
@@ -47,7 +47,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   function TemplateInfo(){}
   /** @type {!Array<!NodeInfo>} */
   TemplateInfo.prototype.nodeInfoList;
-  /** @type {!Array<!Node>} */
+  /** @type {!Array<!GraphNode>} */
   TemplateInfo.prototype.nodeList;
   /** @type {boolean} */
   TemplateInfo.prototype.stripWhitespace;
@@ -61,7 +61,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   TemplateInfo.prototype.nextTemplateInfo;
   /** @type {TemplateInfo | undefined} */
   TemplateInfo.prototype.previousTemplateInfo;
-  /** @type {!Array<!Node>} */
+  /** @type {!Array<!GraphNode>} */
   TemplateInfo.prototype.childNodes;
   /** @type {boolean} */
   TemplateInfo.prototype.wasPreBound;

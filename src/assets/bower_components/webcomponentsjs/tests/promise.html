@@ -1,7 +1,7 @@
 <!doctype html>
 <!--
 @license
-Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
 The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
@@ -10,22 +10,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <html>
   <head>
-    <title>iron-flex-behavior tests</title>
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <title>Test Promise Polyfill</title>
+    <script>window.Promise = null;</script>
+    <script src="../webcomponents-loader.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
   </head>
-
   <body>
     <script>
-      WCT.loadSuites([
-        'iron-flex-layout.html',
-        'iron-flex-layout.html?dom=shadow',
-        'iron-flex-layout-classes.html',
-        'iron-flex-layout-classes.html?dom=shadow'
-      ]);
+      suite('Promise', () => {
+        test('catch works', () => {
+          return Promise.reject('nope!').catch(() => {});
+        });
+      })
     </script>
   </body>
 </html>

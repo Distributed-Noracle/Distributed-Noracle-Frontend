@@ -16,7 +16,6 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#^2.0.2",
-    "openidconnect-signin": "https://github.com/rwth-acis/openidconnect-signin.git#^1.0.1"
+    "polymer": "Polymer/polymer#^2.0.2"
   }
 }

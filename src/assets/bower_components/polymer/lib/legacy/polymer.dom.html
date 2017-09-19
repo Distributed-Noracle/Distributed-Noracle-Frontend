@@ -43,7 +43,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   class DomApi {
 
     /**
-     * @param {Node} node Node for which to create a Polymer.dom helper object.
+     * @param {GraphNode} node Node for which to create a Polymer.dom helper object.
      */
     constructor(node) {
       this.node = node;
@@ -81,7 +81,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * light-DOM children or shadow root, including any nested shadow roots
      * of children therein.
      *
-     * @param {Node} node Node to test
+     * @param {GraphNode} node Node to test
      * @return {boolean} Returns true if the given `node` is contained within
      *   this element's light or shadow DOM.
      */
@@ -102,7 +102,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     /**
      * Returns the root node of this node.  Equivalent to `getRoodNode()`.
      *
-     * @return {Node} Top most element in the dom tree in which the node
+     * @return {GraphNode} Top most element in the dom tree in which the node
      * exists. If the node is connected to a document this is either a
      * shadowRoot or the document; otherwise, it may be the node
      * itself or a node or document fragment containing it.
@@ -115,7 +115,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * For slot elements, returns the nodes assigned to the slot; otherwise
      * an empty array. It is equivalent to `<slot>.addignedNodes({flatten:true})`.
      *
-     * @return {Array<Node>} Array of assigned nodes
+     * @return {Array<GraphNode>} Array of assigned nodes
      */
     getDistributedNodes() {
       return (this.node.localName === 'slot') ?
@@ -141,10 +141,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     /**
      * Calls `importNode` on the `ownerDocument` for this node.
      *
-     * @param {Node} node Node to import
+     * @param {GraphNode} node Node to import
      * @param {boolean} deep True if the node should be cloned deeply during
      *   import
-     * @return {Node} Clone of given node imported to this owner document
+     * @return {GraphNode} Clone of given node imported to this owner document
      */
     importNode(node, deep) {
       let doc = this.node instanceof Document ? this.node :
@@ -171,7 +171,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       let c$ = this.getEffectiveChildNodes();
       let list = [];
       for (let i=0, l=c$.length, c; (i<l) && (c=c$[i]); i++) {
-        if ((c.nodeType === Node.ELEMENT_NODE) &&
+        if ((c.nodeType === GraphNode.ELEMENT_NODE) &&
             matchesSelector(c, selector)) {
           list.push(c);
         }
@@ -183,7 +183,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * For shadow roots, returns the currently focused element within this
      * shadow root.
      *
-     * @return {Node|undefined} Currently focused element
+     * @return {GraphNode|undefined} Currently focused element
      */
     get activeElement() {
       let node = this.node;
@@ -257,7 +257,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     /**
      * Returns the first node on the `composedPath` of this event.
      *
-     * @return {Node} The node this event was dispatched to
+     * @return {GraphNode} The node this event was dispatched to
      */
     get rootTarget() {
       return this.event.composedPath()[0];
@@ -266,7 +266,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     /**
      * Returns the local (re-targeted) target for this event.
      *
-     * @return {Node} The local (re-targeted) target for this event.
+     * @return {GraphNode} The local (re-targeted) target for this event.
      */
     get localTarget() {
       return this.event.target;
@@ -295,7 +295,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
    * @summary Legacy DOM and Event manipulation API wrapper factory used to
    * abstract differences between native Shadow DOM and "Shady DOM."
    * @memberof Polymer
-   * @param {!Node|Event} obj Node or event to operate on
+   * @param {!GraphNode|Event} obj Node or event to operate on
    * @return {DomApi|EventApi} Wrapper providing either node API or event API
    */
   Polymer.dom = function(obj) {

@@ -219,7 +219,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * This method may be overridden to add custom node or template specific
        * metadata based on this node.
        *
-       * @param {Node} node Node to parse
+       * @param {GraphNode} node Node to parse
        * @param {!TemplateInfo} templateInfo Template metadata for current template
        * @param {!NodeInfo} nodeInfo Node metadata for current template.
        * @return {boolean} `true` if the visited node added node-specific
@@ -251,7 +251,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * wrappers, collapses text nodes, and strips whitespace from the template
        * if the `templateInfo.stripWhitespace` setting was provided.
        *
-       * @param {Node} root Root node whose `childNodes` will be parsed
+       * @param {GraphNode} root Root node whose `childNodes` will be parsed
        * @param {!TemplateInfo} templateInfo Template metadata for current template
        * @param {!NodeInfo} nodeInfo Node metadata for current template.
        */
@@ -266,9 +266,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // note that root.normalize() should work but does not so we do this
           // manually.
           next = node.nextSibling;
-          if (node.nodeType === Node.TEXT_NODE) {
+          if (node.nodeType === GraphNode.TEXT_NODE) {
             let /** Node */ n = next;
-            while (n && (n.nodeType === Node.TEXT_NODE)) {
+            while (n && (n.nodeType === GraphNode.TEXT_NODE)) {
               node.textContent += n.textContent;
               next = n.nextSibling;
               root.removeChild(n);
@@ -438,7 +438,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * This method generates a handler function that looks up the method
        * name at handling time.
        *
-       * @param {Node} node Node to add listener on
+       * @param {GraphNode} node Node to add listener on
        * @param {string} eventName Name of event
        * @param {string} methodName Name of method
        * @param {*=} context Context the method will be called on (defaults
@@ -455,7 +455,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       /**
        * Override point for adding custom or simulated event handling.
        *
-       * @param {Node} node Node to add event listener to
+       * @param {GraphNode} node Node to add event listener to
        * @param {string} eventName Name of event
        * @param {Function} handler Listener function to add
        */
@@ -466,7 +466,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       /**
        * Override point for adding custom or simulated event handling.
        *
-       * @param {Node} node Node to remove event listener from
+       * @param {GraphNode} node Node to remove event listener from
        * @param {string} eventName Name of event
        * @param {Function} handler Listener function to remove
        */

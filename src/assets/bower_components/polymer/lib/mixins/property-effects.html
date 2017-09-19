@@ -375,7 +375,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   function runReflectEffect(inst, property, props, oldProps, info) {
     let value = inst.__data[property];
     if (Polymer.sanitizeDOMValue) {
-      value = Polymer.sanitizeDOMValue(value, info.attrName, 'attribute', /** @type {Node} */(inst));
+      value = Polymer.sanitizeDOMValue(value, info.attrName, 'attribute', /** @type {GraphNode} */(inst));
     }
     inst._propertyToAttribute(property, info.attrName, value);
   }
@@ -574,7 +574,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
    * either as a property or attribute.
    *
    * @param {!PropertyEffectsType} inst The instance owning the binding effect
-   * @param {Node} node Target node for binding
+   * @param {GraphNode} node Target node for binding
    * @param {!Binding} binding Binding metadata
    * @param {!BindingPart} part Binding part metadata
    * @param {*} value Value to set
@@ -607,7 +607,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
    * Transforms an "binding" effect value based on compound & negation
    * effect metadata, as well as handling for special-case properties
    *
-   * @param {Node} node Node the value will be set to
+   * @param {GraphNode} node Node the value will be set to
    * @param {*} value Value to set
    * @param {!Binding} binding Binding metadata
    * @param {!BindingPart} part Binding part metadata
@@ -688,7 +688,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
    * storage array for that property, and then the array is joined to result in
    * the final value set to the property/attribute.
    *
-   * @param {Node} node Bound node to initialize
+   * @param {GraphNode} node Bound node to initialize
    * @param {Binding} binding Binding metadata
    * @private
    */
@@ -1383,7 +1383,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        *
        * Users may override this method to provide alternate approaches.
        *
-       * @param {Node} node The node to set a property on
+       * @param {GraphNode} node The node to set a property on
        * @param {string} prop The property to set
        * @param {*} value The value to set
        * @protected
@@ -2384,7 +2384,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * binding.
        *
        * @override
-       * @param {Node} node Node to parse
+       * @param {GraphNode} node Node to parse
        * @param {TemplateInfo} templateInfo Template metadata for current template
        * @param {NodeInfo} nodeInfo Node metadata for current template node
        * @return {boolean} `true` if the visited node added node-specific
@@ -2394,7 +2394,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        */
       static _parseTemplateNode(node, templateInfo, nodeInfo) {
         let noted = super._parseTemplateNode(node, templateInfo, nodeInfo);
-        if (node.nodeType === Node.TEXT_NODE) {
+        if (node.nodeType === GraphNode.TEXT_NODE) {
           let parts = this._parseBindings(node.textContent, templateInfo);
           if (parts) {
             // Initialize the textContent with any literal parts
@@ -2469,7 +2469,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * as `_host_<property>`.
        *
        * @override
-       * @param {Node} node Node to parse
+       * @param {GraphNode} node Node to parse
        * @param {TemplateInfo} templateInfo Template metadata for current template
        * @param {NodeInfo} nodeInfo Node metadata for current template node
        * @return {boolean} `true` if the visited node added node-specific

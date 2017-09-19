@@ -58,7 +58,7 @@ function Polymer(init){}
 Polymer.ElementProperties;
 
 /**
- * @type {(function(*,string,string,Node):*)|undefined}
+ * @type {(function(*,string,string,GraphNode):*)|undefined}
  */
 Polymer.sanitizeDOMValue;
 

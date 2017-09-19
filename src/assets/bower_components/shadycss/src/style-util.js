@@ -98,8 +98,8 @@ export function forEachRule(node, styleRuleCallback, keyframesRuleCallback, only
 /**
  * @param {string} cssText
  * @param {string} moniker
- * @param {Node} target
- * @param {Node} contextNode
+ * @param {GraphNode} target
+ * @param {GraphNode} contextNode
  * @return {HTMLStyleElement}
  */
 export function applyCss(cssText, moniker, target, contextNode) {
@@ -124,7 +124,7 @@ export function createScopeStyle(cssText, moniker) {
 
 /**
  * Track the position of the last added style for placing placeholders
- * @type {Node}
+ * @type {GraphNode}
  */
 let lastHeadApplyNode = null;
 
@@ -146,8 +146,8 @@ export function applyStylePlaceHolder(moniker) {
 
 /**
  * @param {HTMLStyleElement} style
- * @param {?Node} target
- * @param {?Node} contextNode
+ * @param {?GraphNode} target
+ * @param {?GraphNode} contextNode
  */
 export function applyStyle(style, target, contextNode) {
   target = target || document.head;

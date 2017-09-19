@@ -173,7 +173,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       let t = Gestures._findOriginalTarget(ev);
       // make sure the target of the event is an element so we can use getBoundingClientRect,
       // if not, just assume it is a synthetic click
-      if (!t.nodeType || /** @type {Element} */(t).nodeType !== Node.ELEMENT_NODE) {
+      if (!t.nodeType || /** @type {Element} */(t).nodeType !== GraphNode.ELEMENT_NODE) {
         return true;
       }
       let bcr = /** @type {Element} */(t).getBoundingClientRect();
@@ -398,7 +398,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * Adds an event listener to a node for the given gesture type.
      *
      * @memberof Polymer.Gestures
-     * @param {Node} node Node to add listener on
+     * @param {GraphNode} node Node to add listener on
      * @param {string} evType Gesture type: `down`, `up`, `track`, or `tap`
      * @param {Function} handler Event listener function to call
      * @return {boolean} Returns true if a gesture event listener was added.
@@ -416,7 +416,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
      * Removes an event listener from a node for the given gesture type.
      *
      * @memberof Polymer.Gestures
-     * @param {Node} node Node to remove listener from
+     * @param {GraphNode} node Node to remove listener from
      * @param {string} evType Gesture type: `down`, `up`, `track`, or `tap`
      * @param {Function} handler Event listener function previously passed to
      *  `addListener`.

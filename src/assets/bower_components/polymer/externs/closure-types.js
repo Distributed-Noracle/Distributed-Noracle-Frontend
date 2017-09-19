@@ -135,7 +135,7 @@ function Polymer_TemplateStamp(){}
 */
 Polymer_TemplateStamp.prototype._stampTemplate = function(template){};
 /**
-* @param {Node} node Node to add listener on
+* @param {GraphNode} node Node to add listener on
 * @param {string} eventName Name of event
 * @param {string} methodName Name of method
 * @param {*=} context Context the method will be called on (defaults
@@ -144,13 +144,13 @@ Polymer_TemplateStamp.prototype._stampTemplate = function(template){};
 */
 Polymer_TemplateStamp.prototype._addMethodEventListenerToNode = function(node, eventName, methodName, context){};
 /**
-* @param {Node} node Node to add event listener to
+* @param {GraphNode} node Node to add event listener to
 * @param {string} eventName Name of event
 * @param {Function} handler Listener function to add
 */
 Polymer_TemplateStamp.prototype._addEventListenerToNode = function(node, eventName, handler){};
 /**
-* @param {Node} node Node to remove event listener from
+* @param {GraphNode} node Node to remove event listener from
 * @param {string} eventName Name of event
 * @param {Function} handler Listener function to remove
 */
@@ -169,14 +169,14 @@ Polymer_TemplateStamp._parseTemplate = function(template, outerTemplateInfo){};
 */
 Polymer_TemplateStamp._parseTemplateContent = function(template, templateInfo, nodeInfo){};
 /**
-* @param {Node} node Node to parse
+* @param {GraphNode} node Node to parse
 * @param {!TemplateInfo} templateInfo Template metadata for current template
 * @param {!NodeInfo} nodeInfo Node metadata for current template.
 * @return {boolean}
 */
 Polymer_TemplateStamp._parseTemplateNode = function(node, templateInfo, nodeInfo){};
 /**
-* @param {Node} root Root node whose `childNodes` will be parsed
+* @param {GraphNode} root Root node whose `childNodes` will be parsed
 * @param {!TemplateInfo} templateInfo Template metadata for current template
 * @param {!NodeInfo} nodeInfo Node metadata for current template.
 */
@@ -223,7 +223,7 @@ function Polymer_PropertyEffects(){}
 */
 Polymer_PropertyEffects.prototype._stampTemplate = function(template){};
 /**
-* @param {Node} node Node to add listener on
+* @param {GraphNode} node Node to add listener on
 * @param {string} eventName Name of event
 * @param {string} methodName Name of method
 * @param {*=} context Context the method will be called on (defaults
@@ -232,13 +232,13 @@ Polymer_PropertyEffects.prototype._stampTemplate = function(template){};
 */
 Polymer_PropertyEffects.prototype._addMethodEventListenerToNode = function(node, eventName, methodName, context){};
 /**
-* @param {Node} node Node to add event listener to
+* @param {GraphNode} node Node to add event listener to
 * @param {string} eventName Name of event
 * @param {Function} handler Listener function to add
 */
 Polymer_PropertyEffects.prototype._addEventListenerToNode = function(node, eventName, handler){};
 /**
-* @param {Node} node Node to remove event listener from
+* @param {GraphNode} node Node to remove event listener from
 * @param {string} eventName Name of event
 * @param {Function} handler Listener function to remove
 */
@@ -405,7 +405,7 @@ Polymer_PropertyEffects.prototype._hasComputedEffect = function(property){};
 */
 Polymer_PropertyEffects.prototype._setPendingPropertyOrPath = function(path, value, shouldNotify, isPathNotification){};
 /**
-* @param {Node} node The node to set a property on
+* @param {GraphNode} node The node to set a property on
 * @param {string} prop The property to set
 * @param {*} value The value to set
 */
@@ -586,21 +586,21 @@ Polymer_PropertyEffects._parseTemplate = function(template, outerTemplateInfo){}
 Polymer_PropertyEffects._parseTemplateContent = function(template, templateInfo, nodeInfo){};
 /**
 * @override
-* @param {Node} node Node to parse
+* @param {GraphNode} node Node to parse
 * @param {TemplateInfo} templateInfo Template metadata for current template
 * @param {NodeInfo} nodeInfo Node metadata for current template node
 * @return {boolean}
 */
 Polymer_PropertyEffects._parseTemplateNode = function(node, templateInfo, nodeInfo){};
 /**
-* @param {Node} root Root node whose `childNodes` will be parsed
+* @param {GraphNode} root Root node whose `childNodes` will be parsed
 * @param {!TemplateInfo} templateInfo Template metadata for current template
 * @param {!NodeInfo} nodeInfo Node metadata for current template.
 */
 Polymer_PropertyEffects._parseTemplateChildNodes = function(root, templateInfo, nodeInfo){};
 /**
 * @override
-* @param {Node} node Node to parse
+* @param {GraphNode} node Node to parse
 * @param {TemplateInfo} templateInfo Template metadata for current template
 * @param {NodeInfo} nodeInfo Node metadata for current template node
 * @return {boolean}
@@ -712,7 +712,7 @@ function Polymer_ElementMixin(){}
 */
 Polymer_ElementMixin.prototype._stampTemplate = function(template){};
 /**
-* @param {Node} node Node to add listener on
+* @param {GraphNode} node Node to add listener on
 * @param {string} eventName Name of event
 * @param {string} methodName Name of method
 * @param {*=} context Context the method will be called on (defaults
@@ -721,13 +721,13 @@ Polymer_ElementMixin.prototype._stampTemplate = function(template){};
 */
 Polymer_ElementMixin.prototype._addMethodEventListenerToNode = function(node, eventName, methodName, context){};
 /**
-* @param {Node} node Node to add event listener to
+* @param {GraphNode} node Node to add event listener to
 * @param {string} eventName Name of event
 * @param {Function} handler Listener function to add
 */
 Polymer_ElementMixin.prototype._addEventListenerToNode = function(node, eventName, handler){};
 /**
-* @param {Node} node Node to remove event listener from
+* @param {GraphNode} node Node to remove event listener from
 * @param {string} eventName Name of event
 * @param {Function} handler Listener function to remove
 */
@@ -895,7 +895,7 @@ Polymer_ElementMixin.prototype._hasComputedEffect = function(property){};
 */
 Polymer_ElementMixin.prototype._setPendingPropertyOrPath = function(path, value, shouldNotify, isPathNotification){};
 /**
-* @param {Node} node The node to set a property on
+* @param {GraphNode} node The node to set a property on
 * @param {string} prop The property to set
 * @param {*} value The value to set
 */
@@ -1071,7 +1071,7 @@ Polymer_ElementMixin.prototype.connectedCallback = function(){};
 Polymer_ElementMixin.prototype.disconnectedCallback = function(){};
 /**
 * @param {NodeList} dom to attach to the element.
-* @return {Node}
+* @return {GraphNode}
 */
 Polymer_ElementMixin.prototype._attachDom = function(dom){};
 /**
@@ -1099,21 +1099,21 @@ Polymer_ElementMixin._parseTemplate = function(template, outerTemplateInfo){};
 Polymer_ElementMixin._parseTemplateContent = function(template, templateInfo, nodeInfo){};
 /**
 * @override
-* @param {Node} node Node to parse
+* @param {GraphNode} node Node to parse
 * @param {TemplateInfo} templateInfo Template metadata for current template
 * @param {NodeInfo} nodeInfo Node metadata for current template node
 * @return {boolean}
 */
 Polymer_ElementMixin._parseTemplateNode = function(node, templateInfo, nodeInfo){};
 /**
-* @param {Node} root Root node whose `childNodes` will be parsed
+* @param {GraphNode} root Root node whose `childNodes` will be parsed
 * @param {!TemplateInfo} templateInfo Template metadata for current template
 * @param {!NodeInfo} nodeInfo Node metadata for current template.
 */
 Polymer_ElementMixin._parseTemplateChildNodes = function(root, templateInfo, nodeInfo){};
 /**
 * @override
-* @param {Node} node Node to parse
+* @param {GraphNode} node Node to parse
 * @param {TemplateInfo} templateInfo Template metadata for current template
 * @param {NodeInfo} nodeInfo Node metadata for current template node
 * @return {boolean}
@@ -1245,7 +1245,7 @@ function Polymer_LegacyElementMixin(){}
 */
 Polymer_LegacyElementMixin.prototype._stampTemplate = function(template){};
 /**
-* @param {Node} node Node to add listener on
+* @param {GraphNode} node Node to add listener on
 * @param {string} eventName Name of event
 * @param {string} methodName Name of method
 * @param {*=} context Context the method will be called on (defaults
@@ -1428,7 +1428,7 @@ Polymer_LegacyElementMixin.prototype._hasComputedEffect = function(property){};
 */
 Polymer_LegacyElementMixin.prototype._setPendingPropertyOrPath = function(path, value, shouldNotify, isPathNotification){};
 /**
-* @param {Node} node The node to set a property on
+* @param {GraphNode} node The node to set a property on
 * @param {string} prop The property to set
 * @param {*} value The value to set
 */
@@ -1604,7 +1604,7 @@ Polymer_LegacyElementMixin.prototype.connectedCallback = function(){};
 Polymer_LegacyElementMixin.prototype.disconnectedCallback = function(){};
 /**
 * @param {NodeList} dom to attach to the element.
-* @return {Node}
+* @return {GraphNode}
 */
 Polymer_LegacyElementMixin.prototype._attachDom = function(dom){};
 /**
@@ -1737,16 +1737,16 @@ Polymer_LegacyElementMixin.prototype.$$ = function(slctr){};
 */
 Polymer_LegacyElementMixin.prototype.distributeContent = function(){};
 /**
-* @return {Array.<Node>}
+* @return {Array.<GraphNode>}
 */
 Polymer_LegacyElementMixin.prototype.getEffectiveChildNodes = function(){};
 /**
 * @param {string} selector Selector to run.
-* @return {Array.<Node>}
+* @return {Array.<GraphNode>}
 */
 Polymer_LegacyElementMixin.prototype.queryDistributedElements = function(selector){};
 /**
-* @return {Array.<Node>}
+* @return {Array.<GraphNode>}
 */
 Polymer_LegacyElementMixin.prototype.getEffectiveChildren = function(){};
 /**
@@ -1755,18 +1755,18 @@ Polymer_LegacyElementMixin.prototype.getEffectiveChildren = function(){};
 Polymer_LegacyElementMixin.prototype.getEffectiveTextContent = function(){};
 /**
 * @param {string} selector Selector to run.
-* @return {Object.<Node>}
+* @return {Object.<GraphNode>}
 */
 Polymer_LegacyElementMixin.prototype.queryEffectiveChildren = function(selector){};
 /**
 * @param {string} selector Selector to run.
-* @return {Array.<Node>}
+* @return {Array.<GraphNode>}
 */
 Polymer_LegacyElementMixin.prototype.queryAllEffectiveChildren = function(selector){};
 /**
 * @param {string=} slctr CSS selector to choose the desired
   `<slot>`.  Defaults to `content`.
-* @return {Array.<Node>}
+* @return {Array.<GraphNode>}
 */
 Polymer_LegacyElementMixin.prototype.getContentChildNodes = function(slctr){};
 /**
@@ -1776,7 +1776,7 @@ Polymer_LegacyElementMixin.prototype.getContentChildNodes = function(slctr){};
 */
 Polymer_LegacyElementMixin.prototype.getContentChildren = function(slctr){};
 /**
-* @param {?Node} node The element to be checked.
+* @param {?GraphNode} node The element to be checked.
 * @return {boolean}
 */
 Polymer_LegacyElementMixin.prototype.isLightDescendant = function(node){};
@@ -1925,21 +1925,21 @@ Polymer_LegacyElementMixin._parseTemplate = function(template, outerTemplateInfo
 Polymer_LegacyElementMixin._parseTemplateContent = function(template, templateInfo, nodeInfo){};
 /**
 * @override
-* @param {Node} node Node to parse
+* @param {GraphNode} node Node to parse
 * @param {TemplateInfo} templateInfo Template metadata for current template
 * @param {NodeInfo} nodeInfo Node metadata for current template node
 * @return {boolean}
 */
 Polymer_LegacyElementMixin._parseTemplateNode = function(node, templateInfo, nodeInfo){};
 /**
-* @param {Node} root Root node whose `childNodes` will be parsed
+* @param {GraphNode} root Root node whose `childNodes` will be parsed
 * @param {!TemplateInfo} templateInfo Template metadata for current template
 * @param {!NodeInfo} nodeInfo Node metadata for current template.
 */
 Polymer_LegacyElementMixin._parseTemplateChildNodes = function(root, templateInfo, nodeInfo){};
 /**
 * @override
-* @param {Node} node Node to parse
+* @param {GraphNode} node Node to parse
 * @param {TemplateInfo} templateInfo Template metadata for current template
 * @param {NodeInfo} nodeInfo Node metadata for current template node
 * @return {boolean}
@@ -2094,7 +2094,7 @@ Polymer_ArraySelectorMixin.prototype.toggle;
 */
 Polymer_ArraySelectorMixin.prototype._stampTemplate = function(template){};
 /**
-* @param {Node} node Node to add listener on
+* @param {GraphNode} node Node to add listener on
 * @param {string} eventName Name of event
 * @param {string} methodName Name of method
 * @param {*=} context Context the method will be called on (defaults
@@ -2103,13 +2103,13 @@ Polymer_ArraySelectorMixin.prototype._stampTemplate = function(template){};
 */
 Polymer_ArraySelectorMixin.prototype._addMethodEventListenerToNode = function(node, eventName, methodName, context){};
 /**
-* @param {Node} node Node to add event listener to
+* @param {GraphNode} node Node to add event listener to
 * @param {string} eventName Name of event
 * @param {Function} handler Listener function to add
 */
 Polymer_ArraySelectorMixin.prototype._addEventListenerToNode = function(node, eventName, handler){};
 /**
-* @param {Node} node Node to remove event listener from
+* @param {GraphNode} node Node to remove event listener from
 * @param {string} eventName Name of event
 * @param {Function} handler Listener function to remove
 */
@@ -2277,7 +2277,7 @@ Polymer_ArraySelectorMixin.prototype._hasComputedEffect = function(property){};
 */
 Polymer_ArraySelectorMixin.prototype._setPendingPropertyOrPath = function(path, value, shouldNotify, isPathNotification){};
 /**
-* @param {Node} node The node to set a property on
+* @param {GraphNode} node The node to set a property on
 * @param {string} prop The property to set
 * @param {*} value The value to set
 */
@@ -2453,7 +2453,7 @@ Polymer_ArraySelectorMixin.prototype.connectedCallback = function(){};
 Polymer_ArraySelectorMixin.prototype.disconnectedCallback = function(){};
 /**
 * @param {NodeList} dom to attach to the element.
-* @return {Node}
+* @return {GraphNode}
 */
 Polymer_ArraySelectorMixin.prototype._attachDom = function(dom){};
 /**
@@ -2511,21 +2511,21 @@ Polymer_ArraySelectorMixin._parseTemplate = function(template, outerTemplateInfo
 Polymer_ArraySelectorMixin._parseTemplateContent = function(template, templateInfo, nodeInfo){};
 /**
 * @override
-* @param {Node} node Node to parse
+* @param {GraphNode} node Node to parse
 * @param {TemplateInfo} templateInfo Template metadata for current template
 * @param {NodeInfo} nodeInfo Node metadata for current template node
 * @return {boolean}
 */
 Polymer_ArraySelectorMixin._parseTemplateNode = function(node, templateInfo, nodeInfo){};
 /**
-* @param {Node} root Root node whose `childNodes` will be parsed
+* @param {GraphNode} root Root node whose `childNodes` will be parsed
 * @param {!TemplateInfo} templateInfo Template metadata for current template
 * @param {!NodeInfo} nodeInfo Node metadata for current template.
 */
 Polymer_ArraySelectorMixin._parseTemplateChildNodes = function(root, templateInfo, nodeInfo){};
 /**
 * @override
-* @param {Node} node Node to parse
+* @param {GraphNode} node Node to parse
 * @param {TemplateInfo} templateInfo Template metadata for current template
 * @param {NodeInfo} nodeInfo Node metadata for current template node
 * @return {boolean}

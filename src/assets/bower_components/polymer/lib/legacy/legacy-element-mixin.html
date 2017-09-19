@@ -470,7 +470,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * any `<content>` elements are replaced with the list of nodes distributed
        * to the `<content>`, the result of its `getDistributedNodes` method.
        * @this {Element}
-       * @return {Array<Node>} List of effctive child nodes.
+       * @return {Array<GraphNode>} List of effctive child nodes.
        */
       getEffectiveChildNodes() {
         return /** @type {Polymer.DomApi} */ (Polymer.dom(this)).getEffectiveChildNodes();
@@ -482,7 +482,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * children that are insertion points.
        * @param {string} selector Selector to run.
        * @this {Element}
-       * @return {Array<Node>} List of distributed elements that match selector.
+       * @return {Array<GraphNode>} List of distributed elements that match selector.
        */
       queryDistributedElements(selector) {
         return /** @type {Polymer.DomApi} */ (Polymer.dom(this)).queryDistributedElements(selector);
@@ -494,12 +494,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * any `<content>` elements are replaced with the list of elements
        * distributed to the `<content>`.
        *
-       * @return {Array<Node>} List of effctive children.
+       * @return {Array<GraphNode>} List of effctive children.
        */
       getEffectiveChildren() {
         let list = this.getEffectiveChildNodes();
-        return list.filter(function(/** @type {Node} */ n) {
-          return (n.nodeType === Node.ELEMENT_NODE);
+        return list.filter(function(/** @type {GraphNode} */ n) {
+          return (n.nodeType === GraphNode.ELEMENT_NODE);
         });
       }
 
@@ -514,7 +514,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         let cn = this.getEffectiveChildNodes();
         let tc = [];
         for (let i=0, c; (c = cn[i]); i++) {
-          if (c.nodeType !== Node.COMMENT_NODE) {
+          if (c.nodeType !== GraphNode.COMMENT_NODE) {
             tc.push(c.textContent);
           }
         }
@@ -526,7 +526,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * match `selector`. These can be dom child nodes or elements distributed
        * to children that are insertion points.
        * @param {string} selector Selector to run.
-       * @return {Object<Node>} First effective child node that matches selector.
+       * @return {Object<GraphNode>} First effective child node that matches selector.
        */
       queryEffectiveChildren(selector) {
         let e$ = this.queryDistributedElements(selector);
@@ -538,7 +538,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * match `selector`. These can be dom child nodes or elements distributed
        * to children that are insertion points.
        * @param {string} selector Selector to run.
-       * @return {Array<Node>} List of effective child nodes that match selector.
+       * @return {Array<GraphNode>} List of effective child nodes that match selector.
        */
       queryAllEffectiveChildren(selector) {
         return this.queryDistributedElements(selector);
@@ -552,7 +552,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        *
        * @param {string=} slctr CSS selector to choose the desired
        *   `<slot>`.  Defaults to `content`.
-       * @return {Array<Node>} List of distributed nodes for the `<slot>`.
+       * @return {Array<GraphNode>} List of distributed nodes for the `<slot>`.
        */
       getContentChildNodes(slctr) {
         let content = this.root.querySelector(slctr || 'slot');
@@ -576,14 +576,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        */
       getContentChildren(slctr) {
         return /** @type {Array<HTMLElement>} */(this.getContentChildNodes(slctr).filter(function(n) {
-          return (n.nodeType === Node.ELEMENT_NODE);
+          return (n.nodeType === GraphNode.ELEMENT_NODE);
         }));
       }
 
       /**
        * Checks whether an element is in this element's light DOM tree.
        *
-       * @param {?Node} node The element to be checked.
+       * @param {?GraphNode} node The element to be checked.
        * @this {Element}
        * @return {boolean} true if node is in this element's light DOM tree.
        */

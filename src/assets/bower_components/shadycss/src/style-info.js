@@ -38,7 +38,7 @@ export default class StyleInfo {
   }
   /**
    * @param {StyleNode} ast
-   * @param {Node=} placeholder
+   * @param {GraphNode=} placeholder
    * @param {Array<string>=} ownStylePropertyNames
    * @param {string=} elementName
    * @param {string=} typeExtension
@@ -47,7 +47,7 @@ export default class StyleInfo {
   constructor(ast, placeholder, ownStylePropertyNames, elementName, typeExtension, cssBuild) {
     /** @type {StyleNode} */
     this.styleRules = ast || null;
-    /** @type {Node} */
+    /** @type {GraphNode} */
     this.placeholder = placeholder || null;
     /** @type {!Array<string>} */
     this.ownStylePropertyNames = ownStylePropertyNames || [];
