@@ -48,7 +48,8 @@ export class GraphViewComponent implements OnInit, AfterViewInit {
     const d3Sim = this.d3.forceSimulation()
       .force('link', this.d3.forceLink<GraphNode, Edge>().id((n, i, d) => n.id.toString()))
       .force('charge', this.d3.forceManyBody())
-      .force('center', this.d3.forceCenter(width / 2, height / 2));
+      .force('center', this.d3.forceCenter(width / 2, height / 2))
+      .force('collide', this.d3.forceCollide((node) => (node as GraphNode).radius * 1.2));
 
     this.nodes = [
       {
@@ -115,13 +116,14 @@ export class GraphViewComponent implements OnInit, AfterViewInit {
         id: 15,
         label: 'How do I know what I do is effective?',
         title: 'asked by Bernhard'
-      },
-      {
-        id: 16,
-        label: 'Who is actually benefiting from our work',
-        title: 'asked by Bernhard'
       }
-    ].map((d) => new GraphNode(d.id, d.label));
+    ].map((d) => new GraphNode(context, d.id, d.label));
+
+    this.nodes.push([{
+      id: 16,
+      label: 'Who is actually benefiting from our work',
+      title: 'asked by Bernhard'
+    }].map((d) => new GraphNode(context, d.id, d.label, 20))[0]);
 
     // create an array with edges
     this.edges = [
@@ -144,23 +146,17 @@ export class GraphViewComponent implements OnInit, AfterViewInit {
     d3Sim.nodes(this.nodes).on('tick', () => {
       context.clearRect(0, 0, width, height);
       // TODO: draw stuff independently so we can use different colors etc. for different parts of the graph
-      context.beginPath();
       this.edges.forEach((e: Edge) => {
         // draw edge
         e.draw(context as CanvasRenderingContext2D);
       });
-      context.strokeStyle = '#aaa';
-      context.stroke();
-      context.beginPath();
       this.nodes.forEach((n) => {
         // draw node
         n.draw(context as CanvasRenderingContext2D);
       });
-      context.fill();
-      context.strokeStyle = '#fff';
-      context.stroke();
     });
     d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges);
+    // .distance((l1, i, l2) => 100);
 
     // drag behavior
     this.d3.select(canvas)
