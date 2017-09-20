@@ -4,9 +4,10 @@ import {SpaceService} from '../space.service';
 import {QuestionService} from '../question.service';
 import {RelationService} from '../relation.service';
 import {D3, D3Service} from 'd3-ng2-service';
-import {ForceLink} from 'd3-force';
+//import {ForceLink} from 'd3-force';
 import {GraphNode} from './graph-data-model/graph-node';
 import {Edge} from './graph-data-model/edge';
+import {ForceLink} from "@types/d3-force";
 
 @Component({
   selector: 'app-graph-view',
