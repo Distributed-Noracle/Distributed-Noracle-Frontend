@@ -5,7 +5,7 @@ import {Observable} from 'rxjs/Observable';
 
 @Injectable()
 export class RestService {
-  private BASE_URL = 'https://steen.informatik.rwth-aachen.de:9089/distributed-noracle/v0.3.7';
+  private BASE_URL = 'https://steen.informatik.rwth-aachen.de:9089/distributed-noracle/v0.4.0';
 
   constructor(private OidcSecurityService: OidcSecurityService, private Http: Http) {
   }
