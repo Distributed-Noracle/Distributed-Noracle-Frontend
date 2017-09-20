@@ -5,7 +5,6 @@ export class GraphNode implements SimulationNodeDatum {
   private lines: string[];
   private textSize = 10;
 
-
   /**
    * Node’s zero-based index into nodes array. This property is set during the initialization process of a simulation.
    */
@@ -36,7 +35,7 @@ export class GraphNode implements SimulationNodeDatum {
   fy?: number | null;
 
   constructor(context: CanvasRenderingContext2D, public id: number, public label: string, public radius: number = 20) {
-    this.lines = this.wrapText((s) => context.measureText(s).width, this.textSize * 1.5);
+    this.lines = this.wrapText((s) => context.measureText(s).width);
   }
 
   draw(context: CanvasRenderingContext2D) {
@@ -52,44 +51,50 @@ export class GraphNode implements SimulationNodeDatum {
     context.font = this.textSize + 'px sans-serif';
     context.textAlign = 'center';
     context.textBaseline = 'top';
-    let i = 0;
-    for (const line of this.lines) {
-      const yOffset = -(this.textSize * 1.5 * this.lines.length) / 2 + (i * this.textSize * 1.5);
-      context.fillText(line, this.x, this.y + yOffset);
-      i++;
+
+    for (let i = 0; i < this.lines.length; i++) {
+      const yOffset = -(this.getTextHeigth() * this.lines.length) / 2 + (i * this.getTextHeigth());
+      context.fillText(this.lines[i], this.x, this.y + yOffset);
     }
     // TODO: draw nodes with labels
   }
 
-  wrapText(measure: (string) => number, textHeigth: number) {
+  getTextHeigth() {
+    return this.textSize * 1.5;
+  }
+
+  wrapText(measure: (string) => number) {
+    const textHeight = this.getTextHeigth();
     const totalWidth = measure(this.label);
     const words = this.label.split(/\s+/);
     // min line length should at least be able to fit first/last word
     const minLineLength = words.length > 0 ?
       Math.max(measure(words[0]), measure(words[words.length - 1]))
       : totalWidth;
+    const blankWidth = measure(' ');
     let fit = false;
-    let radius = Math.floor(Math.sqrt(totalWidth * textHeigth / 2));
+    let radius = Math.floor(Math.sqrt(totalWidth * textHeight / 3));
     while (!fit) {
       const numberOfLines =
-        Math.floor(Math.sqrt(2 * (Math.pow(radius, 2) - Math.pow(minLineLength / 2, 2)) - textHeigth / 2) / textHeigth);
+        Math.floor(2 * Math.sqrt(Math.pow(radius, 2) - Math.pow(minLineLength / 2, 2)) / textHeight);
       const lines = [''];
       let lineNumber = 0;
       let remainingLineLength =
-        2 * Math.sqrt(Math.pow(radius, 2) - Math.pow(textHeigth / 2 + textHeigth * numberOfLines / 2, 2));
+        2 * Math.sqrt(Math.pow(radius, 2) - Math.pow(textHeight * numberOfLines / 2, 2));
       fit = true;
       for (const word of words) {
         const wordWith = measure(word);
         if (remainingLineLength > wordWith) {
           lines[lineNumber] += word + ' ';
-          remainingLineLength -= (wordWith + 1);
+          remainingLineLength -= (wordWith + blankWidth);
         } else {
           lines[lineNumber] = lines[lineNumber].trim();
           lineNumber++;
           remainingLineLength =
-            2 * Math.sqrt(Math.pow(radius, 2) - Math.pow(textHeigth / 2 + textHeigth * Math.abs((numberOfLines - 1) / 2 - lineNumber), 2));
+            2 * Math.sqrt(Math.pow(radius, 2) - Math.pow(textHeight * Math.abs(numberOfLines / 2 - lineNumber), 2));
           if (remainingLineLength > wordWith) {
             lines.push(word + ' ');
+            remainingLineLength -= (wordWith + blankWidth);
           } else {
             fit = false;
             break;
@@ -104,6 +109,9 @@ export class GraphNode implements SimulationNodeDatum {
         radius++;
       } else {
         this.radius = radius * 1.2;
+        while (lines.length < numberOfLines) {
+          lines.push('');
+        }
         return lines;
       }
     }
