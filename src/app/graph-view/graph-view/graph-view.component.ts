@@ -7,7 +7,6 @@ import {D3, D3Service} from 'd3-ng2-service';
 import {ForceLink} from 'd3-force';
 import {GraphNode} from './graph-data-model/graph-node';
 import {Edge} from './graph-data-model/edge';
-import {ZoomTransform} from 'd3-zoom';
 
 @Component({
   selector: 'app-graph-view',
@@ -19,15 +18,12 @@ export class GraphViewComponent implements OnInit, AfterViewInit {
   private d3: D3;
   private nodes: GraphNode[];
   private edges: Edge[];
-  private transform: ZoomTransform;
-  private isDraggingSubject = false;
 
 
   constructor(private TextlayoutService: TextlayoutService, private SpaceService: SpaceService,
               private QuestionService: QuestionService, private RelationService: RelationService,
               private D3Service: D3Service) {
     this.d3 = D3Service.getD3();
-    this.transform = this.d3.zoomIdentity;
   }
 
   ngOnInit() {
@@ -148,10 +144,8 @@ export class GraphViewComponent implements OnInit, AfterViewInit {
 
 
     d3Sim.nodes(this.nodes).on('tick', () => {
-      context.save();
       context.clearRect(0, 0, width, height);
-      context.translate(this.transform.x, this.transform.y);
-      context.scale(this.transform.k, this.transform.k);
+      // TODO: draw stuff independently so we can use different colors etc. for different parts of the graph
       this.edges.forEach((e: Edge) => {
         // draw edge
         e.draw(context as CanvasRenderingContext2D);
@@ -160,40 +154,25 @@ export class GraphViewComponent implements OnInit, AfterViewInit {
         // draw node
         n.draw(context as CanvasRenderingContext2D);
       });
-      context.restore();
     });
-    d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges)
-      .distance((link, i, links) => ((link.source as GraphNode).radius + (link.target as GraphNode).radius) * 2);
+    d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges);
+    // .distance((l1, i, l2) => 100);
 
     // drag behavior
     this.d3.select(canvas)
       .call(this.d3.drag()
         .container(canvas)
-        .subject(() => {
-          // TODO: verify difference between drag and zoom event coordinates (see todo below)
-          // console.log('subject: (' + this.d3.event.x + '/' + this.d3.event.y + ')')
-          for (let i = this.nodes.length - 1; i >= 0; i--) {
-            const n = this.nodes[i];
-            const dx = this.transform.invertX(this.d3.event.x) - n.x;
-            const dy = this.transform.invertY(this.d3.event.y) - n.y;
-            if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
-              n.x = this.transform.applyX(n.x);
-              n.y = this.transform.applyY(n.y);
-              return n;
-            }
-          }
-        })
+        .subject(() => d3Sim.find(this.d3.event.x, this.d3.event.y))
         .on('start', () => {
           if (!this.d3.event.active) {
             d3Sim.alphaTarget(0.3).restart();
           }
-          this.d3.event.subject.fx = this.transform.invertX(this.d3.event.x);
-          this.d3.event.subject.fy = this.transform.invertY(this.d3.event.y);
+          this.d3.event.subject.fx = this.d3.event.x;
+          this.d3.event.subject.fy = this.d3.event.y;
         })
         .on('drag', () => {
-          console.log(this.transform.invertX(this.d3.event.x) + '/' + this.transform.invertY(this.d3.event.y));
-          this.d3.event.subject.fx = this.transform.invertX(this.d3.event.x);
-          this.d3.event.subject.fy = this.transform.invertY(this.d3.event.y);
+          this.d3.event.subject.fx = this.d3.event.x;
+          this.d3.event.subject.fy = this.d3.event.y;
         })
         .on('end', () => {
           if (!this.d3.event.active) {
@@ -202,28 +181,7 @@ export class GraphViewComponent implements OnInit, AfterViewInit {
           this.d3.event.subject.fx = null;
           this.d3.event.subject.fy = null;
         })
-      )
-      .call(this.d3.zoom().scaleExtent([1 / 4, 4])
-        .filter(() => {
-          // console.log('filter: (' + this.d3.event.x + '/' + this.d3.event.y + ')')
-          if (this.d3.event.type === 'mousedown' || this.d3.event.type === 'touchstart') {
-            for (let i = this.nodes.length - 1; i >= 0; i--) {
-              const n = this.nodes[i];
-              // TODO: verify that 8px difference between filter event and drag event is universial (check logs)
-              const dx = this.d3.event.x - n.x - 8;
-              const dy = this.d3.event.y - n.y - 8;
-              if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
-                return false;
-              }
-            }
-          }
-          return true;
-        }).on('zoom', () => {
-          if (!this.d3.event.active) {
-            d3Sim.restart();
-          }
-          this.transform = this.d3.event.transform;
-        }));
+      );
     // TODO: add zoom behavior
   }
 
