@@ -56,7 +56,6 @@ export class GraphNode implements SimulationNodeDatum {
       const yOffset = -(this.getTextHeigth() * this.lines.length) / 2 + (i * this.getTextHeigth());
       context.fillText(this.lines[i], this.x, this.y + yOffset);
     }
-    // TODO: draw nodes with labels
   }
 
   getTextHeigth() {
