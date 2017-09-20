@@ -37,9 +37,7 @@ import {HashLocationStrategy, LocationStrategy} from "@angular/common";
     PolymerModule.forRoot(),
     AuthModule.forRoot()
   ],
-  providers: [OidcSecurityService,
-    { provide: LocationStrategy, useClass: HashLocationStrategy }
-  ],
+  providers: [OidcSecurityService],
   bootstrap: [AppComponent]
 })
 export class AppModule {
