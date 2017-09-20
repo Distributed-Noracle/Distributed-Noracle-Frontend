@@ -12,6 +12,8 @@ import {RouterModule} from '@angular/router';
 import {GraphViewComponent} from './graph-view/graph-view/graph-view.component';
 import { HomeScreenComponent } from './home-screen/home-screen.component';
 import { LoginComponent } from './login/login.component';
+import {environment} from "../environments/environment";
+import {HashLocationStrategy, LocationStrategy} from "@angular/common";
 
 @NgModule({
   declarations: [
@@ -35,7 +37,9 @@ import { LoginComponent } from './login/login.component';
     PolymerModule.forRoot(),
     AuthModule.forRoot()
   ],
-  providers: [OidcSecurityService],
+  providers: [OidcSecurityService,
+    { provide: LocationStrategy, useClass: HashLocationStrategy }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
@@ -43,11 +47,11 @@ export class AppModule {
 
     const openIDImplicitFlowConfiguration = new OpenIDImplicitFlowConfiguration();
     openIDImplicitFlowConfiguration.stsServer = 'https://api.learning-layers.eu/o/oauth2';
-    openIDImplicitFlowConfiguration.redirect_url = 'http://localhost:4200/login';
+    openIDImplicitFlowConfiguration.redirect_url = environment.redirectUrl;
     openIDImplicitFlowConfiguration.client_id = '8b7837a0-0b49-4443-9a56-591f50531d0a';
     openIDImplicitFlowConfiguration.response_type = 'id_token token';
     openIDImplicitFlowConfiguration.scope = 'openid email profile';
-    openIDImplicitFlowConfiguration.post_logout_redirect_uri = 'https://localhost:4200/login';
+    openIDImplicitFlowConfiguration.post_logout_redirect_uri = environment.redirectUrl;
     openIDImplicitFlowConfiguration.startup_route = '/graph';
     openIDImplicitFlowConfiguration.forbidden_route = '/Forbidden';
     openIDImplicitFlowConfiguration.unauthorized_route = '/Unauthorized';
