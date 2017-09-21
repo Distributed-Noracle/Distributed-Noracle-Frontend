@@ -2,7 +2,7 @@ import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {OidcSecurityService, OidcSecurityValidation} from 'angular-auth-oidc-client';
 
 @Component({
-  selector: 'app-login',
+  selector: 'dnor-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })

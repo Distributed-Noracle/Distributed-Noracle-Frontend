@@ -3,7 +3,7 @@ import {OidcSecurityService} from 'angular-auth-oidc-client';
 import {Router} from '@angular/router';
 
 @Component({
-  selector: 'app-home-screen',
+  selector: 'dnor-home-screen',
   templateUrl: './home-screen.component.html',
   styleUrls: ['./home-screen.component.css']
 })

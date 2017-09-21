@@ -9,11 +9,10 @@ import {PolymerModule} from '@codebakery/origami';
 import {IronElementsModule, PaperElementsModule} from '@codebakery/origami/collections';
 import {AuthModule, OidcSecurityService, OpenIDImplicitFlowConfiguration} from 'angular-auth-oidc-client';
 import {RouterModule} from '@angular/router';
-import {GraphViewComponent} from './graph-view/graph-view/graph-view.component';
-import { HomeScreenComponent } from './home-screen/home-screen.component';
-import { LoginComponent } from './login/login.component';
-import {environment} from "../environments/environment";
-import {HashLocationStrategy, LocationStrategy} from "@angular/common";
+import {HomeScreenComponent} from './home-screen/home-screen.component';
+import {LoginComponent} from './login/login.component';
+import {environment} from '../environments/environment';
+import {GraphViewPageComponent} from './graph-view/graph-view-page/graph-view-page.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +31,7 @@ import {HashLocationStrategy, LocationStrategy} from "@angular/common";
     RouterModule.forRoot([
       { path: '', component: HomeScreenComponent },
       { path: 'login', component: LoginComponent },
-      { path: 'graph', component: GraphViewComponent }
+      { path: 'graph', component: GraphViewPageComponent }
     ]),
     PolymerModule.forRoot(),
     AuthModule.forRoot()
