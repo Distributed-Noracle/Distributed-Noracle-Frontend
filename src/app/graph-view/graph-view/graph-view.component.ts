@@ -186,10 +186,24 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
             }
           }
         })
-        .filter(() => {
-          return false;
-        })
-      )
+        .on('start', () => false)
+        .on('drag', () => false)
+        .on('end', () => {
+          const n = this.d3.event.subject as GraphNode;
+          const dx = this.transform.invertX(this.d3.event.x) - n.x;
+          const dy = this.transform.invertY(this.d3.event.y) - n.y;
+          if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
+            const label = window.prompt('Ask a follow up question to: ' + n.label);
+            const newId = this.nodes.reduce((p, c) => (p === null || c.id > p.id) ? c : p, null).id + 1;
+            const newNode = new GraphNode(this.context, newId, label);
+            this.nodes.push(newNode);
+            this.edges.push(new Edge(n, newNode));
+            d3Sim.nodes(this.nodes);
+            d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges)
+              .distance((link, i, links) => ((link.source as GraphNode).radius + (link.target as GraphNode).radius) * 2);
+            d3Sim.alpha(1).restart();
+          }
+        }))
       .call(this.d3.zoom().filter(() => false));
   }
 

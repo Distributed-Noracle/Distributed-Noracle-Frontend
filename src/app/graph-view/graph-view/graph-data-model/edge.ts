@@ -6,7 +6,7 @@ export class Edge implements SimulationLinkDatum<GraphNode> {
   source: string | number | GraphNode;
   target: string | number | GraphNode;
 
-  constructor(from: number, to: number) {
+  constructor(from: number | GraphNode, to: number | GraphNode) {
     this.source = from;
     this.target = to;
   }
