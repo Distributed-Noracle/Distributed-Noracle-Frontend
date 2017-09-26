@@ -1,9 +1,10 @@
 import {SimulationNodeDatum} from 'd3-force';
 
 export class GraphNode implements SimulationNodeDatum {
-
   private lines: string[];
   private textSize = 10;
+  private bubbleScaleFactor = 1.25;
+  public radius;
 
   /**
    * Node’s zero-based index into nodes array. This property is set during the initialization process of a simulation.
@@ -34,14 +35,18 @@ export class GraphNode implements SimulationNodeDatum {
    */
   fy?: number | null;
 
-  constructor(context: CanvasRenderingContext2D, public id: number, public label: string, public radius: number = 20) {
+  constructor(context: CanvasRenderingContext2D, public id: number, public label: string) {
     this.lines = this.wrapText((s) => context.measureText(s).width);
   }
 
   draw(context: CanvasRenderingContext2D) {
+    const alpha = Math.PI / 8;
+    const beta = Math.PI / 16;
     context.beginPath();
-    context.moveTo(this.x + this.radius, this.y);
-    context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+    context.moveTo(this.x + this.radius / this.bubbleScaleFactor, this.y);
+    context.arc(this.x, this.y, this.radius / this.bubbleScaleFactor, 0, alpha);
+    context.lineTo(this.x + Math.cos(alpha + beta / 2) * this.radius, this.y + Math.sin(alpha + beta / 2) * this.radius);
+    context.arc(this.x, this.y, this.radius / this.bubbleScaleFactor, alpha + beta, 2 * Math.PI);
     context.strokeStyle = '#000';
     context.stroke();
     context.fillStyle = '#fff';
@@ -101,7 +106,7 @@ export class GraphNode implements SimulationNodeDatum {
         while (lines.length - 1 < numberOfLines) {
           lines.push('');
         }
-        this.radius = radius + textHeight * 0.5;
+        this.radius = (radius + textHeight * 0.5) * this.bubbleScaleFactor;
         return lines;
       }
     }
