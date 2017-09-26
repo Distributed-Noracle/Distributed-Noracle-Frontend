@@ -1,3 +1,7 @@
-<h1>Noracle Graph</h1>
+<!--<h1>Noracle Graph</h1>-->
+<div #graphContainer>
 <dnor-graph-view [height]="height" [width]="width" [editmode]="isEditMode"></dnor-graph-view>
-<button (click)="toggleEdit()">{{isEditMode?"Explore":"Edit"}}</button>
+</div>
+<div #below>
+  <button md-raised-button color="primary" (click)="toggleEdit()">{{isEditMode?"Explore Graph":"Add Question"}}</button>
+</div>

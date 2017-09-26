@@ -9,34 +9,42 @@ import {PolymerModule} from '@codebakery/origami';
 import {IronElementsModule, PaperElementsModule} from '@codebakery/origami/collections';
 import {AuthModule, OidcSecurityService, OpenIDImplicitFlowConfiguration} from 'angular-auth-oidc-client';
 import {RouterModule} from '@angular/router';
-import {HomeScreenComponent} from './home-screen/home-screen.component';
 import {LoginComponent} from './login/login.component';
 import {environment} from '../environments/environment';
 import {GraphViewPageComponent} from './graph-view/graph-view-page/graph-view-page.component';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {FlexLayoutModule} from '@angular/flex-layout';
+import {MdButtonModule, MdMenuModule, MdToolbarModule} from '@angular/material';
+import {NavComponent} from './nav/nav.component';
+import {AuthGuardService} from './auth-guard/auth-guard.service';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomeScreenComponent,
-    LoginComponent
-  ],
+    LoginComponent,
+    NavComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
     HttpModule,
     IronElementsModule,
     PaperElementsModule,
+    FlexLayoutModule,
     GraphViewModule,
+    MdMenuModule,
+    MdToolbarModule,
+    MdButtonModule,
     RouterModule.forRoot([
-      { path: '', component: HomeScreenComponent },
-      { path: 'login', component: LoginComponent },
-      { path: 'graph', component: GraphViewPageComponent }
+      {path: 'login', component: LoginComponent},
+      {path: 'graph', component: GraphViewPageComponent, canActivate: [AuthGuardService]},
+      {path: '**', redirectTo: 'login' }
     ]),
     PolymerModule.forRoot(),
     AuthModule.forRoot()
   ],
-  providers: [OidcSecurityService],
+  providers: [OidcSecurityService, AuthGuardService],
   bootstrap: [AppComponent]
 })
 export class AppModule {
@@ -50,15 +58,15 @@ export class AppModule {
     openIDImplicitFlowConfiguration.scope = 'openid email profile';
     openIDImplicitFlowConfiguration.post_logout_redirect_uri = environment.redirectUrl;
     openIDImplicitFlowConfiguration.startup_route = '/graph';
-    openIDImplicitFlowConfiguration.forbidden_route = '/Forbidden';
-    openIDImplicitFlowConfiguration.unauthorized_route = '/Unauthorized';
     openIDImplicitFlowConfiguration.auto_userinfo = true;
-    openIDImplicitFlowConfiguration.log_console_warning_active = true;
-    openIDImplicitFlowConfiguration.log_console_debug_active = false;
+    openIDImplicitFlowConfiguration.log_console_warning_active = !environment.production;
+    openIDImplicitFlowConfiguration.log_console_debug_active = !environment.production;
     openIDImplicitFlowConfiguration.max_id_token_iat_offset_allowed_in_seconds = 10;
     openIDImplicitFlowConfiguration.override_well_known_configuration = false;
-    // openIDImplicitFlowConfiguration.override_well_known_configuration_url = '';
-    // openIDImplicitFlowConfiguration.storage = localStorage;
+
+    // TODO: configure
+    openIDImplicitFlowConfiguration.forbidden_route = '/Forbidden';
+    openIDImplicitFlowConfiguration.unauthorized_route = '/Unauthorized';
 
     this.oidcSecurityService.setupModule(openIDImplicitFlowConfiguration);
   }

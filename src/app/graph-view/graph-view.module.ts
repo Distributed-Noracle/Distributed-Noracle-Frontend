@@ -7,11 +7,13 @@ import {SpaceService} from './space.service';
 import {QuestionService} from './question.service';
 import {RelationService} from './relation.service';
 import {D3Service} from 'd3-ng2-service';
-import { GraphViewPageComponent } from './graph-view-page/graph-view-page.component';
+import {GraphViewPageComponent} from './graph-view-page/graph-view-page.component';
+import {MdButtonModule} from '@angular/material';
 
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
+    MdButtonModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [GraphViewComponent, GraphViewPageComponent],

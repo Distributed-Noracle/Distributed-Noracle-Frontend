@@ -30,14 +30,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.oidcSecurityService.authorize();
   }
 
-  logout() {
-    this.oidcSecurityService.logoff();
-  }
-
   private doLogin() {
     if (!window.location.hash) {
-      // XXX: temporary hack to wait for well-known data to load
-      setTimeout(() => {this.login(); }, 200);
+      // to discuss: hack to wait for well-known data to load and then redirect to oidc ID-Provider
+      // setTimeout(() => {
+      //   this.login();
+      // }, 200);
     } else {
       // fixing messed up signature check in OidcSecurityValidation
       OidcSecurityValidation.prototype.getHeaderFromToken = function (token, encode) {
