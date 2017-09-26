@@ -11,6 +11,10 @@ export class Edge implements SimulationLinkDatum<GraphNode> {
     this.target = to;
   }
 
+  getDistance() {
+    return (this.source as GraphNode).radius + (this.target as GraphNode).radius + 10;
+  }
+
   draw(context: CanvasRenderingContext2D) {
     context.beginPath();
     context.moveTo((this.source as GraphNode).x, (this.source as GraphNode).y);

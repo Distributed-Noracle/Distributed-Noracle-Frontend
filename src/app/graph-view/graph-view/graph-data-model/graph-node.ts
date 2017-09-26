@@ -66,51 +66,42 @@ export class GraphNode implements SimulationNodeDatum {
     const textHeight = this.getTextHeigth();
     const totalWidth = measure(this.label);
     const words = this.label.split(/\s+/);
-    // min line length should at least be able to fit first/last word
-    const minLineLength = words.length > 0 ?
-      Math.max(measure(words[0]), measure(words[words.length - 1]))
-      : totalWidth;
+    const longestWordLength =
+      Math.ceil(measure(words.reduce((prev, cur, i) => measure(prev) > measure(cur) ? prev : cur)));
     const blankWidth = measure(' ');
     let fit = false;
     let radius = Math.floor(Math.sqrt(totalWidth * textHeight / 3));
+    radius = radius > longestWordLength / 2 ? radius : longestWordLength / 2;
     while (!fit) {
-      const numberOfLines =
-        Math.floor(2 * Math.sqrt(Math.pow(radius, 2) - Math.pow(minLineLength / 2, 2)) / textHeight);
+      const numberOfLines = Math.floor(2 * radius / textHeight);
       const lines = [''];
-      let lineNumber = 0;
       let remainingLineLength =
         2 * Math.sqrt(Math.pow(radius, 2) - Math.pow(textHeight * numberOfLines / 2, 2));
       fit = true;
       for (const word of words) {
         const wordWith = measure(word);
-        if (remainingLineLength > wordWith) {
-          lines[lineNumber] += word + ' ';
-          remainingLineLength -= (wordWith + blankWidth);
-        } else {
-          lines[lineNumber] = lines[lineNumber].trim();
-          lineNumber++;
+        while (remainingLineLength < wordWith) {
+          // skip lines that are too short for the word
+          lines[lines.length - 1] = lines[lines.length - 1].trim();
+          lines.push('');
           remainingLineLength =
-            2 * Math.sqrt(Math.pow(radius, 2) - Math.pow(textHeight * Math.abs(numberOfLines / 2 - lineNumber), 2));
-          if (remainingLineLength > wordWith) {
-            lines.push(word + ' ');
-            remainingLineLength -= (wordWith + blankWidth);
-          } else {
-            fit = false;
-            break;
-          }
-          if (lineNumber > numberOfLines) {
+            2 * Math.sqrt(Math.pow(radius, 2) - Math.pow(textHeight * Math.abs(numberOfLines / 2 - (lines.length - 1)), 2));
+          if (lines.length > numberOfLines) {
+            // word was too long for all remaining lines
             fit = false;
             break;
           }
         }
+        lines[lines.length - 1] += word + ' ';
+        remainingLineLength -= (wordWith + blankWidth);
       }
       if (!fit) {
         radius++;
       } else {
-        this.radius = radius * 1.2;
-        while (lines.length < numberOfLines) {
+        while (lines.length - 1 < numberOfLines) {
           lines.push('');
         }
+        this.radius = radius + textHeight * 0.5;
         return lines;
       }
     }

@@ -93,7 +93,7 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
       context.restore();
     });
     d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges)
-      .distance((link, i, links) => ((link.source as GraphNode).radius + (link.target as GraphNode).radius) * 2);
+      .distance((link, i, links) => (link as Edge).getDistance());
 
     if (this.editmode) {
       this.setEditBehavior();
@@ -200,7 +200,7 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
             this.edges.push(new Edge(n, newNode));
             d3Sim.nodes(this.nodes);
             d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges)
-              .distance((link, i, links) => ((link.source as GraphNode).radius + (link.target as GraphNode).radius) * 2);
+              .distance((link, i, links) => (link as Edge).getDistance());
             d3Sim.alpha(1).restart();
           }
         }))
