@@ -1,13 +1,13 @@
 import {AfterViewInit, Component, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
-import {TextlayoutService} from '../textlayout.service';
 import {SpaceService} from '../space.service';
 import {QuestionService} from '../question.service';
 import {RelationService} from '../relation.service';
 import {D3, D3Service} from 'd3-ng2-service';
-import {ForceLink, Simulation, SimulationLinkDatum, SimulationNodeDatum} from 'd3-force';
+import {ForceLink, Simulation} from 'd3-force';
 import {GraphNode} from './graph-data-model/graph-node';
 import {Edge} from './graph-data-model/edge';
 import {ZoomTransform} from 'd3-zoom';
+import {GraphInteractionMode} from './graph-data-model/graph-interaction-mode.enum';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -18,7 +18,7 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
   @ViewChild('d3root') private d3Root;
   @Input('height') private height = 400;
   @Input('width') private width = 400;
-  @Input('editmode') private editmode = false;
+  @Input('interactionMode') private interactionMode: GraphInteractionMode;
 
   private d3: D3;
   private nodes: GraphNode[];
@@ -30,8 +30,9 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
   private d3Sim: Simulation<GraphNode, Edge>;
 
 
-  constructor(private TextlayoutService: TextlayoutService, private SpaceService: SpaceService,
-              private QuestionService: QuestionService, private RelationService: RelationService,
+  constructor(private SpaceService: SpaceService,
+              private QuestionService: QuestionService,
+              private RelationService: RelationService,
               private D3Service: D3Service) {
     this.d3 = D3Service.getD3();
     this.transform = this.d3.zoomIdentity;
@@ -59,8 +60,16 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
       this.d3Sim.force('center', this.d3.forceCenter(this.width / 2, this.height / 2));
       this.d3Sim.restart();
       // TODO: add dirty check
-      if (this.editmode) {
-        this.setEditBehavior();
+      if (this.interactionMode === GraphInteractionMode.AddQuestion) {
+        this.setEditBehavior((n) => this.addNewChildToNode(n));
+      } else if (this.interactionMode === GraphInteractionMode.EditQuestion) {
+        this.setEditBehavior((n) => this.editNode(n));
+      } else if (this.interactionMode === GraphInteractionMode.AddRelation) {
+        // TODO: implement and set Behavior
+        this.setExploreBehavior();
+      } else if (this.interactionMode === GraphInteractionMode.EditRelation) {
+        // TODO: implement and set Behavior
+        this.setExploreBehavior();
       } else {
         this.setExploreBehavior();
       }
@@ -95,14 +104,14 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
     d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges)
       .distance((link, i, links) => (link as Edge).getDistance());
 
-    if (this.editmode) {
-      this.setEditBehavior();
+    if (this.interactionMode) {
+      this.setEditBehavior((n) => this.addNewChildToNode(n));
     } else {
       this.setExploreBehavior();
     }
   }
 
-  private setExploreBehavior() {
+  private  setExploreBehavior() {
     const canvas = this.canvas;
     const d3Sim = this.d3Sim;
 
@@ -163,7 +172,7 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
         }));
   }
 
-  private setEditBehavior() {
+  private   setEditBehavior(editFunction: (n: GraphNode) => void) {
     const canvas = this.canvas;
     const d3Sim = this.d3Sim;
 
@@ -193,11 +202,7 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
           const dx = this.transform.invertX(this.d3.event.x) - n.x;
           const dy = this.transform.invertY(this.d3.event.y) - n.y;
           if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
-            const label = window.prompt('Ask a follow up question to: ' + n.label);
-            const newId = this.nodes.reduce((p, c) => (p === null || c.id > p.id) ? c : p, null).id + 1;
-            const newNode = new GraphNode(this.context, newId, label);
-            this.nodes.push(newNode);
-            this.edges.push(new Edge(n, newNode));
+            editFunction(n);
             d3Sim.nodes(this.nodes);
             d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges)
               .distance((link, i, links) => (link as Edge).getDistance());
@@ -205,6 +210,19 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
           }
         }))
       .call(this.d3.zoom().filter(() => false));
+  }
+
+  private addNewChildToNode(n: GraphNode) {
+    const label = window.prompt('Ask a follow up question to: ' + n.label);
+    const newId = this.nodes.reduce((p, c) => (p === null || c.id > p.id) ? c : p, null).id + 1;
+    const newNode = new GraphNode(this.context, newId, label);
+    this.nodes.push(newNode);
+    this.edges.push(new Edge(n, newNode));
+  }
+
+  private editNode(n: GraphNode) {
+    const label = window.prompt('Edit Question:', n.label);
+    n.setLabel(label, this.context);
   }
 
 

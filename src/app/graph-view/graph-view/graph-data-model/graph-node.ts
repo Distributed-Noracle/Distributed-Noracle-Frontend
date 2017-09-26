@@ -39,6 +39,11 @@ export class GraphNode implements SimulationNodeDatum {
     this.lines = this.wrapText((s) => context.measureText(s).width);
   }
 
+  public setLabel(label: string, context: CanvasRenderingContext2D) {
+    this.label = label;
+    this.lines = this.wrapText((s) => context.measureText(s).width);
+  }
+
   draw(context: CanvasRenderingContext2D) {
     const alpha = Math.PI / 8;
     const beta = Math.PI / 16;

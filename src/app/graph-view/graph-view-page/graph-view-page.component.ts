@@ -1,4 +1,5 @@
 import {Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
+import {GraphInteractionMode} from '../graph-view/graph-data-model/graph-interaction-mode.enum';
 
 @Component({
   selector: 'dnor-graph-view-page',
@@ -12,7 +13,7 @@ export class GraphViewPageComponent implements OnInit {
   private below;
   private elementRef: ElementRef;
 
-  public isEditMode = false;
+  public interactionMode = GraphInteractionMode.DragAndZoom;
   public height = 600;
   public width = 800;
 
@@ -36,8 +37,17 @@ export class GraphViewPageComponent implements OnInit {
     this.adjustSize();
   }
 
-  toggleEdit() {
-    this.isEditMode = !this.isEditMode;
+  private getInteractionModes() {
+    const modes = [];
+    for (const mode in GraphInteractionMode) {
+      if (typeof GraphInteractionMode[mode] === 'number') {
+        modes.push(GraphInteractionMode[mode]);
+      }
+    }
+    return modes;
   }
 
+  private getInteractionModeLabel(mode: number) {
+    return GraphInteractionMode[mode];
+  }
 }

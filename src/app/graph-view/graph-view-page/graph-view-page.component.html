@@ -1,7 +1,11 @@
 <!--<h1>Noracle Graph</h1>-->
 <div #graphContainer>
-<dnor-graph-view [height]="height" [width]="width" [editmode]="isEditMode"></dnor-graph-view>
+  <dnor-graph-view [height]="height" [width]="width" [interactionMode]="interactionMode"></dnor-graph-view>
 </div>
 <div #below>
-  <button md-raised-button color="primary" (click)="toggleEdit()">{{isEditMode?"Explore Graph":"Add Question"}}</button>
+  <md-radio-group [(ngModel)]="interactionMode">
+    <md-radio-button *ngFor="let m of getInteractionModes()" [value]="m">
+      {{getInteractionModeLabel(m)}}
+    </md-radio-button>
+  </md-radio-group>
 </div>
