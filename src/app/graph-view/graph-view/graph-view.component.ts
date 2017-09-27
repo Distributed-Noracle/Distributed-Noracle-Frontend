@@ -220,6 +220,9 @@ export class GraphViewComponent implements OnInit, OnChanges {
       if (label !== null) {
         const newId = this.nodes.reduce((p, c) => (p === null || c.id > p.id) ? c : p, null).id + 1;
         const newNode = new GraphNode(this.context, newId, label);
+        newNode.x = n.x;
+        newNode.y = n.y;
+        newNode.isSelected = true;
         this.nodes.push(newNode);
         this.edges.push(new Edge(n, newNode));
       }
