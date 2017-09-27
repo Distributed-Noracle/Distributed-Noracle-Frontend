@@ -93,7 +93,7 @@ export class GraphViewComponent implements OnInit, OnChanges {
       return;
     }
     if (this.interactionMode === GraphInteractionMode.SelectAndNavigate) {
-      this.setNodeSelectionBehavior((n) => this.changeSelection(n).then(() => this.initVisualization()));
+      this.setNodeSelectionBehavior((n) => this.changeSelection(n));
     } else if (this.interactionMode === GraphInteractionMode.AddQuestion) {
       this.setNodeSelectionBehavior((n) => this.addNewChildToNode(n));
     } else if (this.interactionMode === GraphInteractionMode.EditQuestion) {
@@ -173,7 +173,7 @@ export class GraphViewComponent implements OnInit, OnChanges {
         }));
   }
 
-  private setNodeSelectionBehavior(editFunction: (n: GraphNode) => void) {
+  private setNodeSelectionBehavior(editFunction: (n: GraphNode) => Promise<any>) {
     const canvas = this.canvas;
     const d3Sim = this.d3Sim;
 
@@ -203,35 +203,64 @@ export class GraphViewComponent implements OnInit, OnChanges {
           const dx = this.transform.invertX(this.d3.event.x) - n.x;
           const dy = this.transform.invertY(this.d3.event.y) - n.y;
           if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
-            editFunction(n);
-            d3Sim.nodes(this.nodes);
-            d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges)
-              .distance((link, i, links) => (link as Edge).getDistance());
-            d3Sim.alpha(1).restart();
+            editFunction(n).then(() => {
+              d3Sim.nodes(this.nodes);
+              d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges)
+                .distance((link, i, links) => (link as Edge).getDistance());
+              d3Sim.alpha(1).restart();
+            });
           }
         }))
       .call(this.d3.zoom().filter(() => false));
   }
 
-  private addNewChildToNode(n: GraphNode) {
-    const label = window.prompt('Ask a follow up question to: ' + n.label);
-    if (label !== null) {
-      const newId = this.nodes.reduce((p, c) => (p === null || c.id > p.id) ? c : p, null).id + 1;
-      const newNode = new GraphNode(this.context, newId, label);
-      this.nodes.push(newNode);
-      this.edges.push(new Edge(n, newNode));
-    }
+  private addNewChildToNode(n: GraphNode): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const label = window.prompt('Ask a follow up question to: ' + n.label);
+      if (label !== null) {
+        const newId = this.nodes.reduce((p, c) => (p === null || c.id > p.id) ? c : p, null).id + 1;
+        const newNode = new GraphNode(this.context, newId, label);
+        this.nodes.push(newNode);
+        this.edges.push(new Edge(n, newNode));
+      }
+      resolve();
+    });
   }
 
   private editNode(n: GraphNode) {
-    const label = window.prompt('Edit Question:', n.label);
-    if (label !== null) {
-      n.setLabel(label, this.context);
-    }
+    return new Promise((resolve, reject) => {
+      const label = window.prompt('Edit Question:', n.label);
+      if (label !== null) {
+        n.setLabel(label, this.context);
+      }
+      resolve();
+    });
   }
 
   private changeSelection(n: GraphNode): Promise<any> {
     if (n.isSelected) {
+      n.isSelected = false;
+      const hasSelectedNeighbour = (node: GraphNode) => -1 !== this.edges.findIndex(
+        (e) => {
+          if (e.source === node) {
+            return (e.target as GraphNode).isSelected;
+          } else if (e.target === node) {
+            return (e.source as GraphNode).isSelected;
+          } else {
+            return false;
+          }
+        });
+      for (let i = this.nodes.length - 1; i >= 0; i--) {
+        const node = this.nodes[i];
+        if (!node.isSelected && !hasSelectedNeighbour(node)) {
+          this.nodes.splice(this.nodes.indexOf(node), 1);
+          for (let j = this.edges.length - 1; j >= 0; j--) {
+            if (this.edges[j].source === node || this.edges[j].target === node) {
+              this.edges.splice(j, 1);
+            }
+          }
+        }
+      }
       return new Promise((resolve, reject) => resolve());
     } else {
       n.isSelected = true;
@@ -247,12 +276,19 @@ export class GraphViewComponent implements OnInit, OnChanges {
             }
           });
           return Promise.all(promises).then((questions) => {
-            questions.forEach((d) => this.nodes.push(new GraphNode(this.context, d.id, d.label)));
-            newRelations.forEach(
-              (e) => this.edges.push(
+            for (let i = questions.length - 1; i >= 0; i--) {
+              const d = questions[i];
+              const graphNode = new GraphNode(this.context, d.id, d.label);
+              graphNode.x = n.x;
+              graphNode.y = n.y;
+              this.nodes.push(graphNode);
+            }
+            for (let i = newRelations.length - 1; i >= 0; i--) {
+              const e = newRelations[i];
+              this.edges.push(
                 new Edge(this.nodes.find((node) => node.id === e.from), this.nodes.find((node) => node.id === e.to))
-              )
-            );
+              );
+            }
           });
         });
     }
