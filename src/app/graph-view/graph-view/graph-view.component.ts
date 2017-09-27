@@ -261,6 +261,7 @@ export class GraphViewComponent implements OnInit, OnChanges {
   private setEdgeSelectionBehavior(editFunction: (e: Edge) => void) {
     const canvas = this.canvas;
     const d3Sim = this.d3Sim;
+    const squaredDistanceThreshold = 100;
 
     // drag behavior
     this.d3.select(canvas)
@@ -276,7 +277,7 @@ export class GraphViewComponent implements OnInit, OnChanges {
               (edge.target as GraphNode).x, (edge.target as GraphNode).y,
               this.transform.invertX(this.d3.event.x), this.transform.invertY(this.d3.event.y)
             );
-            if (d_sqr <= 100) {
+            if (d_sqr <= squaredDistanceThreshold) {
               return edge;
             }
           }
@@ -290,7 +291,7 @@ export class GraphViewComponent implements OnInit, OnChanges {
             (edge.target as GraphNode).x, (edge.target as GraphNode).y,
             this.transform.invertX(this.d3.event.x), this.transform.invertY(this.d3.event.y)
           );
-          if (d_sqr <= 100) {
+          if (d_sqr <= squaredDistanceThreshold) {
             editFunction(edge);
             d3Sim.nodes(this.nodes);
             d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges)
