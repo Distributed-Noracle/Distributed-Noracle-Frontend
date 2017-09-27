@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
 import {D3, D3Service} from 'd3-ng2-service';
 import {ForceLink, Simulation} from 'd3-force';
 import {GraphNode} from './graph-data-model/graph-node';
@@ -12,20 +12,21 @@ import {GraphViewService} from './graph-view.service';
   templateUrl: './graph-view.component.html',
   styleUrls: ['./graph-view.component.css']
 })
-export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
+export class GraphViewComponent implements OnInit, OnChanges {
   @ViewChild('d3root') private d3Root;
   @Input('height') private height = 400;
   @Input('width') private width = 400;
   @Input('interactionMode') private interactionMode: GraphInteractionMode;
 
   private d3: D3;
-  private nodes: GraphNode[];
-  private edges: Edge[];
+  private nodes: GraphNode[] = [];
+  private edges: Edge[] = [];
   private transform: ZoomTransform;
   private hasDragSubject = false;
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
   private d3Sim: Simulation<GraphNode, Edge>;
+  private activatedInteractionMode: GraphInteractionMode;
 
 
   constructor(private graphViewService: GraphViewService,
@@ -44,31 +45,17 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
     this.context = this.canvas.getContext('2d');
     this.d3Sim = this.d3.forceSimulation() as Simulation<GraphNode, Edge>;
 
-    this.initData();
-  }
-
-  ngAfterViewInit() {
-    this.initVisualization();
+    this.initData().then(() => {
+      this.initVisualization();
+      this.updateInteractionMode();
+    });
   }
 
   ngOnChanges() {
     if (this.d3Sim) {
       this.d3Sim.force('center', this.d3.forceCenter(this.width / 2, this.height / 2));
       this.d3Sim.restart();
-      // TODO: add dirty check
-      if (this.interactionMode === GraphInteractionMode.AddQuestion) {
-        this.setEditBehavior((n) => this.addNewChildToNode(n));
-      } else if (this.interactionMode === GraphInteractionMode.EditQuestion) {
-        this.setEditBehavior((n) => this.editNode(n));
-      } else if (this.interactionMode === GraphInteractionMode.AddRelation) {
-        // TODO: implement and set Behavior
-        this.setExploreBehavior();
-      } else if (this.interactionMode === GraphInteractionMode.EditRelation) {
-        // TODO: implement and set Behavior
-        this.setExploreBehavior();
-      } else {
-        this.setExploreBehavior();
-      }
+      this.updateInteractionMode();
     }
   }
 
@@ -98,9 +85,25 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
     });
     d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges)
       .distance((link, i, links) => (link as Edge).getDistance());
+  }
 
-    if (this.interactionMode) {
+  private updateInteractionMode() {
+    if (this.activatedInteractionMode === this.interactionMode) {
+      // no change
+      return;
+    }
+    if (this.interactionMode === GraphInteractionMode.SelectAndNavigate) {
+      this.setEditBehavior((n) => this.changeSelection(n).then(() => this.initVisualization()));
+    } else if (this.interactionMode === GraphInteractionMode.AddQuestion) {
       this.setEditBehavior((n) => this.addNewChildToNode(n));
+    } else if (this.interactionMode === GraphInteractionMode.EditQuestion) {
+      this.setEditBehavior((n) => this.editNode(n));
+    } else if (this.interactionMode === GraphInteractionMode.AddRelation) {
+      // TODO: implement and set Behavior
+      this.setExploreBehavior();
+    } else if (this.interactionMode === GraphInteractionMode.EditRelation) {
+      // TODO: implement and set Behavior
+      this.setExploreBehavior();
     } else {
       this.setExploreBehavior();
     }
@@ -209,35 +212,79 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
 
   private addNewChildToNode(n: GraphNode) {
     const label = window.prompt('Ask a follow up question to: ' + n.label);
-    const newId = this.nodes.reduce((p, c) => (p === null || c.id > p.id) ? c : p, null).id + 1;
-    const newNode = new GraphNode(this.context, newId, label);
-    this.nodes.push(newNode);
-    this.edges.push(new Edge(n, newNode));
+    if (label !== null) {
+      const newId = this.nodes.reduce((p, c) => (p === null || c.id > p.id) ? c : p, null).id + 1;
+      const newNode = new GraphNode(this.context, newId, label);
+      this.nodes.push(newNode);
+      this.edges.push(new Edge(n, newNode));
+    }
   }
 
   private editNode(n: GraphNode) {
     const label = window.prompt('Edit Question:', n.label);
-    n.setLabel(label, this.context);
+    if (label !== null) {
+      n.setLabel(label, this.context);
+    }
+  }
+
+  private changeSelection(n: GraphNode): Promise<any> {
+    if (n.isSelected) {
+      return new Promise((resolve, reject) => resolve());
+    } else {
+      n.isSelected = true;
+      return this.graphViewService.getRelationsForQuestion(n.id)
+        .then((relations) => {
+          const promises = [];
+          const newRelations = [];
+          relations.forEach((r) => {
+            const id = r.from === n.id ? r.to : r.from;
+            if (this.nodes.findIndex((node) => node.id === id) === -1) {
+              promises.push(this.graphViewService.getQuestion(id));
+              newRelations.push(r);
+            }
+          });
+          return Promise.all(promises).then((questions) => {
+            questions.forEach((d) => this.nodes.push(new GraphNode(this.context, d.id, d.label)));
+            newRelations.forEach(
+              (e) => this.edges.push(
+                new Edge(this.nodes.find((node) => node.id === e.from), this.nodes.find((node) => node.id === e.to))
+              )
+            );
+          });
+        });
+    }
   }
 
 
   private initData() {
     const context = this.d3Root.nativeElement.getContext('2d');
-    const initialQuestion = this.graphViewService.getQuestion(1);
-    const initialQuestions = [initialQuestion];
-    const initialQuestionRelations = this.graphViewService.getRelationsForQuestion(1);
-    initialQuestionRelations.forEach((r) => {
-      if (r.from === initialQuestion.id) {
-        initialQuestions.push(this.graphViewService.getQuestion(r.to));
-      } else {
-        initialQuestions.push(this.graphViewService.getQuestion(r.from));
-      }
-    });
+    return Promise.all<any, any[]>([this.graphViewService.getQuestion(1), this.graphViewService.getRelationsForQuestion(1)])
+      .then((values) => {
+        const initialQuestion = values[0];
+        const initialQuestions = [];
+        const initialQuestionRelations = values[1];
 
-    // generate nodes
-    this.nodes = initialQuestions.map((d) => new GraphNode(context, d.id, d.label));
-    // create an array with edges
-    this.edges = initialQuestionRelations.map((e) => new Edge(e.from, e.to));
+        return Promise.all(initialQuestionRelations.map((r) => {
+          if (r.from === initialQuestion.id) {
+            return this.graphViewService.getQuestion(r.to);
+          } else {
+            return this.graphViewService.getQuestion(r.from);
+          }
+        })).then((questions) => {
+          questions.forEach((q) => initialQuestions.push(q));
+          // generate nodes
+          this.nodes.push(new GraphNode(context, initialQuestion.id, initialQuestion.label, true));
+          initialQuestions.forEach((d) => this.nodes.push(new GraphNode(context, d.id, d.label)));
+          // create an array with edges
+          initialQuestionRelations.forEach(
+            (e) => this.edges.push(
+              new Edge(this.nodes.find((n) => n.id === e.from), this.nodes.find((n) => n.id === e.to))
+            )
+          );
+        });
+      });
+
+
   }
 
 }

@@ -13,7 +13,7 @@ export class GraphViewPageComponent implements OnInit {
   private below;
   private elementRef: ElementRef;
 
-  public interactionMode = GraphInteractionMode.DragAndZoom;
+  public interactionMode = GraphInteractionMode.SelectAndNavigate;
   public height = 600;
   public width = 800;
 

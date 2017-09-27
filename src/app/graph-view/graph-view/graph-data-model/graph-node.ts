@@ -35,7 +35,7 @@ export class GraphNode implements SimulationNodeDatum {
    */
   fy?: number | null;
 
-  constructor(context: CanvasRenderingContext2D, public id: number, public label: string) {
+  constructor(context: CanvasRenderingContext2D, public id: number, public label: string, public isSelected = false) {
     this.lines = this.wrapText((s) => context.measureText(s).width);
   }
 
@@ -53,6 +53,7 @@ export class GraphNode implements SimulationNodeDatum {
     context.lineTo(this.x + Math.cos(alpha + beta / 2) * this.radius, this.y + Math.sin(alpha + beta / 2) * this.radius);
     context.arc(this.x, this.y, this.radius / this.bubbleScaleFactor, alpha + beta, 2 * Math.PI);
     context.strokeStyle = '#000';
+    context.lineWidth = this.isSelected ? 3 : 1;
     context.stroke();
     context.fillStyle = '#fff';
     context.fill();

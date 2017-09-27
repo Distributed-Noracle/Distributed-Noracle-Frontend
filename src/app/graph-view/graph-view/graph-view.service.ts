@@ -10,12 +10,14 @@ export class GraphViewService {
     this.initDummyData();
   }
 
-  public getQuestion(questionId: number) {
-    return this.questions.find((q) => q.id === questionId);
+  public getQuestion(questionId: number): Promise<any> {
+    return new Promise((resolve, reject) => resolve(this.questions.find((q) => q.id === questionId)));
   }
 
-  public getRelationsForQuestion(questionId: number) {
-    return this.relations.filter((r) => r.from === questionId || r.to === questionId);
+  public getRelationsForQuestion(questionId: number): Promise<any[]> {
+    return new Promise(
+      (resolve, reject) => resolve(this.relations.filter((r) => r.from === questionId || r.to === questionId))
+    );
   }
 
 
