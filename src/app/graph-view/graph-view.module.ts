@@ -10,13 +10,15 @@ import {GraphViewPageComponent} from './graph-view-page/graph-view-page.componen
 import {MdButtonModule, MdRadioModule} from '@angular/material';
 import {FormsModule} from '@angular/forms';
 import { GraphViewService } from './graph-view/graph-view.service';
+import {FlexLayoutModule} from '@angular/flex-layout';
 
 @NgModule({
   imports: [
     CommonModule,
     MdButtonModule,
     MdRadioModule,
-    FormsModule
+    FormsModule,
+    FlexLayoutModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [GraphViewComponent, GraphViewPageComponent],

@@ -3,7 +3,7 @@
   <dnor-graph-view [height]="height" [width]="width" [interactionMode]="interactionMode"></dnor-graph-view>
 </div>
 <div #below>
-  <md-radio-group [(ngModel)]="interactionMode">
+  <md-radio-group fxLayout="row" fxLayoutGap="20px" [(ngModel)]="interactionMode">
     <md-radio-button *ngFor="let m of getInteractionModes()" [value]="m">
       {{getInteractionModeLabel(m)}}
     </md-radio-button>

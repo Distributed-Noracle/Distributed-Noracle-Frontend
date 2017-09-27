@@ -238,30 +238,36 @@ export class GraphViewComponent implements OnInit, OnChanges {
   }
 
   private changeSelection(n: GraphNode): Promise<any> {
-    if (n.isSelected) {
+    if (n.isSelected && this.nodes.filter((node) => node.isSelected).length > 1) {
       n.isSelected = false;
-      const hasSelectedNeighbour = (node: GraphNode) => -1 !== this.edges.findIndex(
-        (e) => {
-          if (e.source === node) {
-            return (e.target as GraphNode).isSelected;
-          } else if (e.target === node) {
-            return (e.source as GraphNode).isSelected;
-          } else {
-            return false;
-          }
-        });
-      for (let i = this.nodes.length - 1; i >= 0; i--) {
-        const node = this.nodes[i];
-        if (!node.isSelected && !hasSelectedNeighbour(node)) {
-          this.nodes.splice(this.nodes.indexOf(node), 1);
-          for (let j = this.edges.length - 1; j >= 0; j--) {
-            if (this.edges[j].source === node || this.edges[j].target === node) {
-              this.edges.splice(j, 1);
+      return new Promise((resolve, reject) => {
+        const hasSelectedNeighbour = (node: GraphNode) => -1 !== this.edges.findIndex(
+          (e) => {
+            if (e.source === node) {
+              return (e.target as GraphNode).isSelected;
+            } else if (e.target === node) {
+              return (e.source as GraphNode).isSelected;
+            } else {
+              return false;
+            }
+          });
+        for (let i = this.nodes.length - 1; i >= 0; i--) {
+          const node = this.nodes[i];
+          if (!node.isSelected && !hasSelectedNeighbour(node)) {
+            this.nodes.splice(this.nodes.indexOf(node), 1);
+            for (let j = this.edges.length - 1; j >= 0; j--) {
+              if (this.edges[j].source === node || this.edges[j].target === node) {
+                this.edges.splice(j, 1);
+              }
             }
           }
         }
-      }
-      return new Promise((resolve, reject) => resolve());
+        resolve();
+      });
+    } else if (n.isSelected) {
+      return new Promise((resolve, reject) => {
+        window.alert('You can\'t deselect the last selected node.');
+      });
     } else {
       n.isSelected = true;
       return this.graphViewService.getRelationsForQuestion(n.id)
