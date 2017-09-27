@@ -1,13 +1,11 @@
 import {AfterViewInit, Component, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
-import {SpaceService} from '../space.service';
-import {QuestionService} from '../question.service';
-import {RelationService} from '../relation.service';
 import {D3, D3Service} from 'd3-ng2-service';
 import {ForceLink, Simulation} from 'd3-force';
 import {GraphNode} from './graph-data-model/graph-node';
 import {Edge} from './graph-data-model/edge';
 import {ZoomTransform} from 'd3-zoom';
 import {GraphInteractionMode} from './graph-data-model/graph-interaction-mode.enum';
+import {GraphViewService} from './graph-view.service';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -30,11 +28,9 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
   private d3Sim: Simulation<GraphNode, Edge>;
 
 
-  constructor(private SpaceService: SpaceService,
-              private QuestionService: QuestionService,
-              private RelationService: RelationService,
-              private D3Service: D3Service) {
-    this.d3 = D3Service.getD3();
+  constructor(private graphViewService: GraphViewService,
+              private d3Service: D3Service) {
+    this.d3 = d3Service.getD3();
     this.transform = this.d3.zoomIdentity;
   }
 
@@ -77,7 +73,6 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   initVisualization() {
-    const canvas = this.canvas;
     const context = this.context;
     const d3Sim = this.d3Sim;
 
@@ -228,96 +223,21 @@ export class GraphViewComponent implements OnInit, OnChanges, AfterViewInit {
 
   private initData() {
     const context = this.d3Root.nativeElement.getContext('2d');
+    const initialQuestion = this.graphViewService.getQuestion(1);
+    const initialQuestions = [initialQuestion];
+    const initialQuestionRelations = this.graphViewService.getRelationsForQuestion(1);
+    initialQuestionRelations.forEach((r) => {
+      if (r.from === initialQuestion.id) {
+        initialQuestions.push(this.graphViewService.getQuestion(r.to));
+      } else {
+        initialQuestions.push(this.graphViewService.getQuestion(r.from));
+      }
+    });
 
     // generate nodes
-    this.nodes = [
-      {
-        id: 1,
-        label: 'What is the most imporatant challenge for European Youth Workers?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 11,
-        label: 'How do we finance our work',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 111,
-        label: 'Are we administrators or pedagogues?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 112,
-        label: 'How do we finance our lives?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 12,
-        label: 'Do our intentions match our actions?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 121,
-        label: 'Do we have the same intentions?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 122,
-        label: 'How can you evaluate the connection between ideology and practice?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 13,
-        label: 'If you have an answer, what question have you asked yourself to arrive at that answer?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 131,
-        label: 'What are the barriers to participation?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 1311,
-        label: 'Which barriers do we think we can address?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 1312,
-        label: 'Do we even know who we are serving?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 14,
-        label: 'Why am I doing this',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 15,
-        label: 'How do I know what I do is effective?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 16,
-        label: 'Who is actually benefiting from our work',
-        title: 'asked by Bernhard'
-      }
-    ].map((d) => new GraphNode(context, d.id, d.label));
+    this.nodes = initialQuestions.map((d) => new GraphNode(context, d.id, d.label));
     // create an array with edges
-    this.edges = [
-      {from: 1, to: 11, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 1, to: 12, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 1, to: 13, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 1, to: 14, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 1, to: 15, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 1, to: 16, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 11, to: 111, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 11, to: 112, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 12, to: 121, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 12, to: 122, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 13, to: 131, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 131, to: 1311, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 131, to: 1312, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-    ].map((e) => new Edge(e.from, e.to));
+    this.edges = initialQuestionRelations.map((e) => new Edge(e.from, e.to));
   }
 
 }

@@ -9,6 +9,7 @@ import {D3Service} from 'd3-ng2-service';
 import {GraphViewPageComponent} from './graph-view-page/graph-view-page.component';
 import {MdButtonModule, MdRadioModule} from '@angular/material';
 import {FormsModule} from '@angular/forms';
+import { GraphViewService } from './graph-view/graph-view.service';
 
 @NgModule({
   imports: [
@@ -20,7 +21,7 @@ import {FormsModule} from '@angular/forms';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [GraphViewComponent, GraphViewPageComponent],
   exports: [GraphViewPageComponent],
-  providers: [RestService, SpaceService, QuestionService, RelationService, D3Service]
+  providers: [RestService, SpaceService, QuestionService, RelationService, D3Service, GraphViewService]
 })
 export class GraphViewModule {
 }
