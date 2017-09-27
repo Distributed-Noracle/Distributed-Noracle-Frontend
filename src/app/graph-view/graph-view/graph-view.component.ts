@@ -93,17 +93,20 @@ export class GraphViewComponent implements OnInit, OnChanges {
       return;
     }
     if (this.interactionMode === GraphInteractionMode.SelectAndNavigate) {
-      this.setEditBehavior((n) => this.changeSelection(n).then(() => this.initVisualization()));
+      this.setNodeSelectionBehavior((n) => this.changeSelection(n).then(() => this.initVisualization()));
     } else if (this.interactionMode === GraphInteractionMode.AddQuestion) {
-      this.setEditBehavior((n) => this.addNewChildToNode(n));
+      this.setNodeSelectionBehavior((n) => this.addNewChildToNode(n));
     } else if (this.interactionMode === GraphInteractionMode.EditQuestion) {
-      this.setEditBehavior((n) => this.editNode(n));
+      this.setNodeSelectionBehavior((n) => this.editNode(n));
     } else if (this.interactionMode === GraphInteractionMode.AddRelation) {
       // TODO: implement and set Behavior
       this.setExploreBehavior();
     } else if (this.interactionMode === GraphInteractionMode.EditRelation) {
-      // TODO: implement and set Behavior
-      this.setExploreBehavior();
+      this.setEdgeSelectionBehavior((e: Edge) => {
+        this.edges.forEach((edge) => edge.isSelected = false);
+        e.isSelected = true;
+        // window.alert('Edge from [' + (e.source as GraphNode).label + '] to [' + (e.target as GraphNode).label + ']');
+      });
     } else {
       this.setExploreBehavior();
     }
@@ -170,7 +173,7 @@ export class GraphViewComponent implements OnInit, OnChanges {
         }));
   }
 
-  private   setEditBehavior(editFunction: (n: GraphNode) => void) {
+  private setNodeSelectionBehavior(editFunction: (n: GraphNode) => void) {
     const canvas = this.canvas;
     const d3Sim = this.d3Sim;
 
@@ -255,6 +258,76 @@ export class GraphViewComponent implements OnInit, OnChanges {
     }
   }
 
+  private setEdgeSelectionBehavior(editFunction: (e: Edge) => void) {
+    const canvas = this.canvas;
+    const d3Sim = this.d3Sim;
+
+    // drag behavior
+    this.d3.select(canvas)
+      .call(this.d3.drag()
+        .container(canvas)
+        .subject(() => {
+          // console.log('subject: (' + this.d3.event.x + '/' + this.d3.event.y + ')')
+          this.hasDragSubject = false;
+          for (let i = this.edges.length - 1; i >= 0; i--) {
+            const edge = this.edges[i];
+            const d_sqr = this.getPointToLineSegmentSquaredDistance(
+              (edge.source as GraphNode).x, (edge.source as GraphNode).y,
+              (edge.target as GraphNode).x, (edge.target as GraphNode).y,
+              this.transform.invertX(this.d3.event.x), this.transform.invertY(this.d3.event.y)
+            );
+            if (d_sqr <= 100) {
+              return edge;
+            }
+          }
+        })
+        .on('start', () => false)
+        .on('drag', () => false)
+        .on('end', () => {
+          const edge = this.d3.event.subject as Edge;
+          const d_sqr = this.getPointToLineSegmentSquaredDistance(
+            (edge.source as GraphNode).x, (edge.source as GraphNode).y,
+            (edge.target as GraphNode).x, (edge.target as GraphNode).y,
+            this.transform.invertX(this.d3.event.x), this.transform.invertY(this.d3.event.y)
+          );
+          if (d_sqr <= 100) {
+            editFunction(edge);
+            d3Sim.nodes(this.nodes);
+            d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges)
+              .distance((link, i, links) => (link as Edge).getDistance());
+            d3Sim.alpha(1).restart();
+          }
+        }))
+      .call(this.d3.zoom().filter(() => false));
+  }
+
+  private getPointToLineSegmentSquaredDistance(ax: number, ay: number, bx: number, by: number, px: number, py: number) {
+    // calculate unit vector of AB
+    const ab_len = Math.sqrt(Math.pow(bx - ax, 2) + Math.pow(by - ay, 2));
+    const abx_0 = (bx - ax) / ab_len;
+    const aby_0 = (by - ay) / ab_len;
+
+    // calculate projection point C, projecting AP on AB
+    const dot = abx_0 * (px - ax) + aby_0 * (py - ay);
+    const cx = ax + dot * abx_0;
+    const cy = ay + dot * aby_0;
+
+    // calculate multiplier for unit vector to reach point C from point A
+    const ac_mul = (cx - ax) / abx_0;
+
+    let d_sqr;
+    if (ac_mul < 0) {
+      // not above the line segment, closer to A
+      d_sqr = Math.pow(ax - px, 2) + Math.pow(ay - py, 2);
+    } else if (ac_mul > ab_len) {
+      // not above the line segment, closer to B
+      d_sqr = Math.pow(bx - px, 2) + Math.pow(by - py, 2);
+    } else {
+      // above the line segment, distance to C === distance to AB
+      d_sqr = Math.pow(cx - px, 2) + Math.pow(cy - py, 2);
+    }
+    return d_sqr;
+  }
 
   private initData() {
     const context = this.d3Root.nativeElement.getContext('2d');
