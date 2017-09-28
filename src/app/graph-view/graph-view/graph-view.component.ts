@@ -8,6 +8,7 @@ import {GraphInteractionMode} from './graph-data-model/graph-interaction-mode.en
 import {GraphViewService} from './graph-view.service';
 import {Relation} from '../../shared/rest-data-model/relation';
 import {Question} from '../../shared/rest-data-model/question';
+import {Network} from './graph-data-model/network';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -21,8 +22,7 @@ export class GraphViewComponent implements OnInit, OnChanges {
   @Input('interactionMode') private interactionMode: GraphInteractionMode;
 
   private d3: D3;
-  private nodes: GraphNode[] = [];
-  private edges: Edge[] = [];
+  private network = new Network();
   private transform: ZoomTransform;
   private hasDragSubject = false;
   private canvas: HTMLCanvasElement;
@@ -38,11 +38,6 @@ export class GraphViewComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    // TODO: load data
-    // this.SpaceService.getSpace().then((resp) => {
-    //   console.log(resp);
-    //   // TODO: process and push data
-    // });
     this.canvas = this.d3Root.nativeElement;
     this.context = this.canvas.getContext('2d');
     this.d3Sim = this.d3.forceSimulation() as Simulation<GraphNode, Edge>;
@@ -70,22 +65,22 @@ export class GraphViewComponent implements OnInit, OnChanges {
     d3Sim.force('center', this.d3.forceCenter(this.width / 2, this.height / 2));
 
     d3Sim.force('collide', this.d3.forceCollide((node) => (node as GraphNode).radius * 1.2));
-    d3Sim.nodes(this.nodes).on('tick', () => {
+    d3Sim.nodes(this.network.getNodes()).on('tick', () => {
       context.save();
       context.clearRect(0, 0, this.width, this.height);
       context.translate(this.transform.x, this.transform.y);
       context.scale(this.transform.k, this.transform.k);
-      this.edges.forEach((e: Edge) => {
+      this.network.getEdges().forEach((e: Edge) => {
         // draw edge
         e.draw(context as CanvasRenderingContext2D);
       });
-      this.nodes.forEach((n) => {
+      this.network.getNodes().forEach((n) => {
         // draw node
         n.draw(context as CanvasRenderingContext2D);
       });
       context.restore();
     });
-    d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges)
+    d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.network.getEdges())
       .distance((link, i, links) => (link as Edge).getDistance());
   }
 
@@ -105,7 +100,7 @@ export class GraphViewComponent implements OnInit, OnChanges {
       this.setExploreBehavior();
     } else if (this.interactionMode === GraphInteractionMode.EditRelation) {
       this.setEdgeSelectionBehavior((e: Edge) => {
-        this.edges.forEach((edge) => edge.isSelected = false);
+        this.network.getEdges().forEach((edge) => edge.isSelected = false);
         e.isSelected = true;
       });
     } else {
@@ -124,8 +119,9 @@ export class GraphViewComponent implements OnInit, OnChanges {
         .subject(() => {
           // console.log('subject: (' + this.d3.event.x + '/' + this.d3.event.y + ')')
           this.hasDragSubject = false;
-          for (let i = this.nodes.length - 1; i >= 0; i--) {
-            const n = this.nodes[i];
+          const nodes = this.network.getNodes();
+          for (let i = nodes.length - 1; i >= 0; i--) {
+            const n = nodes[i];
             const dx = this.transform.invertX(this.d3.event.x) - n.x;
             const dy = this.transform.invertY(this.d3.event.y) - n.y;
             if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
@@ -159,7 +155,6 @@ export class GraphViewComponent implements OnInit, OnChanges {
       .call(this.d3.zoom()
         .scaleExtent([1 / 4, 4])
         .filter(() => {
-          // TODO: verify this is working on touch devices aswell
           if (this.d3.event.type === 'mousedown' || this.d3.event.type === 'touchstart') {
             if (this.hasDragSubject) {
               return false;
@@ -185,8 +180,9 @@ export class GraphViewComponent implements OnInit, OnChanges {
         .subject(() => {
           // console.log('subject: (' + this.d3.event.x + '/' + this.d3.event.y + ')')
           this.hasDragSubject = false;
-          for (let i = this.nodes.length - 1; i >= 0; i--) {
-            const n = this.nodes[i];
+          const nodes = this.network.getNodes();
+          for (let i = nodes.length - 1; i >= 0; i--) {
+            const n = nodes[i];
             const dx = this.transform.invertX(this.d3.event.x) - n.x;
             const dy = this.transform.invertY(this.d3.event.y) - n.y;
             if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
@@ -205,8 +201,8 @@ export class GraphViewComponent implements OnInit, OnChanges {
           const dy = this.transform.invertY(this.d3.event.y) - n.y;
           if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
             editFunction(n).then(() => {
-              d3Sim.nodes(this.nodes);
-              d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges)
+              d3Sim.nodes(this.network.getNodes());
+              d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.network.getEdges())
                 .distance((link, i, links) => (link as Edge).getDistance());
               d3Sim.alpha(1).restart();
             });
@@ -219,13 +215,19 @@ export class GraphViewComponent implements OnInit, OnChanges {
     return new Promise((resolve, reject) => {
       const label = window.prompt('Ask a follow up question to: ' + n.label);
       if (label !== null) {
-        const newId = this.nodes.reduce((p, c) => (p === null || c.id > p.id) ? c : p, null).id + 1;
-        const newNode = new GraphNode(this.context, newId, label);
+        // TODO: POST question, use questionId from response, POST relation
+        const newId = this.network.getNodes().reduce((p, c) => (p === null || c.id > p.id) ? c : p, null).id + 1;
+        const newRel = new Relation();
+        newRel.firstQuestionId = n.id;
+        newRel.secondQuestionId = newId;
+        newRel.relationId = '[' + n.id + '][' + newId + ']';
+        newRel.name = 'follow up';
+        newRel.directed = true;
+        const newNode = new GraphNode(this.context, newId, label, [newRel]);
         newNode.x = n.x;
         newNode.y = n.y;
         newNode.isSelected = true;
-        this.nodes.push(newNode);
-        this.edges.push(new Edge(n, newNode));
+        this.network.addNode(newNode);
       }
       resolve();
     });
@@ -242,28 +244,14 @@ export class GraphViewComponent implements OnInit, OnChanges {
   }
 
   private changeSelection(n: GraphNode): Promise<any> {
-    if (n.isSelected && this.nodes.filter((node) => node.isSelected).length > 1) {
+    if (n.isSelected && this.network.getNodes().filter((node) => node.isSelected).length > 1) {
       n.isSelected = false;
       return new Promise((resolve, reject) => {
-        const hasSelectedNeighbour = (node: GraphNode) => -1 !== this.edges.findIndex(
-          (e) => {
-            if (e.source === node) {
-              return (e.target as GraphNode).isSelected;
-            } else if (e.target === node) {
-              return (e.source as GraphNode).isSelected;
-            } else {
-              return false;
-            }
-          });
-        for (let i = this.nodes.length - 1; i >= 0; i--) {
-          const node = this.nodes[i];
-          if (!node.isSelected && !hasSelectedNeighbour(node)) {
-            this.nodes.splice(this.nodes.indexOf(node), 1);
-            for (let j = this.edges.length - 1; j >= 0; j--) {
-              if (this.edges[j].source === node || this.edges[j].target === node) {
-                this.edges.splice(j, 1);
-              }
-            }
+        const nodes = this.network.getNodes();
+        for (let i = nodes.length - 1; i >= 0; i--) {
+          const node = nodes[i];
+          if (!node.isSelected && !this.network.hasSelectedNeighbour(node)) {
+            this.network.removeNode(node);
           }
         }
         resolve();
@@ -275,30 +263,27 @@ export class GraphViewComponent implements OnInit, OnChanges {
       return this.graphViewService.getRelationsForQuestion(n.id)
         .then((relations) => {
           const promises = [];
-          const newRelations: Relation[] = [];
+          const newIds: string[] = [];
           relations.forEach((r) => {
             const id = r.firstQuestionId === n.id ? r.secondQuestionId : r.firstQuestionId;
-            if (this.nodes.findIndex((node) => node.id === id) === -1) {
+            if (this.network.getNodes().findIndex((node) => node.id === id) === -1
+              && newIds.indexOf(id) === -1) {
+              // question not yet in network and not yet scheduled for download
+              newIds.push(id);
               promises.push(this.graphViewService.getQuestion(id));
-              newRelations.push(r);
             }
           });
           return Promise.all<Question>(promises).then((questions) => {
             for (let i = questions.length - 1; i >= 0; i--) {
               const question = questions[i];
-              const graphNode = new GraphNode(this.context, question.questionId, question.text);
-              graphNode.x = n.x;
-              graphNode.y = n.y;
-              this.nodes.push(graphNode);
-            }
-            for (let i = newRelations.length - 1; i >= 0; i--) {
-              const relation = newRelations[i];
-              this.edges.push(
-                new Edge(this.nodes.find(
-                  (node) => node.id === relation.firstQuestionId),
-                  this.nodes.find((node) => node.id === relation.secondQuestionId)
+              const graphNode = new GraphNode(this.context, question.questionId, question.text,
+                relations.filter(
+                  (r) => r.firstQuestionId === question.questionId || r.secondQuestionId === question.questionId
                 )
               );
+              graphNode.x = n.x;
+              graphNode.y = n.y;
+              this.network.addNode(graphNode);
             }
           });
         });
@@ -317,8 +302,9 @@ export class GraphViewComponent implements OnInit, OnChanges {
         .subject(() => {
           // console.log('subject: (' + this.d3.event.x + '/' + this.d3.event.y + ')')
           this.hasDragSubject = false;
-          for (let i = this.edges.length - 1; i >= 0; i--) {
-            const edge = this.edges[i];
+          const edges = this.network.getEdges();
+          for (let i = edges.length - 1; i >= 0; i--) {
+            const edge = edges[i];
             const d_sqr = this.getPointToLineSegmentSquaredDistance(
               (edge.source as GraphNode).x, (edge.source as GraphNode).y,
               (edge.target as GraphNode).x, (edge.target as GraphNode).y,
@@ -340,8 +326,8 @@ export class GraphViewComponent implements OnInit, OnChanges {
           );
           if (d_sqr <= squaredDistanceThreshold) {
             editFunction(edge);
-            d3Sim.nodes(this.nodes);
-            d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.edges)
+            d3Sim.nodes(this.network.getNodes());
+            d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.network.getEdges())
               .distance((link, i, links) => (link as Edge).getDistance());
             d3Sim.alpha(1).restart();
           }
@@ -394,15 +380,13 @@ export class GraphViewComponent implements OnInit, OnChanges {
           }
         })).then((questions) => {
           // generate nodes
-          this.nodes.push(new GraphNode(context, initialQuestion.questionId, initialQuestion.text, true));
-          questions.forEach((q) => this.nodes.push(new GraphNode(context, q.questionId, q.text)));
-          // create an array with edges
-          initialQuestionRelations.forEach(
-            (e) => this.edges.push(
-              new Edge(this.nodes.find((n) => n.id === e.firstQuestionId),
-                this.nodes.find((n) => n.id === e.secondQuestionId))
-            )
-          );
+          this.network.addNode(
+            new GraphNode(context, initialQuestion.questionId, initialQuestion.text, initialQuestionRelations, true));
+          // TODO: consider loading relations eagerly; see also: Network.updateEdgesFromNodeRelationships()
+          questions.forEach((q) => this.network.addNode(new GraphNode(context, q.questionId, q.text,
+            initialQuestionRelations.filter(
+              (r) => r.firstQuestionId === q.questionId || r.secondQuestionId === q.questionId
+            ))));
         });
       });
 

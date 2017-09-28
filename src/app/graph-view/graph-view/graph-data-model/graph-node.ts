@@ -6,12 +6,7 @@ export class GraphNode implements SimulationNodeDatum {
   private textSize = 10;
   private bubbleScaleFactor = 1.25;
   public radius;
-  public relations: Relation[];
 
-  /**
-   * Node’s zero-based index into nodes array. This property is set during the initialization process of a simulation.
-   */
-  index?: number;
   /**
    * Node’s current x-position
    */
@@ -20,24 +15,10 @@ export class GraphNode implements SimulationNodeDatum {
    * Node’s current y-position
    */
   y?: number;
-  /**
-   * Node’s current x-velocity
-   */
-  vx?: number;
-  /**
-   * Node’s current y-velocity
-   */
-  vy?: number;
-  /**
-   * Node’s fixed x-position (if position was fixed)
-   */
-  fx?: number | null;
-  /**
-   * Node’s fixed y-position (if position was fixed)
-   */
-  fy?: number | null;
 
-  constructor(context: CanvasRenderingContext2D, public id: string, public label: string, public isSelected = false) {
+
+  constructor(context: CanvasRenderingContext2D, public id: string, public label: string,
+              public relations: Relation[], public isSelected = false) {
     this.lines = this.wrapText((s) => context.measureText(s).width);
   }
 

@@ -1,0 +1,97 @@
+import {GraphNode} from './graph-node';
+import {Edge} from './edge';
+/**
+ * Created by bgoeschlberger on 28.09.2017.
+ */
+export class Network {
+  private nodes: GraphNode[] = [];
+  private edges: Edge[] = [];
+
+  /**
+   * returns the collection of nodes in the network
+   * do not add nodes via push!
+   * use Network.addNode() to add nodes
+   * @returns {GraphNode[]}
+   */
+  public getNodes(): GraphNode[] {
+    return this.nodes;
+  }
+
+  /**
+   * returns the collection of edges in the network
+   * do not add edges via push!
+   * use Network.addNode(), edges are generated from Node.relations
+   * @returns {Edge[]}
+   */
+  public getEdges(): Edge[] {
+    return this.edges;
+  }
+
+  public addNode(nodeToAdd: GraphNode) {
+    this.nodes.push(nodeToAdd);
+    nodeToAdd.relations.forEach((r) => {
+      if (this.edges.findIndex((e) => e.id === r.relationId) === -1) {
+        // edge not yet in network
+        const node1 = this.nodes.find((n) => r.firstQuestionId === n.id);
+        const node2 = this.nodes.find((n) => n.id === r.secondQuestionId);
+        if (node1 !== undefined && node2 !== undefined) {
+          // both nodes are in the network
+          this.edges.push(new Edge(r.relationId, node1, node2));
+          // update nodes if necessary
+          if (node1.relations.findIndex((n) => n.relationId === r.relationId) === -1) {
+            node1.relations.push(r);
+          }
+          if (node2.relations.findIndex((n) => n.relationId === r.relationId) === -1) {
+            node2.relations.push(r);
+          }
+        }
+      }
+    });
+    this.updateEdgesFromNodeRelationships();
+  }
+
+  public removeNode(node: GraphNode) {
+    this.nodes.splice(this.nodes.indexOf(node), 1);
+    for (let i = this.edges.length - 1; i >= 0; i--) {
+      if (-1 !== node.relations.findIndex((rel) => rel.relationId === this.edges[i].id)) {
+        this.edges.splice(i, 1);
+      }
+    }
+  }
+
+  public hasSelectedNeighbour(node: GraphNode): boolean {
+    return -1 !== this.edges.findIndex(
+        (e) => {
+          if (e.source === node) {
+            return (e.target as GraphNode).isSelected;
+          } else if (e.target === node) {
+            return (e.source as GraphNode).isSelected;
+          } else {
+            return false;
+          }
+        });
+  }
+
+  /**
+   * utility to update relations that "don't know" their relationship with another node in the network
+   * this is necessary as we add nodes on the perimeter without loading their relationships
+   * we can drop this if we load relations for a question eagerly
+   */
+  private updateEdgesFromNodeRelationships() {
+    this.nodes.forEach(node => {
+      node.relations.forEach(relation => {
+        if (this.edges.findIndex(edge => edge.id === relation.relationId) === -1) {
+          const outbound = relation.firstQuestionId === node.id;
+          const otherNodeId = (outbound ? relation.secondQuestionId : relation.firstQuestionId);
+          const otherNode = this.nodes.find(n => n.id === otherNodeId);
+          if (otherNode !== undefined) {
+            if (otherNode.relations.findIndex(rel => rel.relationId === relation.relationId) === -1) {
+              otherNode.relations.push(relation);
+            }
+            this.edges.push(new Edge(relation.relationId, outbound ? node : otherNode, outbound ? otherNode : node));
+          }
+        }
+      });
+    });
+  }
+}

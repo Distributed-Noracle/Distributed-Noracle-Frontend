@@ -3,13 +3,11 @@ import {GraphNode} from './graph-node';
 
 export class Edge implements SimulationLinkDatum<GraphNode> {
 
-  public source: string | number | GraphNode;
-  public target: string | number | GraphNode;
   public isSelected = false;
 
-  constructor(from: number | GraphNode, to: number | GraphNode) {
-    this.source = from;
-    this.target = to;
+  constructor(public id: string,
+              public source: string | number | GraphNode,
+              public target: string | number | GraphNode) {
   }
 
   getDistance() {

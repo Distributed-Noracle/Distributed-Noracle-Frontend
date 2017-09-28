@@ -117,6 +117,7 @@ export class GraphViewService {
       {from: 131, to: 1312, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
     ].map((obj) => {
       const r = new Relation();
+      r.relationId = '[' + obj.from + '][' + obj.to + ']';
       r.firstQuestionId = obj.from.toString();
       r.secondQuestionId = obj.to.toString();
       r.name = obj.label;
