@@ -1,5 +1,6 @@
 import {GraphNode} from './graph-node';
 import {Edge} from './edge';
+import {Relation} from '../../../shared/rest-data-model/relation';
 /**
  * Created by bgoeschlberger on 28.09.2017.
  */
@@ -47,7 +48,14 @@ export class Network {
         }
       }
     });
-    this.updateEdgesFromNodeRelationships();
+    this.updateEdgesFromAllNodeRelationships();
+  }
+
+  public addRelationToNode(relation: Relation, node: GraphNode) {
+    if (relation.firstQuestionId === node.id || relation.secondQuestionId === node.id) {
+      node.relations.push(relation);
+      this.updateEdgesForNode(node);
+    }
   }
 
   public removeNode(node: GraphNode) {
@@ -77,21 +85,25 @@ export class Network {
    * this is necessary as we add nodes on the perimeter without loading their relationships
    * we can drop this if we load relations for a question eagerly
    */
-  private updateEdgesFromNodeRelationships() {
+  private updateEdgesFromAllNodeRelationships() {
     this.nodes.forEach(node => {
-      node.relations.forEach(relation => {
-        if (this.edges.findIndex(edge => edge.id === relation.relationId) === -1) {
-          const outbound = relation.firstQuestionId === node.id;
-          const otherNodeId = (outbound ? relation.secondQuestionId : relation.firstQuestionId);
-          const otherNode = this.nodes.find(n => n.id === otherNodeId);
-          if (otherNode !== undefined) {
-            if (otherNode.relations.findIndex(rel => rel.relationId === relation.relationId) === -1) {
-              otherNode.relations.push(relation);
-            }
-            this.edges.push(new Edge(relation.relationId, outbound ? node : otherNode, outbound ? otherNode : node));
+      this.updateEdgesForNode(node);
+    });
+  }
+
+  private updateEdgesForNode(node: GraphNode) {
+    node.relations.forEach(relation => {
+      if (this.edges.findIndex(edge => edge.id === relation.relationId) === -1) {
+        const outbound = relation.firstQuestionId === node.id;
+        const otherNodeId = (outbound ? relation.secondQuestionId : relation.firstQuestionId);
+        const otherNode = this.nodes.find(n => n.id === otherNodeId);
+        if (otherNode !== undefined) {
+          if (otherNode.relations.findIndex(rel => rel.relationId === relation.relationId) === -1) {
+            otherNode.relations.push(relation);
           }
+          this.edges.push(new Edge(relation.relationId, outbound ? node : otherNode, outbound ? otherNode : node));
         }
-      });
+      }
     });
   }
 }

@@ -9,6 +9,11 @@ import {GraphViewService} from './graph-view.service';
 import {Relation} from '../../shared/rest-data-model/relation';
 import {Question} from '../../shared/rest-data-model/question';
 import {Network} from './graph-data-model/network';
+import {ChangeNodeSelectionBehavior} from './interaction-behaviors/change-node-selection-behavior';
+import {NodeInteractionBehavior} from './interaction-behaviors/node-interaction-behavior';
+import {AddChildNodeBehavior} from './interaction-behaviors/add-child-node-behavior';
+import {EditQuestionBehavior} from './interaction-behaviors/edit-question-behavior';
+import {AddRelationBehavior} from './interaction-behaviors/add-relation-behavior';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -90,14 +95,14 @@ export class GraphViewComponent implements OnInit, OnChanges {
       return;
     }
     if (this.interactionMode === GraphInteractionMode.SelectAndNavigate) {
-      this.setNodeSelectionBehavior((n) => this.changeSelection(n));
+      // TODO: review: a new behavior every time?
+      this.setNodeSelectionBehavior(new ChangeNodeSelectionBehavior(this.network, this.graphViewService, this.context));
     } else if (this.interactionMode === GraphInteractionMode.AddQuestion) {
-      this.setNodeSelectionBehavior((n) => this.addNewChildToNode(n));
+      this.setNodeSelectionBehavior(new AddChildNodeBehavior(this.network, this.context));
     } else if (this.interactionMode === GraphInteractionMode.EditQuestion) {
-      this.setNodeSelectionBehavior((n) => this.editNode(n));
+      this.setNodeSelectionBehavior(new EditQuestionBehavior(this.context));
     } else if (this.interactionMode === GraphInteractionMode.AddRelation) {
-      // TODO: implement and set Behavior
-      this.setExploreBehavior();
+      this.setNodeSelectionBehavior(new AddRelationBehavior(this.network));
     } else if (this.interactionMode === GraphInteractionMode.EditRelation) {
       this.setEdgeSelectionBehavior((e: Edge) => {
         this.network.getEdges().forEach((edge) => edge.isSelected = false);
@@ -169,7 +174,7 @@ export class GraphViewComponent implements OnInit, OnChanges {
         }));
   }
 
-  private setNodeSelectionBehavior(editFunction: (n: GraphNode) => Promise<any>) {
+  private setNodeSelectionBehavior(nodeInteractionBehavior: NodeInteractionBehavior) {
     const canvas = this.canvas;
     const d3Sim = this.d3Sim;
 
@@ -200,7 +205,7 @@ export class GraphViewComponent implements OnInit, OnChanges {
           const dx = this.transform.invertX(this.d3.event.x) - n.x;
           const dy = this.transform.invertY(this.d3.event.y) - n.y;
           if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
-            editFunction(n).then(() => {
+            nodeInteractionBehavior.interactWith(n).then(() => {
               d3Sim.nodes(this.network.getNodes());
               d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.network.getEdges())
                 .distance((link, i, links) => (link as Edge).getDistance());
@@ -209,85 +214,6 @@ export class GraphViewComponent implements OnInit, OnChanges {
           }
         }))
       .call(this.d3.zoom().filter(() => false));
-  }
-
-  private addNewChildToNode(n: GraphNode): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const label = window.prompt('Ask a follow up question to: ' + n.label);
-      if (label !== null) {
-        // TODO: POST question, use questionId from response, POST relation
-        const newId = this.network.getNodes().reduce((p, c) => (p === null || c.id > p.id) ? c : p, null).id + 1;
-        const newRel = new Relation();
-        newRel.firstQuestionId = n.id;
-        newRel.secondQuestionId = newId;
-        newRel.relationId = '[' + n.id + '][' + newId + ']';
-        newRel.name = 'follow up';
-        newRel.directed = true;
-        const newNode = new GraphNode(this.context, newId, label, [newRel]);
-        newNode.x = n.x;
-        newNode.y = n.y;
-        newNode.isSelected = true;
-        this.network.addNode(newNode);
-      }
-      resolve();
-    });
-  }
-
-  private editNode(n: GraphNode) {
-    return new Promise((resolve, reject) => {
-      const label = window.prompt('Edit Question:', n.label);
-      if (label !== null) {
-        n.setLabel(label, this.context);
-      }
-      resolve();
-    });
-  }
-
-  private changeSelection(n: GraphNode): Promise<any> {
-    if (n.isSelected && this.network.getNodes().filter((node) => node.isSelected).length > 1) {
-      n.isSelected = false;
-      return new Promise((resolve, reject) => {
-        const nodes = this.network.getNodes();
-        for (let i = nodes.length - 1; i >= 0; i--) {
-          const node = nodes[i];
-          if (!node.isSelected && !this.network.hasSelectedNeighbour(node)) {
-            this.network.removeNode(node);
-          }
-        }
-        resolve();
-      });
-    } else if (n.isSelected) {
-      return Promise.resolve(window.alert('You can\'t deselect the last selected node.'));
-    } else {
-      n.isSelected = true;
-      return this.graphViewService.getRelationsForQuestion(n.id)
-        .then((relations) => {
-          const promises = [];
-          const newIds: string[] = [];
-          relations.forEach((r) => {
-            const id = r.firstQuestionId === n.id ? r.secondQuestionId : r.firstQuestionId;
-            if (this.network.getNodes().findIndex((node) => node.id === id) === -1
-              && newIds.indexOf(id) === -1) {
-              // question not yet in network and not yet scheduled for download
-              newIds.push(id);
-              promises.push(this.graphViewService.getQuestion(id));
-            }
-          });
-          return Promise.all<Question>(promises).then((questions) => {
-            for (let i = questions.length - 1; i >= 0; i--) {
-              const question = questions[i];
-              const graphNode = new GraphNode(this.context, question.questionId, question.text,
-                relations.filter(
-                  (r) => r.firstQuestionId === question.questionId || r.secondQuestionId === question.questionId
-                )
-              );
-              graphNode.x = n.x;
-              graphNode.y = n.y;
-              this.network.addNode(graphNode);
-            }
-          });
-        });
-    }
   }
 
   private setEdgeSelectionBehavior(editFunction: (e: Edge) => void) {
@@ -389,8 +315,5 @@ export class GraphViewComponent implements OnInit, OnChanges {
             ))));
         });
       });
-
-
   }
-
 }
