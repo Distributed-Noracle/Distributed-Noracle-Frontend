@@ -1,10 +1,12 @@
 import {SimulationNodeDatum} from 'd3-force';
+import {Relation} from '../../../shared/rest-data-model/relation';
 
 export class GraphNode implements SimulationNodeDatum {
   private lines: string[];
   private textSize = 10;
   private bubbleScaleFactor = 1.25;
   public radius;
+  public relations: Relation[];
 
   /**
    * Node’s zero-based index into nodes array. This property is set during the initialization process of a simulation.
@@ -35,7 +37,7 @@ export class GraphNode implements SimulationNodeDatum {
    */
   fy?: number | null;
 
-  constructor(context: CanvasRenderingContext2D, public id: number, public label: string, public isSelected = false) {
+  constructor(context: CanvasRenderingContext2D, public id: string, public label: string, public isSelected = false) {
     this.lines = this.wrapText((s) => context.measureText(s).width);
   }
 

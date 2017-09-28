@@ -1,22 +1,24 @@
 import {Injectable} from '@angular/core';
+import {Question} from '../../shared/rest-data-model/question';
+import {Relation} from '../../shared/rest-data-model/relation';
 
 @Injectable()
 export class GraphViewService {
 
-  private questions: any[];
-  private relations: any[];
+  private questions: Question[];
+  private relations: Relation[];
 
   constructor() {
     this.initDummyData();
   }
 
-  public getQuestion(questionId: number): Promise<any> {
-    return new Promise((resolve, reject) => resolve(this.questions.find((q) => q.id === questionId)));
+  public getQuestion(questionId: string): Promise<Question> {
+    return new Promise((resolve, reject) => resolve(this.questions.find((q) => q.questionId === questionId)));
   }
 
-  public getRelationsForQuestion(questionId: number): Promise<any[]> {
+  public getRelationsForQuestion(questionId: string): Promise<Relation[]> {
     return new Promise(
-      (resolve, reject) => resolve(this.relations.filter((r) => r.from === questionId || r.to === questionId))
+      (resolve, reject) => resolve(this.relations.filter((r) => r.firstQuestionId === questionId || r.secondQuestionId === questionId))
     );
   }
 
@@ -93,7 +95,12 @@ export class GraphViewService {
         label: 'Who is actually benefiting from our work',
         title: 'asked by Bernhard'
       }
-    ];
+    ].map((obj) => {
+      const q = new Question();
+      q.questionId = obj.id.toString();
+      q.text = obj.label;
+      return q;
+    });
     this.relations = [
       {from: 1, to: 11, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
       {from: 1, to: 12, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
@@ -108,6 +115,13 @@ export class GraphViewService {
       {from: 13, to: 131, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
       {from: 131, to: 1311, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
       {from: 131, to: 1312, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-    ];
+    ].map((obj) => {
+      const r = new Relation();
+      r.firstQuestionId = obj.from.toString();
+      r.secondQuestionId = obj.to.toString();
+      r.name = obj.label;
+      r.directed = obj.arrows !== undefined;
+      return r;
+    });
   }
 }

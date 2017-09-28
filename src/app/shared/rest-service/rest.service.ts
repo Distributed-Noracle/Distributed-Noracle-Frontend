@@ -2,6 +2,10 @@ import {Injectable} from '@angular/core';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
 import {Headers, Http, Response} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
+import {Question} from '../rest-data-model/question';
+import {Space} from '../rest-data-model/space';
+import {Relation} from '../rest-data-model/relation';
+import {SpaceSubscription} from '../rest-data-model/spacesubscription';
 
 @Injectable()
 export class RestService {

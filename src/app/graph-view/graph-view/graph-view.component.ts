@@ -6,6 +6,8 @@ import {Edge} from './graph-data-model/edge';
 import {ZoomTransform} from 'd3-zoom';
 import {GraphInteractionMode} from './graph-data-model/graph-interaction-mode.enum';
 import {GraphViewService} from './graph-view.service';
+import {Relation} from '../../shared/rest-data-model/relation';
+import {Question} from '../../shared/rest-data-model/question';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -105,7 +107,6 @@ export class GraphViewComponent implements OnInit, OnChanges {
       this.setEdgeSelectionBehavior((e: Edge) => {
         this.edges.forEach((edge) => edge.isSelected = false);
         e.isSelected = true;
-        // window.alert('Edge from [' + (e.source as GraphNode).label + '] to [' + (e.target as GraphNode).label + ']');
       });
     } else {
       this.setExploreBehavior();
@@ -268,34 +269,35 @@ export class GraphViewComponent implements OnInit, OnChanges {
         resolve();
       });
     } else if (n.isSelected) {
-      return new Promise((resolve, reject) => {
-        window.alert('You can\'t deselect the last selected node.');
-      });
+      return Promise.resolve(window.alert('You can\'t deselect the last selected node.'));
     } else {
       n.isSelected = true;
       return this.graphViewService.getRelationsForQuestion(n.id)
         .then((relations) => {
           const promises = [];
-          const newRelations = [];
+          const newRelations: Relation[] = [];
           relations.forEach((r) => {
-            const id = r.from === n.id ? r.to : r.from;
+            const id = r.firstQuestionId === n.id ? r.secondQuestionId : r.firstQuestionId;
             if (this.nodes.findIndex((node) => node.id === id) === -1) {
               promises.push(this.graphViewService.getQuestion(id));
               newRelations.push(r);
             }
           });
-          return Promise.all(promises).then((questions) => {
+          return Promise.all<Question>(promises).then((questions) => {
             for (let i = questions.length - 1; i >= 0; i--) {
-              const d = questions[i];
-              const graphNode = new GraphNode(this.context, d.id, d.label);
+              const question = questions[i];
+              const graphNode = new GraphNode(this.context, question.questionId, question.text);
               graphNode.x = n.x;
               graphNode.y = n.y;
               this.nodes.push(graphNode);
             }
             for (let i = newRelations.length - 1; i >= 0; i--) {
-              const e = newRelations[i];
+              const relation = newRelations[i];
               this.edges.push(
-                new Edge(this.nodes.find((node) => node.id === e.from), this.nodes.find((node) => node.id === e.to))
+                new Edge(this.nodes.find(
+                  (node) => node.id === relation.firstQuestionId),
+                  this.nodes.find((node) => node.id === relation.secondQuestionId)
+                )
               );
             }
           });
@@ -377,27 +379,28 @@ export class GraphViewComponent implements OnInit, OnChanges {
 
   private initData() {
     const context = this.d3Root.nativeElement.getContext('2d');
-    return Promise.all<any, any[]>([this.graphViewService.getQuestion(1), this.graphViewService.getRelationsForQuestion(1)])
+    const initialSelection = ['1'];
+    return Promise.all<Question, Relation[]>([this.graphViewService.getQuestion(initialSelection[0]),
+      this.graphViewService.getRelationsForQuestion(initialSelection[0])])
       .then((values) => {
         const initialQuestion = values[0];
-        const initialQuestions = [];
         const initialQuestionRelations = values[1];
 
-        return Promise.all(initialQuestionRelations.map((r) => {
-          if (r.from === initialQuestion.id) {
-            return this.graphViewService.getQuestion(r.to);
+        return Promise.all<Question>(initialQuestionRelations.map((r) => {
+          if (r.firstQuestionId === initialQuestion.questionId) {
+            return this.graphViewService.getQuestion(r.secondQuestionId);
           } else {
-            return this.graphViewService.getQuestion(r.from);
+            return this.graphViewService.getQuestion(r.firstQuestionId);
           }
         })).then((questions) => {
-          questions.forEach((q) => initialQuestions.push(q));
           // generate nodes
-          this.nodes.push(new GraphNode(context, initialQuestion.id, initialQuestion.label, true));
-          initialQuestions.forEach((d) => this.nodes.push(new GraphNode(context, d.id, d.label)));
+          this.nodes.push(new GraphNode(context, initialQuestion.questionId, initialQuestion.text, true));
+          questions.forEach((q) => this.nodes.push(new GraphNode(context, q.questionId, q.text)));
           // create an array with edges
           initialQuestionRelations.forEach(
             (e) => this.edges.push(
-              new Edge(this.nodes.find((n) => n.id === e.from), this.nodes.find((n) => n.id === e.to))
+              new Edge(this.nodes.find((n) => n.id === e.firstQuestionId),
+                this.nodes.find((n) => n.id === e.secondQuestionId))
             )
           );
         });
