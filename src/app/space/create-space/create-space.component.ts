@@ -21,7 +21,7 @@ export class CreateSpaceComponent implements OnInit {
 
   createSpace() {
     this.spaceService.postSpace(this.space).then((space) => {
-      this.router.navigate(['space', space.spaceId]);
+      this.router.navigate(['/spaces', space.spaceId]);
     }, );
   }
 

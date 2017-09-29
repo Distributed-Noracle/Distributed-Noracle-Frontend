@@ -66,6 +66,7 @@ export class RestHelperService {
     const password = 'testtest';
     const base64encodedData = btoa(user + ':' + password);
     headers.append('Authorization', 'Basic ' + base64encodedData);
+    headers.append('location', '');
     return headers;
   }
 
