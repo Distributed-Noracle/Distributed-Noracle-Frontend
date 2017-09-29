@@ -105,14 +105,14 @@ export class RestService {
     return headers;
   }
 
-  private getMockHeaders(){
-      const headers = new Headers();
-      headers.append('Accept', 'application/json');
-      headers.append('Content-Type', 'application/json');
-      var user = 'noracle-example-smith';
-      var password = 'testtest';
-      var base64encodedData = new Buffer(user + ':' + password).toString('base64');
-      headers.append('Authorization', 'Basic ' + base64encodedData);
-      return headers;
+  private getMockHeaders() {
+    const headers = new Headers();
+    headers.append('Accept', 'application/json');
+    headers.append('Content-Type', 'application/json');
+    const user = 'noracle-example-smith';
+    const password = 'testtest';
+    const base64encodedData = new Buffer(user + ':' + password).toString('base64');
+    headers.append('Authorization', 'Basic ' + base64encodedData);
+    return headers;
   }
 }

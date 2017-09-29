@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {RestService} from "../shared/rest-service/rest.service";
-import {Question} from "../shared/rest-data-model/question";
+import {RestService} from '../shared/rest-service/rest.service';
+import {Question} from '../shared/rest-data-model/question';
 
 @Injectable()
 export class QuestionService {
@@ -9,7 +9,7 @@ export class QuestionService {
   }
 
   public getQuestionsOfSpace(id): Promise<Question[]> {
-    return this.RestService.getQuestions(id).toPromise().then((res)=> {
+    return this.RestService.getQuestions(id).toPromise().then((res) => {
       return res.json() as Question[];
     });
 
