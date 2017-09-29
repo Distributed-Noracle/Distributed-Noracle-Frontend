@@ -1,5 +1,9 @@
 <button md-button [mdMenuTriggerFor]="menu">Spaces</button>
 <md-menu #menu [overlapTrigger]="false">
-  <a *ngFor="let space of spaces" fxFlex md-button routerLink="['/graph']"
+  <a *ngFor="let space of spaces" md-menu-item [routerLink]="['spaces', space.spaceId]"
      routerLinkActive="router-link-active"><span>{{space.name}}</span></a>
+  <hr *ngIf="spaces.length>0"/>
+  <a md-menu-item [routerLink]="['myspaces']"><span>Show Space Overview</span></a>
+  <a md-menu-item [routerLink]="['spaces', 'create']"><span>Create new Space</span></a>
+
 </md-menu>

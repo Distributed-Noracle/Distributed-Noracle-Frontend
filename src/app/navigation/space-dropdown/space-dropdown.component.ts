@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {SpaceSubscription} from '../../shared/rest-data-model/spacesubscription';
+import {AgentService} from '../../shared/agent/agent.service';
 
 @Component({
   selector: 'dnor-space-dropdown',
@@ -10,15 +11,11 @@ export class SpaceDropdownComponent implements OnInit {
 
   private spaces: SpaceSubscription[] = [];
 
-  constructor() {
+  constructor(private agentService: AgentService) {
   }
 
   ngOnInit() {
-    const s = new SpaceSubscription();
-    s.name = 'Test 1';
-    s.spaceId = '1';
-    s.selectedQuestions = ['1'];
-    this.spaces.push(s);
+    this.agentService.getSpaceSubscriptions().then((subscriptions) => subscriptions.forEach(s => this.spaces.push(s)));
   }
 
 }

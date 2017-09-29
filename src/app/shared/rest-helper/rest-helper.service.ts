@@ -19,6 +19,12 @@ export class RestHelperService {
     );
   }
 
+  public getAbsoulte(absolutePath: string) {
+    return this.http.get(absolutePath,
+      {headers: this.getHeaders()}
+    );
+  }
+
   public put(path: string, body: any) {
     return this.http.put(this.BASE_URL + path,
       body,
@@ -42,7 +48,7 @@ export class RestHelperService {
       return this.getMockHeaders();
     }
     const headers = new Headers();
-    headers.append('Accept', 'application/json');
+    headers.append('Accept', 'application/json;q=0.9,text/plain;q=0.8,*/*;q=0.5');
     headers.append('Content-Type', 'application/json');
     const token = this.OidcSecurityService.getToken();
     if (token !== '') {
@@ -54,7 +60,7 @@ export class RestHelperService {
 
   private getMockHeaders(): Headers {
     const headers = new Headers();
-    headers.append('Accept', 'application/json');
+    headers.append('Accept', 'application/json;q=0.9,text/plain;q=0.8,*/*;q=0.5');
     headers.append('Content-Type', 'application/json');
     const user = 'noracle-example-smith';
     const password = 'testtest';

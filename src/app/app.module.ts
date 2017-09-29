@@ -1,5 +1,5 @@
 import {BrowserModule} from '@angular/platform-browser';
-import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
+import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 import {AppComponent} from './app.component';
@@ -16,10 +16,12 @@ import {LoginModule} from './login/login.module';
 import {LoginPageComponent} from './login/login-page/login-page.component';
 import {GraphViewPageComponent} from './graph-view/graph-view-page/graph-view-page.component';
 import {WelcomePageComponent} from './login/welcome-page/welcome-page.component';
+import {SpaceModule} from './space/space.module';
+import {SubscribedSpacesOverviewComponent} from './space/subscribed-spaces-overview/subscribed-spaces-overview.component';
+import {CreateSpaceComponent} from './space/create-space/create-space.component';
 
 @NgModule({
   declarations: [AppComponent],
-  // schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -28,11 +30,14 @@ import {WelcomePageComponent} from './login/welcome-page/welcome-page.component'
     SharedModule,
     NavigationModule,
     LoginModule,
+    SpaceModule,
     GraphViewModule,
     RouterModule.forRoot([
       {path: 'welcome', component: WelcomePageComponent},
       {path: 'login', component: LoginPageComponent},
-      {path: 'graph', component: GraphViewPageComponent, canActivate: [AuthGuardService]},
+      {path: 'myspaces', component: SubscribedSpacesOverviewComponent, canActivate: [AuthGuardService]},
+      {path: 'spaces/create', component: CreateSpaceComponent},
+      {path: 'spaces/:spaceId', component: GraphViewPageComponent, canActivate: [AuthGuardService]},
       {path: '**', redirectTo: 'welcome'}
     ]),
     PolymerModule.forRoot(),
@@ -51,7 +56,7 @@ export class AppModule {
     openIDImplicitFlowConfiguration.response_type = 'id_token token';
     openIDImplicitFlowConfiguration.scope = 'openid email profile';
     openIDImplicitFlowConfiguration.post_logout_redirect_uri = environment.redirectUrl;
-    openIDImplicitFlowConfiguration.startup_route = '/welcome';
+    openIDImplicitFlowConfiguration.startup_route = '/myspaces';
     openIDImplicitFlowConfiguration.auto_userinfo = true;
     openIDImplicitFlowConfiguration.log_console_warning_active = !environment.production;
     openIDImplicitFlowConfiguration.log_console_debug_active = !environment.production;

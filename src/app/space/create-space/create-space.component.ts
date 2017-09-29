@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {Space} from '../../shared/rest-data-model/space';
+import {SpaceService} from '../../shared/space/space.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'dnor-create-space',
@@ -7,9 +10,19 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CreateSpaceComponent implements OnInit {
 
-  constructor() { }
+  private space = new Space();
+
+  constructor(private spaceService: SpaceService, private router: Router) {
+    this.space.name = '';
+  }
 
   ngOnInit() {
+  }
+
+  createSpace() {
+    this.spaceService.postSpace(this.space).then((space) => {
+      this.router.navigate(['space', space.spaceId]);
+    }, );
   }
 
 }
