@@ -22,6 +22,13 @@ export class GraphViewService {
     );
   }
 
+  public getQuestionAndRelations(questionId: string): Promise<{ question: Question, relations: Relation[] }> {
+    return Promise.all<Question, Relation[]>([this.getQuestion(questionId), this.getRelationsForQuestion(questionId)])
+      .then(value => {
+        return {question: value[0], relations: value[1]};
+      });
+  }
+
 
   private initDummyData() {
     this.questions = [

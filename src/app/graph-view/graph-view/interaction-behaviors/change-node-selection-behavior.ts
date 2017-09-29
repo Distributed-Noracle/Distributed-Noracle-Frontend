@@ -3,6 +3,7 @@ import {GraphNode} from '../graph-data-model/graph-node';
 import {Network} from '../graph-data-model/network';
 import {GraphViewService} from '../graph-view.service';
 import {Question} from '../../../shared/rest-data-model/question';
+import {Relation} from '../../../shared/rest-data-model/relation';
 
 export class ChangeNodeSelectionBehavior extends NodeInteractionBehavior {
 
@@ -41,7 +42,7 @@ export class ChangeNodeSelectionBehavior extends NodeInteractionBehavior {
     n.isSelected = true;
     return this.graphViewService.getRelationsForQuestion(n.id)
       .then((relations) => {
-        const promises = [];
+        const promises: Promise<{ question: Question, relations: Relation[] }>[] = [];
         const newIds: string[] = [];
         relations.forEach((r) => {
           const id = r.firstQuestionId === n.id ? r.secondQuestionId : r.firstQuestionId;
@@ -49,17 +50,14 @@ export class ChangeNodeSelectionBehavior extends NodeInteractionBehavior {
             && newIds.indexOf(id) === -1) {
             // question not yet in network and not yet scheduled for download
             newIds.push(id);
-            promises.push(this.graphViewService.getQuestion(id));
+            promises.push(this.graphViewService.getQuestionAndRelations(id));
           }
         });
-        return Promise.all<Question>(promises).then((questions) => {
-          for (let i = questions.length - 1; i >= 0; i--) {
-            const question = questions[i];
-            const graphNode = new GraphNode(this.context, question.questionId, question.text,
-              relations.filter(
-                (r) => r.firstQuestionId === question.questionId || r.secondQuestionId === question.questionId
-              )
-            );
+        return Promise.all<{ question: Question, relations: Relation[] }>(promises).then((values) => {
+          for (let i = values.length - 1; i >= 0; i--) {
+            const question = values[i].question;
+            const rel = values[i].relations;
+            const graphNode = new GraphNode(this.context, question.questionId, question.text, rel);
             graphNode.x = n.x;
             graphNode.y = n.y;
             this.network.addNode(graphNode);

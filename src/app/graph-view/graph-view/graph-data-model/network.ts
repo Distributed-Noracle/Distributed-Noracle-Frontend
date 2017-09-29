@@ -48,7 +48,6 @@ export class Network {
         }
       }
     });
-    this.updateEdgesFromAllNodeRelationships();
   }
 
   public addRelationToNode(relation: Relation, node: GraphNode) {
@@ -78,17 +77,6 @@ export class Network {
             return false;
           }
         });
-  }
-
-  /**
-   * utility to update relations that "don't know" their relationship with another node in the network
-   * this is necessary as we add nodes on the perimeter without loading their relationships
-   * we can drop this if we load relations for a question eagerly
-   */
-  private updateEdgesFromAllNodeRelationships() {
-    this.nodes.forEach(node => {
-      this.updateEdgesForNode(node);
-    });
   }
 
   private updateEdgesForNode(node: GraphNode) {

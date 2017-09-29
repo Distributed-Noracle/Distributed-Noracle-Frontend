@@ -292,28 +292,22 @@ export class GraphViewComponent implements OnInit, OnChanges {
   private initData() {
     const context = this.d3Root.nativeElement.getContext('2d');
     const initialSelection = ['1'];
-    return Promise.all<Question, Relation[]>([this.graphViewService.getQuestion(initialSelection[0]),
-      this.graphViewService.getRelationsForQuestion(initialSelection[0])])
-      .then((values) => {
-        const initialQuestion = values[0];
-        const initialQuestionRelations = values[1];
-
-        return Promise.all<Question>(initialQuestionRelations.map((r) => {
-          if (r.firstQuestionId === initialQuestion.questionId) {
-            return this.graphViewService.getQuestion(r.secondQuestionId);
-          } else {
-            return this.graphViewService.getQuestion(r.firstQuestionId);
-          }
-        })).then((questions) => {
-          // generate nodes
-          this.network.addNode(
-            new GraphNode(context, initialQuestion.questionId, initialQuestion.text, initialQuestionRelations, true));
-          // TODO: consider loading relations eagerly; see also: Network.updateEdgesFromNodeRelationships()
-          questions.forEach((q) => this.network.addNode(new GraphNode(context, q.questionId, q.text,
-            initialQuestionRelations.filter(
-              (r) => r.firstQuestionId === q.questionId || r.secondQuestionId === q.questionId
-            ))));
-        });
+    return this.graphViewService.getQuestionAndRelations(initialSelection[0]).then((res) => {
+      const initialQuestion = res.question;
+      const initialQuestionRelations = res.relations;
+      this.network.addNode(
+        new GraphNode(context, initialQuestion.questionId, initialQuestion.text, initialQuestionRelations, true));
+      return Promise.all<{ question: Question, relations: Relation[] }>(initialQuestionRelations.map((r) => {
+        if (r.firstQuestionId === initialQuestion.questionId) {
+          return this.graphViewService.getQuestionAndRelations(r.secondQuestionId);
+        } else {
+          return this.graphViewService.getQuestionAndRelations(r.firstQuestionId);
+        }
+      })).then((values) => {
+        // generate nodes
+        values.forEach((val) => this.network.addNode(new GraphNode(context, val.question.questionId, val.question.text,
+          val.relations)));
       });
+    });
   }
 }
