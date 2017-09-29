@@ -3,10 +3,10 @@ import {OidcSecurityService, OidcSecurityValidation} from 'angular-auth-oidc-cli
 
 @Component({
   selector: 'dnor-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  templateUrl: './login-page.component.html',
+  styleUrls: ['./login-page.component.css']
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class LoginPageComponent implements OnInit, OnDestroy {
 
   constructor(public oidcSecurityService: OidcSecurityService) {
     if (this.oidcSecurityService.moduleSetup) {

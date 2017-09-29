@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
-import {AuthGuardService} from '../auth-guard/auth-guard.service';
+import {AuthGuardService} from '../../shared/auth-guard/auth-guard.service';
 import {Router} from '@angular/router';
+
 
 @Component({
   selector: 'dnor-nav',
@@ -18,7 +19,7 @@ export class NavComponent implements OnInit {
   }
 
   logout() {
-    this.authGuardService.isAuthorized()
+    this.authGuardService.isAuthorized();
     {
       this.oidcSecurityService.logoff();
       this.authGuardService.logoff();

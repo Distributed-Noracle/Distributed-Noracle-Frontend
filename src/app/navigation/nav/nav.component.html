@@ -1,0 +1,13 @@
+<md-toolbar color="primary">
+  <div fxLayout="row" fxFlex fxLayoutAlign="end center">
+    <a fxFlex md-button [routerLink]="['welcome']" routerLinkActive="router-link-active"><span>Noracle</span></a>
+    <span fxFlex="grow"></span>
+    <dnor-space-dropdown *ngIf="authGuardService.isAuthorized()"></dnor-space-dropdown>
+    <a fxFlex md-button [routerLink]="['graph']" routerLinkActive="router-link-active"><span>Graph</span></a>
+    <a fxFlex md-button (click)="logout()" *ngIf="authGuardService.isAuthorized()"><span>Logout</span></a>
+    <a fxFlex md-button [routerLink]="['login']" routerLinkActive="router-link-active"
+       *ngIf="!authGuardService.isAuthorized()">
+      <span>Login</span>
+    </a>
+  </div>
+</md-toolbar>

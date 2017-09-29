@@ -1,8 +1,0 @@
-<md-toolbar color="primary">
-  <div fxLayout="row" fxFlex fxLayoutAlign="end center">
-    <span fxFlex>Noracle</span>
-    <span fxFlex="grow"></span>
-    <a fxFlex md-button [routerLink]="['/graph']" routerLinkActive="router-link-active"><span>Graph</span></a>
-    <a fxFlex md-button (click)="logout()" *ngIf="authGuardService.isAuthorized()"><span>Logout</span></a>
-  </div>
-</md-toolbar>
