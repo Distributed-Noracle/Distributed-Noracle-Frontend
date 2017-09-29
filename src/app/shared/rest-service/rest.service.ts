@@ -1,3 +1,4 @@
+///<reference path="../../../../node_modules/@types/node/index.d.ts"/>
 import {Injectable} from '@angular/core';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
 import {Headers, Http, Response} from '@angular/http';
@@ -9,7 +10,7 @@ import {SpaceSubscription} from '../rest-data-model/spacesubscription';
 
 @Injectable()
 export class RestService {
-  private BASE_URL = 'https://steen.informatik.rwth-aachen.de:9089/distributed-noracle/v0.4.0';
+  private BASE_URL = 'https://steen.informatik.rwth-aachen.de:9082/distributed-noracle/v0.5.0';
 
   constructor(private OidcSecurityService: OidcSecurityService, private Http: Http) {
   }
@@ -23,7 +24,7 @@ export class RestService {
 
   public getSpace(spaceId): Observable<Response> {
     return this.Http.get(this.BASE_URL + '/spaces/' + spaceId,
-      {headers: this.getHeaders()}
+      {headers: this.getMockHeaders()}
     );
   }
 
@@ -36,7 +37,7 @@ export class RestService {
 
   public getQuestions(spaceId): Observable<Response> {
     return this.Http.get(this.BASE_URL + '/spaces/' + spaceId + '/questions',
-      {headers: this.getHeaders()}
+      {headers: this.getMockHeaders()}
     );
   }
 
@@ -61,8 +62,8 @@ export class RestService {
   }
 
   public getRelations(spaceId): Observable<Response> {
-    return this.Http.post(this.BASE_URL + '/spaces/' + spaceId + '/relations',
-      {headers: this.getHeaders()}
+    return this.Http.get(this.BASE_URL + '/spaces/' + spaceId + '/relations',
+      {headers: this.getMockHeaders()}
     );
   }
 
@@ -102,5 +103,16 @@ export class RestService {
       headers.append('Authorization', tokenValue);
     }
     return headers;
+  }
+
+  private getMockHeaders(){
+      const headers = new Headers();
+      headers.append('Accept', 'application/json');
+      headers.append('Content-Type', 'application/json');
+      var user = 'noracle-example-smith';
+      var password = 'testtest';
+      var base64encodedData = new Buffer(user + ':' + password).toString('base64');
+      headers.append('Authorization', 'Basic ' + base64encodedData);
+      return headers;
   }
 }

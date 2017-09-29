@@ -1,25 +1,26 @@
 import {Injectable} from '@angular/core';
 import {Question} from '../../shared/rest-data-model/question';
 import {Relation} from '../../shared/rest-data-model/relation';
+import {QuestionService} from "../question.service";
+import {RelationService} from "../relation.service";
 
 @Injectable()
 export class GraphViewService {
 
-  private questions: Question[];
-  private relations: Relation[];
+  private initPromise: Promise<any>;
+  private questions: Question[] = [];
+  private relations: Relation[] = [];
 
-  constructor() {
-    this.initDummyData();
+  constructor(private questionService:QuestionService, private relationService:RelationService) {
+    this.initData();
   }
 
   public getQuestion(questionId: string): Promise<Question> {
-    return new Promise((resolve, reject) => resolve(this.questions.find((q) => q.questionId === questionId)));
+    return this.initPromise.then(() => this.questions.find((q) => q.questionId === questionId))
   }
 
   public getRelationsForQuestion(questionId: string): Promise<Relation[]> {
-    return new Promise(
-      (resolve, reject) => resolve(this.relations.filter((r) => r.firstQuestionId === questionId || r.secondQuestionId === questionId))
-    );
+    return this.initPromise.then(() => this.relations.filter((r) => r.firstQuestionId === questionId || r.secondQuestionId === questionId))
   }
 
   public getQuestionAndRelations(questionId: string): Promise<{ question: Question, relations: Relation[] }> {
@@ -29,6 +30,13 @@ export class GraphViewService {
       });
   }
 
+  private initData() {
+    this.initPromise = Promise.all([
+    this.questionService.getQuestionsOfSpace(1346968278).then((res)=>
+    this.questions = res),
+    this.relationService.getRelationsOfSpace(1346968278).then((res)=>
+      this.relations = res)]);
+  }
 
   private initDummyData() {
     this.questions = [

@@ -291,7 +291,7 @@ export class GraphViewComponent implements OnInit, OnChanges {
 
   private initData() {
     const context = this.d3Root.nativeElement.getContext('2d');
-    const initialSelection = ['1'];
+    const initialSelection = ['8188563431'];
     return this.graphViewService.getQuestionAndRelations(initialSelection[0]).then((res) => {
       const initialQuestion = res.question;
       const initialQuestionRelations = res.relations;

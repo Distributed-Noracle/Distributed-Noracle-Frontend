@@ -7,9 +7,8 @@ export class SpaceService {
   constructor(private RestService: RestService) {
   }
 
-  public getSpace() {
-    // XXX: hardcoded for now
-    return this.RestService.getSpace(7367518275).toPromise();
+  public getSpace(id) {
+    return this.RestService.getSpace(id).toPromise();
   }
 
 }
