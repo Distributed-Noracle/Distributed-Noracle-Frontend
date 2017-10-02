@@ -25,7 +25,7 @@ export class AddChildNodeBehavior extends NodeInteractionBehavior {
         newNode.x = node.x;
         newNode.y = node.y;
         newNode.isSelected = true;
-        this.network.addNode(newNode);
+        this.network.addOrUpdateNode(newNode);
       }
       resolve();
     });

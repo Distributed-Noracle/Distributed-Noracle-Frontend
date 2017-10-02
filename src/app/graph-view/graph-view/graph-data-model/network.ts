@@ -28,9 +28,10 @@ export class Network {
     return this.edges;
   }
 
-  public addNode(nodeToAdd: GraphNode) {
+  public addOrUpdateNode(nodeToAdd: GraphNode): boolean {
     if (this.nodes.findIndex((n) => n.id === nodeToAdd.id) !== -1) {
-      return;
+      // TODO: update node
+      return false;
     }
     this.nodes.push(nodeToAdd);
     nodeToAdd.relations.forEach((r) => {
@@ -51,6 +52,7 @@ export class Network {
         }
       }
     });
+    return true;
   }
 
   public addRelationToNode(relation: Relation, node: GraphNode) {
