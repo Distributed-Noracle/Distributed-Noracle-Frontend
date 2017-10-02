@@ -12,8 +12,14 @@ export class GraphViewService {
   private relations: Relation[] = [];
 
   constructor(private questionService: QuestionService, private relationService: RelationService) {
-    // TODO: this.initData();
-    this.initDummyData();
+  }
+
+  public initServiceForSpace(spaceId: string) {
+    if (spaceId === 'dummy') {
+      this.initDummyData(spaceId);
+    } else {
+      this.initData(spaceId);
+    }
   }
 
   public getQuestion(questionId: string): Promise<Question> {
@@ -31,15 +37,19 @@ export class GraphViewService {
       });
   }
 
-  private initData() {
+  public getFirstQuestionOfSpace(spaceId: string): Promise<Question> {
+    return this.initPromise.then(() => this.questions.length > 0 ? this.questions[0] : undefined);
+  }
+
+  private initData(spaceId: string) {
     this.initPromise = Promise.all([
-      this.questionService.getQuestionsOfSpace(1346968278).then((res) =>
+      this.questionService.getQuestionsOfSpace(spaceId).then((res) =>
         this.questions = res),
-      this.relationService.getRelationsOfSpace(1346968278).then((res) =>
+      this.relationService.getRelationsOfSpace(spaceId).then((res) =>
         this.relations = res)]);
   }
 
-  private initDummyData() {
+  private initDummyData(spaceId: string) {
     this.initPromise = new Promise((resolve) => {
       this.questions = [
         {

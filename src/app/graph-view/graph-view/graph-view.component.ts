@@ -14,6 +14,7 @@ import {NodeInteractionBehavior} from './interaction-behaviors/node-interaction-
 import {AddChildNodeBehavior} from './interaction-behaviors/add-child-node-behavior';
 import {EditQuestionBehavior} from './interaction-behaviors/edit-question-behavior';
 import {AddRelationBehavior} from './interaction-behaviors/add-relation-behavior';
+import {AgentService} from '../../shared/agent/agent.service';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -25,9 +26,12 @@ export class GraphViewComponent implements OnInit, OnChanges {
   @Input('height') private height = 400;
   @Input('width') private width = 400;
   @Input('interactionMode') private interactionMode: GraphInteractionMode;
+  @Input('spaceId') private spaceId = 'dummy';
+  @Input('selectedQuestions') private selectedQuestions;
 
   private d3: D3;
-  private network = new Network();
+  private loadedSpaceId;
+  private network: Network;
   private transform: ZoomTransform;
   private hasDragSubject = false;
   private canvas: HTMLCanvasElement;
@@ -36,7 +40,7 @@ export class GraphViewComponent implements OnInit, OnChanges {
   private activatedInteractionMode: GraphInteractionMode;
 
 
-  constructor(private graphViewService: GraphViewService,
+  constructor(private graphViewService: GraphViewService, private agentSevice: AgentService,
               private d3Service: D3Service) {
     this.d3 = d3Service.getD3();
     this.transform = this.d3.zoomIdentity;
@@ -54,6 +58,13 @@ export class GraphViewComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
+    if (this.spaceId !== this.loadedSpaceId) {
+      this.initData().then(() => {
+        this.initVisualization();
+        this.updateInteractionMode();
+        this.loadedSpaceId = this.spaceId;
+      });
+    }
     if (this.d3Sim) {
       this.d3Sim.force('center', this.d3.forceCenter(this.width / 2, this.height / 2));
       this.d3Sim.restart();
@@ -87,6 +98,7 @@ export class GraphViewComponent implements OnInit, OnChanges {
     });
     d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.network.getEdges())
       .distance((link, i, links) => (link as Edge).getDistance());
+    d3Sim.restart();
   }
 
   private updateInteractionMode() {
@@ -290,24 +302,40 @@ export class GraphViewComponent implements OnInit, OnChanges {
   }
 
   private initData() {
+    this.graphViewService.initServiceForSpace(this.spaceId);
+    this.network = new Network();
     const context = this.d3Root.nativeElement.getContext('2d');
-    const initialSelection = ['1'];
-    return this.graphViewService.getQuestionAndRelations(initialSelection[0]).then((res) => {
-      const initialQuestion = res.question;
-      const initialQuestionRelations = res.relations;
-      this.network.addNode(
-        new GraphNode(context, initialQuestion.questionId, initialQuestion.text, initialQuestionRelations, true));
-      return Promise.all<{ question: Question, relations: Relation[] }>(initialQuestionRelations.map((r) => {
-        if (r.firstQuestionId === initialQuestion.questionId) {
-          return this.graphViewService.getQuestionAndRelations(r.secondQuestionId);
+    let selectionPromise: Promise<string[]>;
+    if (this.selectedQuestions !== undefined) {
+      selectionPromise = Promise.resolve(this.selectedQuestions);
+    } else {
+      selectionPromise = this.agentSevice.getSpaceSubscriptions().then((myspaces) => {
+        const initialSelection = myspaces.find(s => s.spaceId === this.spaceId).selectedQuestions;
+        if (initialSelection === undefined || initialSelection.length === 0) {
+          return this.graphViewService.getFirstQuestionOfSpace(this.spaceId).then(q => [q.questionId]);
         } else {
-          return this.graphViewService.getQuestionAndRelations(r.firstQuestionId);
+          return initialSelection;
         }
-      })).then((values) => {
-        // generate nodes
-        values.forEach((val) => this.network.addNode(new GraphNode(context, val.question.questionId, val.question.text,
-          val.relations)));
       });
+    }
+    return selectionPromise.then((initialSelection) => {
+      return Promise.all(initialSelection.map(s => this.graphViewService.getQuestionAndRelations(s).then((res) => {
+        const initialQuestion = res.question;
+        const initialQuestionRelations = res.relations;
+        this.network.addNode(
+          new GraphNode(context, initialQuestion.questionId, initialQuestion.text, initialQuestionRelations, true));
+        return Promise.all<{ question: Question, relations: Relation[] }>(initialQuestionRelations.map((r) => {
+          if (r.firstQuestionId === initialQuestion.questionId) {
+            return this.graphViewService.getQuestionAndRelations(r.secondQuestionId);
+          } else {
+            return this.graphViewService.getQuestionAndRelations(r.firstQuestionId);
+          }
+        })).then((values) => {
+          // generate nodes
+          values.forEach((val) => this.network.addNode(new GraphNode(context, val.question.questionId, val.question.text,
+            val.relations)));
+        });
+      })));
     });
   }
 }

@@ -1,6 +1,8 @@
 <!--<h1>Noracle Graph</h1>-->
 <div #graphContainer>
-  <dnor-graph-view [height]="height" [width]="width" [interactionMode]="interactionMode"></dnor-graph-view>
+  <dnor-graph-view [spaceId]="spaceId"
+                   [selectedQuestions]="selectedQuestions" [height]="height" [width]="width"
+                   [interactionMode]="interactionMode"></dnor-graph-view>
 </div>
 <div #below>
   <md-radio-group fxLayout="row" fxLayoutGap="20px" [(ngModel)]="interactionMode">

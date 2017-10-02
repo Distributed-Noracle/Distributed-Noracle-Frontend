@@ -29,6 +29,9 @@ export class Network {
   }
 
   public addNode(nodeToAdd: GraphNode) {
+    if (this.nodes.findIndex((n) => n.id === nodeToAdd.id) !== -1) {
+      return;
+    }
     this.nodes.push(nodeToAdd);
     nodeToAdd.relations.forEach((r) => {
       if (this.edges.findIndex((e) => e.id === r.relationId) === -1) {

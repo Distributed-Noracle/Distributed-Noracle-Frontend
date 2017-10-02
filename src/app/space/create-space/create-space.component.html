@@ -1,9 +1,18 @@
 <h1>Create a new Space:</h1>
 
 <form #creationForm="ngForm" (ngSubmit)="createSpace()">
-  <md-form-field>
-    <input mdInput id="name" name="ngModel" placeholder="Space Name" [(ngModel)]="space.name" maxlength="20" required>
-    <md-hint align="end">{{space.name.length}} / 20</md-hint>
-  </md-form-field>
+  <p>
+    <md-form-field>
+      <input mdInput id="name" name="space.name" placeholder="Space Name" [(ngModel)]="space.name" maxlength="20"
+             required/>
+      <md-hint align="end">{{space.name.length}} / 20</md-hint>
+    </md-form-field>
+  </p>
+  <p>
+    <md-form-field>
+    <textarea mdInput id="question" name="question.text" placeholder="Seed Question" [(ngModel)]="question.text"
+              maxlength="140" required></textarea>
+    </md-form-field>
+  </p>
   <button type="submit" md-raised-button color="primary" [disabled]="!creationForm.form.valid">Create</button>
 </form>
