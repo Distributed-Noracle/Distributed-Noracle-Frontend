@@ -14,7 +14,6 @@ import {NodeInteractionBehavior} from './interaction-behaviors/node-interaction-
 import {AddChildNodeBehavior} from './interaction-behaviors/add-child-node-behavior';
 import {EditQuestionBehavior} from './interaction-behaviors/edit-question-behavior';
 import {AddRelationBehavior} from './interaction-behaviors/add-relation-behavior';
-import {AgentService} from '../../shared/agent/agent.service';
 import {Subscription} from 'rxjs/Subscription';
 
 @Component({
@@ -42,8 +41,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
   private updateSubscription: Subscription;
 
 
-  constructor(private graphViewService: GraphViewService, private agentSevice: AgentService,
-              private d3Service: D3Service) {
+  constructor(private graphViewService: GraphViewService, private d3Service: D3Service) {
     this.d3 = d3Service.getD3();
     this.transform = this.d3.zoomIdentity;
   }
@@ -115,7 +113,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       // TODO: review: a new behavior every time?
       this.setNodeSelectionBehavior(new ChangeNodeSelectionBehavior(this.network, this.graphViewService, this.context));
     } else if (this.interactionMode === GraphInteractionMode.AddQuestion) {
-      this.setNodeSelectionBehavior(new AddChildNodeBehavior(this.network, this.context));
+      this.setNodeSelectionBehavior(new AddChildNodeBehavior(this.graphViewService));
     } else if (this.interactionMode === GraphInteractionMode.EditQuestion) {
       this.setNodeSelectionBehavior(new EditQuestionBehavior(this.context));
     } else if (this.interactionMode === GraphInteractionMode.AddRelation) {
@@ -193,8 +191,6 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
 
   private setNodeSelectionBehavior(nodeInteractionBehavior: NodeInteractionBehavior) {
     const canvas = this.canvas;
-    const d3Sim = this.d3Sim;
-
     // drag behavior
     this.d3.select(canvas)
       .call(this.d3.drag()

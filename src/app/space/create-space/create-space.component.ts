@@ -4,7 +4,7 @@ import {SpaceService} from '../../shared/space/space.service';
 import {Router} from '@angular/router';
 import {Question} from '../../shared/rest-data-model/question';
 import {QuestionService} from '../../shared/question/question.service';
-import {AgentService} from '../../shared/agent/agent.service';
+import {MyspacesService} from '../../shared/myspaces/myspaces.service';
 
 @Component({
   selector: 'dnor-create-space',
@@ -17,7 +17,7 @@ export class CreateSpaceComponent implements OnInit {
   private question = new Question();
 
   constructor(private spaceService: SpaceService, private questionService: QuestionService,
-              private agentService: AgentService, private router: Router) {
+              private myspacesService: MyspacesService, private router: Router) {
     this.space.name = '';
     this.question.text = '';
   }
@@ -29,7 +29,7 @@ export class CreateSpaceComponent implements OnInit {
     this.spaceService.postSpace(this.space).then((space) => {
       this.questionService.postQuestion(space.spaceId, this.question).then((q) => {
         this.router.navigate(['/spaces', space.spaceId], {queryParams: {sq: q.questionId}});
-        this.agentService.getSpaceSubscriptions().then((s) => s);
+        this.myspacesService.getMySpaces().then((s) => s);
       });
     });
   }

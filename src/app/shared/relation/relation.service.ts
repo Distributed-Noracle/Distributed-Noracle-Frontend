@@ -9,8 +9,16 @@ export class RelationService {
   }
 
   public getRelationsOfSpace(id): Promise<Relation[]> {
-    return this.restHelperService.get(`/spaces/${id}/relations`).toPromise().then((res) => {
+    // TODO: proper pagination
+    return this.restHelperService.get(`/spaces/${id}/relations?limit=1000`).toPromise().then((res) => {
       return res.json() as Relation[];
+    });
+  }
+
+  public postRelation(spaceId: string, relation: Relation): Promise<Relation> {
+    return this.restHelperService.post(`/spaces/${spaceId}/relations`, relation).toPromise().then((res) => {
+      return this.restHelperService.getAbsoulte(res.headers.get('location')).toPromise()
+        .then((r) => r.json() as Relation);
     });
   }
 

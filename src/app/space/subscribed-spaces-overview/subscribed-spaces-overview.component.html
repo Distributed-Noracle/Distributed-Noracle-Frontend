@@ -1,7 +1,7 @@
 <h1>My Spaces</h1>
 <md-list>
   <md-list-item *ngFor="let space of spaces">
-    <a md-button [routerLink]="['/spaces', space.spaceId]">{{space.name}}</a>
+    <a md-button [routerLink]="['/spaces', space.space.spaceId]">{{space.space.name}}</a>
     <button md-icon-button color="primary">
       <md-icon>edit</md-icon>
     </button>

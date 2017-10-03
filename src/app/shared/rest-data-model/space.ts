@@ -4,4 +4,7 @@
 export class Space {
   spaceId: string;
   name: string;
+  spaceOwnerId: string;
+  spaceReaderGroupId: string;
+  spaceSecret: string;
 }

@@ -9,7 +9,8 @@ export class QuestionService {
   }
 
   public getQuestionsOfSpace(spaceId: string): Promise<Question[]> {
-    return this.restHelperService.get(`/spaces/${spaceId}/questions`).toPromise().then((res) => {
+    // TODO: proper pagination
+    return this.restHelperService.get(`/spaces/${spaceId}/questions?limit=1000`).toPromise().then((res) => {
       return res.json() as Question[];
     });
   }

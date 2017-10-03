@@ -45,6 +45,22 @@ export class GraphViewService {
     return false;
   }
 
+  public addQuestionToParentAndRegisterForUpdate(question: Question, parentQuestionId: string) {
+    this.questionService.postQuestion(this.spaceId, question).then((q) => {
+      const relation = new Relation();
+      relation.firstQuestionId = parentQuestionId;
+      relation.secondQuestionId = q.questionId;
+      relation.name = 'follows';
+      relation.directed = true;
+      this.relationService.postRelation(this.spaceId, relation).then((r) => {
+        this.registerQuestionForUpdate(q.questionId);
+        this.questions.push(q);
+        this.relations.push(r);
+        this.notifyObservers();
+      });
+    });
+  }
+
   public requestUpdate() {
     if (this.spaceId === 'dummy') {
       this.initDummyData(this.spaceId);
@@ -79,7 +95,11 @@ export class GraphViewService {
         // trick that allows seed-question subscription without knowing the id
         qId = this.questions[0].questionId;
       }
-      this.update.next({question: this.getQuestion(qId), relations: this.getRelationsForQuestion(qId)});
+      const question = this.getQuestion(qId);
+      const relationsForQuestion = this.getRelationsForQuestion(qId);
+      if (question !== undefined && relationsForQuestion !== undefined) {
+        this.update.next({question: question, relations: relationsForQuestion});
+      }
     });
   }
 

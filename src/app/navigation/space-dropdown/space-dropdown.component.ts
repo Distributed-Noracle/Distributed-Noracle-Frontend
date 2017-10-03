@@ -1,7 +1,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {SpaceSubscription} from '../../shared/rest-data-model/spacesubscription';
-import {AgentService} from '../../shared/agent/agent.service';
 import {Subscription} from 'rxjs/Subscription';
+import {MyspacesService} from '../../shared/myspaces/myspaces.service';
+import {Space} from '../../shared/rest-data-model/space';
 
 @Component({
   selector: 'dnor-space-dropdown',
@@ -10,16 +11,16 @@ import {Subscription} from 'rxjs/Subscription';
 })
 export class SpaceDropdownComponent implements OnInit, OnDestroy {
 
-  private spaces: SpaceSubscription[] = [];
+  private spaces: {space: Space, subscription: SpaceSubscription}[] = [];
   private spaceSubscription: Subscription;
 
-  constructor(private agentService: AgentService) {
+  constructor(private myspacesService: MyspacesService) {
   }
 
   ngOnInit() {
     this.spaceSubscription =
-      this.agentService.getSpaceSubscriptionObservable().subscribe((subscriptions) => this.spaces = subscriptions);
-    this.agentService.getSpaceSubscriptions().then((s) => s);
+      this.myspacesService.getMySpacesObservable().subscribe((myspaces) => this.spaces = myspaces);
+    this.myspacesService.getMySpaces().then((s) => s);
   }
 
   ngOnDestroy() {
