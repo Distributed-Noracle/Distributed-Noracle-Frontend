@@ -62,6 +62,7 @@ export class AppModule {
     openIDImplicitFlowConfiguration.log_console_debug_active = !environment.production;
     openIDImplicitFlowConfiguration.max_id_token_iat_offset_allowed_in_seconds = 10;
     openIDImplicitFlowConfiguration.override_well_known_configuration = false;
+    openIDImplicitFlowConfiguration.silent_renew = false;
 
     // TODO: configure
     openIDImplicitFlowConfiguration.forbidden_route = '/Forbidden';
