@@ -69,4 +69,8 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
     window.prompt('Could not copy to clipboard automatically. Please copy the following invitation link manually:', url);
   }
 
+  getStringifiedParamArray(subscription: SpaceSubscription): string {
+    return JSON.stringify(subscription.selectedQuestionIds);
+  }
+
 }
