@@ -29,6 +29,17 @@ export class AgentService {
       });
   }
 
+  public postSpaceSubscription(postData: { spaceId: string, spaceSecret: string }): Promise<SpaceSubscription> {
+    return this.getAgent()
+      .then((agent) => {
+        return this.restHelperService.post(`/agents/${agent.agentid}/spacesubscriptions`, postData).toPromise()
+          .then(res => {
+            return this.restHelperService.getAbsoulte(res.headers.get('location')).toPromise()
+              .then((res2) => res2.json() as SpaceSubscription);
+          });
+      });
+  }
+
   public putSelectionOfSubscription(spaceId: string, selection: string[]): Promise<any> {
     return this.getAgent().then((agent) => {
       return this.restHelperService

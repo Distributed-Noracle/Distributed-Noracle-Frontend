@@ -8,7 +8,7 @@ const HOST_URL = 'https://steen.informatik.rwth-aachen.de:9082';
 export class RestHelperService {
   private CORE_BASE_URL = HOST_URL + '/las2peer';
   private BASE_URL = HOST_URL + '/distributed-noracle/v0.5.0';
-  private isMock = true;
+  private isMock = false;
 
   constructor(private OidcSecurityService: OidcSecurityService, private http: Http) {
   }

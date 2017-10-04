@@ -1,7 +1,8 @@
 import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {GraphInteractionMode} from '../graph-view/graph-data-model/graph-interaction-mode.enum';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {Subscription} from 'rxjs/Subscription';
+import {MyspacesService} from '../../shared/myspaces/myspaces.service';
 
 @Component({
   selector: 'dnor-graph-view-page',
@@ -15,6 +16,7 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
   private below;
   private elementRef: ElementRef;
 
+  private subscriptionInProgress = false;
   private interactionMode = GraphInteractionMode.SelectAndNavigate;
   private height = 600;
   private width = 800;
@@ -30,7 +32,8 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
     this.width = window.innerWidth * 0.9;
   }
 
-  constructor(elementRef: ElementRef, private activatedRoute: ActivatedRoute) {
+  constructor(elementRef: ElementRef, private activatedRoute: ActivatedRoute,
+              private router: Router, private myspacesService: MyspacesService) {
     this.elementRef = elementRef;
   }
 
@@ -39,6 +42,17 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
       this.spaceId = params['spaceId'];
     });
     this.queryParamSubscription = this.activatedRoute.queryParams.subscribe((queryParams) => {
+      const pw = queryParams['pw'];
+      if (pw !== undefined) {
+        this.subscriptionInProgress = true;
+        this.myspacesService.subscribeToSpace(this.spaceId, pw).then(() => {
+          const qp = queryParams['sq'] !== undefined ? {sq: queryParams['sq']} : {};
+          this.router.navigate([], {queryParams: qp, replaceUrl: true}).then(() =>
+            this.subscriptionInProgress = false
+          );
+        });
+
+      }
       const q = queryParams['sq'];
       if (q === undefined) {
         this.selectedQuestions = [];

@@ -1,11 +1,17 @@
 <!--<h1>Noracle Graph</h1>-->
 <div #graphContainer>
-  <dnor-graph-view [spaceId]="spaceId"
-                   [selectedQuestions]="selectedQuestions" [height]="height" [width]="width"
-                   [interactionMode]="interactionMode"></dnor-graph-view>
+  <div *ngIf="subscriptionInProgress" fxLayout="column" fxLayoutAlign="space-around center">
+    <p>Subscribing to space&hellip;</p>
+    <md-spinner></md-spinner>
+  </div>
+  <dnor-graph-view *ngIf="!subscriptionInProgress"
+    [spaceId]="spaceId"
+    [selectedQuestions]="selectedQuestions" [height]="height" [width]="width"
+    [interactionMode]="interactionMode"></dnor-graph-view>
 </div>
 <div #below>
-  <md-radio-group fxLayout="row" fxLayoutGap="20px" [(ngModel)]="interactionMode">
+  <md-radio-group *ngIf="!subscriptionInProgress"
+    fxLayout="row" fxLayoutGap="20px" [(ngModel)]="interactionMode">
     <md-radio-button *ngFor="let m of getInteractionModes()" [value]="m">
       {{getInteractionModeLabel(m)}}
     </md-radio-button>

@@ -5,6 +5,5 @@
 
 export const environment = {
   production: false,
-  redirectUrl: 'http://localhost:4200/login',
-  mockService: true
+  redirectUrl: 'http://localhost:4200/login'
 };

@@ -40,6 +40,20 @@ export class MyspacesService {
       });
   }
 
+  public subscribeToSpace(spaceId: string, secret: string): Promise<{ subscription: SpaceSubscription, space: Space }> {
+    return this.getMySpaces().then((ms) => {
+      const index = ms.findIndex((s) => s.subscription.spaceId === spaceId);
+      if (index === -1) {
+        this.agentService.postSpaceSubscription({spaceId: spaceId, spaceSecret: secret})
+          .then((subscription) => {
+            return this.getMySpaces().then(ms2 => ms2.find((s) => s.subscription.spaceId === spaceId));
+          });
+      } else {
+        return Promise.resolve(ms[index]);
+      }
+    });
+  }
+
   public updateSelectionOfSubscription(spaceId: string, selection: string[]) {
     this.agentService.putSelectionOfSubscription(spaceId, selection).then(() => this.getMySpaces().then((s) => s));
   }
