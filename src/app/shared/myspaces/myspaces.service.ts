@@ -27,13 +27,6 @@ export class MyspacesService {
               const space = values.find((val) => val.spaceId === subscription.spaceId);
               result.push({space: space, subscription: subscription});
             });
-            const dummySubscription = new SpaceSubscription();
-            const dummySpace = new Space();
-            dummySpace.spaceId = dummySubscription.spaceId = 'dummy';
-            dummySubscription.selectedQuestionIds = ['1'];
-            dummySpace.name = 'Dummy Subscription';
-            dummySpace.spaceSecret = 'dummypassword';
-            result.push({space: dummySpace, subscription: dummySubscription});
             this.myspacesSubject.next(result);
             return result;
           });

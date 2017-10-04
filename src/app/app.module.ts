@@ -19,6 +19,7 @@ import {WelcomePageComponent} from './login/welcome-page/welcome-page.component'
 import {SpaceModule} from './space/space.module';
 import {SubscribedSpacesOverviewComponent} from './space/subscribed-spaces-overview/subscribed-spaces-overview.component';
 import {CreateSpaceComponent} from './space/create-space/create-space.component';
+import {AfterLoginComponent} from './login/after-login/after-login.component';
 
 @NgModule({
   declarations: [AppComponent],
@@ -35,8 +36,9 @@ import {CreateSpaceComponent} from './space/create-space/create-space.component'
     RouterModule.forRoot([
       {path: 'welcome', component: WelcomePageComponent},
       {path: 'login', component: LoginPageComponent},
+      {path: 'afterlogin', component: AfterLoginComponent},
       {path: 'myspaces', component: SubscribedSpacesOverviewComponent, canActivate: [AuthGuardService]},
-      {path: 'spaces/create', component: CreateSpaceComponent},
+      {path: 'spaces/create', component: CreateSpaceComponent, canActivate: [AuthGuardService]},
       {path: 'spaces/:spaceId', component: GraphViewPageComponent, canActivate: [AuthGuardService]},
       {path: '**', redirectTo: 'welcome'}
     ]),
@@ -56,7 +58,7 @@ export class AppModule {
     openIDImplicitFlowConfiguration.response_type = 'id_token token';
     openIDImplicitFlowConfiguration.scope = 'openid email profile';
     openIDImplicitFlowConfiguration.post_logout_redirect_uri = environment.redirectUrl;
-    openIDImplicitFlowConfiguration.startup_route = '/myspaces';
+    openIDImplicitFlowConfiguration.startup_route = '/afterlogin';
     openIDImplicitFlowConfiguration.auto_userinfo = true;
     openIDImplicitFlowConfiguration.log_console_warning_active = !environment.production;
     openIDImplicitFlowConfiguration.log_console_debug_active = !environment.production;
