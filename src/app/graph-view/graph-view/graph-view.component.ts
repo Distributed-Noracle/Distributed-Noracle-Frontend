@@ -327,7 +327,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     const isSelected = this.selectedQuestions !== undefined &&
       this.selectedQuestions.findIndex((id) => id === updateData.question.questionId) !== -1;
     this.network.addOrUpdateNode(
-      new GraphNode(context, updateData.question.questionId, updateData.question.text, updateData.relations, isSelected));
+      new GraphNode(context, updateData.question.questionId, updateData.question, updateData.relations, isSelected));
     this.updateSimulation();
     if (isSelected) {
       let updateRequired = false;

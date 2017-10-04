@@ -1,5 +1,6 @@
 import {SimulationNodeDatum} from 'd3-force';
 import {Relation} from '../../../shared/rest-data-model/relation';
+import {Question} from '../../../shared/rest-data-model/question';
 
 export class GraphNode implements SimulationNodeDatum {
   private lines: string[];
@@ -17,13 +18,13 @@ export class GraphNode implements SimulationNodeDatum {
   y?: number;
 
 
-  constructor(context: CanvasRenderingContext2D, public id: string, public label: string,
+  constructor(context: CanvasRenderingContext2D, public id: string, public question: Question,
               public relations: Relation[], public isSelected = false) {
     this.lines = this.wrapText((s) => context.measureText(s).width);
   }
 
   public setLabel(label: string, context: CanvasRenderingContext2D) {
-    this.label = label;
+    this.question.text = label;
     this.lines = this.wrapText((s) => context.measureText(s).width);
   }
 
@@ -58,8 +59,8 @@ export class GraphNode implements SimulationNodeDatum {
 
   wrapText(measure: (string) => number) {
     const textHeight = this.getTextHeigth();
-    const totalWidth = measure(this.label);
-    const words = this.label.split(/\s+/);
+    const totalWidth = measure(this.question.text);
+    const words = this.question.text.split(/\s+/);
     const longestWordLength =
       Math.ceil(measure(words.reduce((prev, cur, i) => measure(prev) > measure(cur) ? prev : cur)));
     const blankWidth = measure(' ');
@@ -102,7 +103,7 @@ export class GraphNode implements SimulationNodeDatum {
   }
 
   update(n: GraphNode) {
-    this.label = n.label;
+    this.question = n.question;
     this.lines = n.lines;
     this.radius = n.radius;
     this.textSize = n.textSize;

@@ -17,7 +17,7 @@ export class EditQuestionBehavior extends NodeInteractionBehavior {
       data: {
         title: 'Edit Question',
         message: 'Edit question text and click Ok to save',
-        text: node.label
+        text: node.question.text
       }
     });
     return dialogRef.afterClosed().toPromise().then(result => {

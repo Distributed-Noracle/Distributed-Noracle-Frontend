@@ -16,7 +16,7 @@ export class AddChildNodeBehavior extends NodeInteractionBehavior {
       width: '250px',
       data: {
         title: 'Ask a Follow Up Question',
-        message: 'Enter the question. Parent question is: ' + node.label,
+        message: 'Enter the question. Parent question is: ' + node.question.text,
         text: ''
       }
     });

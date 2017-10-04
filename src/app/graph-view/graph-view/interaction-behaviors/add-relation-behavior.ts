@@ -25,7 +25,7 @@ export class AddRelationBehavior extends NodeInteractionBehavior {
         width: '250px',
         data: {
           title: 'Choose the type of relation', message: 'What type of relation would you like to create from ['
-          + firstNode.label + '] to [' + node.label + ']?'
+          + firstNode.question.text + '] to [' + node.question.text + ']?'
         }
       });
       return dialogRef.afterClosed().toPromise().then(result => {
