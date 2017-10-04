@@ -65,6 +65,13 @@ export class GraphViewService {
     });
   }
 
+  public addRelation(relation: Relation) {
+    this.relationService.postRelation(this.spaceId, relation).then((r) => {
+      this.relations.push(r);
+      this.notifyObservers();
+    });
+  }
+
   public requestUpdate() {
     if (this.spaceId === 'dummy') {
       this.initDummyData();

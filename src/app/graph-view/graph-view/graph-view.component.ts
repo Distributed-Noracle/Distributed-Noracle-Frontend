@@ -15,7 +15,7 @@ import {AddChildNodeBehavior} from './interaction-behaviors/add-child-node-behav
 import {EditQuestionBehavior} from './interaction-behaviors/edit-question-behavior';
 import {AddRelationBehavior} from './interaction-behaviors/add-relation-behavior';
 import {Subscription} from 'rxjs/Subscription';
-import {Router} from '@angular/router';
+import {MdDialog} from '@angular/material';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -42,7 +42,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
   private updateSubscription: Subscription;
 
 
-  constructor(private graphViewService: GraphViewService, private d3Service: D3Service) {
+  constructor(private graphViewService: GraphViewService, private d3Service: D3Service, private dialog: MdDialog) {
     this.d3 = d3Service.getD3();
     this.transform = this.d3.zoomIdentity;
   }
@@ -121,7 +121,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     } else if (this.interactionMode === GraphInteractionMode.EditQuestion) {
       this.setNodeSelectionBehavior(new EditQuestionBehavior(this.context));
     } else if (this.interactionMode === GraphInteractionMode.AddRelation) {
-      this.setNodeSelectionBehavior(new AddRelationBehavior(this.network));
+      this.setNodeSelectionBehavior(new AddRelationBehavior(this.graphViewService, this.dialog));
     } else if (this.interactionMode === GraphInteractionMode.EditRelation) {
       this.setEdgeSelectionBehavior((e: Edge) => {
         this.network.getEdges().forEach((edge) => edge.isSelected = false);
