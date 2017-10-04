@@ -7,6 +7,7 @@ import {Subject} from 'rxjs/Subject';
 import {Observable} from 'rxjs/Observable';
 import {MyspacesService} from '../../shared/myspaces/myspaces.service';
 import {Router} from '@angular/router';
+import {RelationType} from './graph-data-model/relation-type.enum';
 
 @Injectable()
 export class GraphViewService {
@@ -53,7 +54,7 @@ export class GraphViewService {
       const relation = new Relation();
       relation.firstQuestionId = parentQuestionId;
       relation.secondQuestionId = q.questionId;
-      relation.name = 'follows';
+      relation.name = RelationType[RelationType.FollowUp];
       relation.directed = true;
       this.relationService.postRelation(this.spaceId, relation).then((r) => {
         this.questions.push(q);
