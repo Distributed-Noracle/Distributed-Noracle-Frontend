@@ -66,6 +66,17 @@ export class GraphViewService {
     });
   }
 
+  public updateQuestion(questionId: string, text: string) {
+    const question = new Question();
+    question.text = text;
+    return this.questionService.putQuestion(this.spaceId, questionId, question).then((newQ) => {
+      this.questions.splice(this.questions.findIndex((oldQ) => oldQ.questionId === newQ.questionId) , 1);
+      this.questions.push(newQ);
+      this.notifyObservers();
+      return newQ;
+    });
+  }
+
   public addRelation(relation: Relation) {
     this.relationService.postRelation(this.spaceId, relation).then((r) => {
       this.relations.push(r);

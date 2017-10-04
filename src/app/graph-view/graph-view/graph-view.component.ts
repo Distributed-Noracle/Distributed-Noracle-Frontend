@@ -117,9 +117,9 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       // TODO: review: a new behavior every time?
       this.setNodeSelectionBehavior(new ChangeNodeSelectionBehavior(this.network, this.graphViewService));
     } else if (this.interactionMode === GraphInteractionMode.AddQuestion) {
-      this.setNodeSelectionBehavior(new AddChildNodeBehavior(this.graphViewService));
+      this.setNodeSelectionBehavior(new AddChildNodeBehavior(this.graphViewService, this.dialog));
     } else if (this.interactionMode === GraphInteractionMode.EditQuestion) {
-      this.setNodeSelectionBehavior(new EditQuestionBehavior(this.context));
+      this.setNodeSelectionBehavior(new EditQuestionBehavior(this.graphViewService, this.dialog));
     } else if (this.interactionMode === GraphInteractionMode.AddRelation) {
       this.setNodeSelectionBehavior(new AddRelationBehavior(this.graphViewService, this.dialog));
     } else if (this.interactionMode === GraphInteractionMode.EditRelation) {

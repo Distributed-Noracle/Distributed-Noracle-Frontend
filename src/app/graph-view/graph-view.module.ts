@@ -3,12 +3,16 @@ import {CommonModule} from '@angular/common';
 import {GraphViewComponent} from './graph-view/graph-view.component';
 import {D3Service} from 'd3-ng2-service';
 import {GraphViewPageComponent} from './graph-view-page/graph-view-page.component';
-import {MdButtonModule, MdDialogModule, MdProgressSpinnerModule, MdRadioModule} from '@angular/material';
+import {
+  MdButtonModule, MdDialogModule, MdFormFieldModule, MdInputModule, MdProgressSpinnerModule,
+  MdRadioModule
+} from '@angular/material';
 import {FormsModule} from '@angular/forms';
 import {GraphViewService} from './graph-view/graph-view.service';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {SharedModule} from '../shared/shared.module';
 import {RelationPickerDialogComponent} from './relation-picker-dialog/relation-picker-dialog.component';
+import { CreateQuestionDialogComponent } from './create-question-dialog/create-question-dialog.component';
 
 @NgModule({
   imports: [
@@ -17,13 +21,15 @@ import {RelationPickerDialogComponent} from './relation-picker-dialog/relation-p
     MdRadioModule,
     MdDialogModule,
     MdProgressSpinnerModule,
+    MdFormFieldModule,
+    MdInputModule,
     FormsModule,
     FlexLayoutModule,
     SharedModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  declarations: [GraphViewComponent, GraphViewPageComponent, RelationPickerDialogComponent],
-  bootstrap: [RelationPickerDialogComponent],
+  declarations: [GraphViewComponent, GraphViewPageComponent, RelationPickerDialogComponent, CreateQuestionDialogComponent],
+  bootstrap: [RelationPickerDialogComponent, CreateQuestionDialogComponent],
   exports: [GraphViewPageComponent],
   providers: [D3Service, GraphViewService]
 })

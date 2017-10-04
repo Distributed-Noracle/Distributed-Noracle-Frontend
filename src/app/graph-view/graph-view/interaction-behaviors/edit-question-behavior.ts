@@ -1,19 +1,29 @@
 import {NodeInteractionBehavior} from './node-interaction-behavior';
 import {GraphNode} from '../graph-data-model/graph-node';
+import {GraphViewService} from '../graph-view.service';
+import {MdDialog} from '@angular/material';
+import {CreateQuestionDialogComponent} from '../../create-question-dialog/create-question-dialog.component';
 
 export class EditQuestionBehavior extends NodeInteractionBehavior {
 
-  constructor(private context: CanvasRenderingContext2D) {
+  constructor(private graphViewService: GraphViewService, private dialog: MdDialog) {
     super();
   }
 
   interactWith(node: GraphNode): Promise<any> {
-    return new Promise((resolve, reject) => {
-      const label = window.prompt('Edit Question:', node.label);
-      if (label !== null) {
-        node.setLabel(label, this.context);
+    // TODO: handle edit attempts on questions of others
+    const dialogRef = this.dialog.open(CreateQuestionDialogComponent, {
+      width: '250px',
+      data: {
+        title: 'Edit Question',
+        message: 'Edit question text and click Ok to save',
+        text: node.label
       }
-      resolve();
+    });
+    return dialogRef.afterClosed().toPromise().then(result => {
+      if (result !== undefined) {
+        return this.graphViewService.updateQuestion(node.id, result);
+      }
     });
   }
 }

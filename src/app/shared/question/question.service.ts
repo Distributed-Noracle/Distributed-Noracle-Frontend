@@ -22,4 +22,9 @@ export class QuestionService {
     });
   }
 
+  public putQuestion(spaceId: string, questionId: string, question: Question): Promise<Question> {
+    return this.restHelperService.put(`/spaces/${spaceId}/questions/${questionId}`, question).toPromise()
+      .then((r) => r.json() as Question);
+  }
+
 }
