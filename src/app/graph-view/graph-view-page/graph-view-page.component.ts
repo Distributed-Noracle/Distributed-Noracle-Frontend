@@ -38,9 +38,13 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
     this.paramSubscription = this.activatedRoute.params.subscribe((params) => {
       this.spaceId = params['spaceId'];
     });
-    this.queryParamSubscription =  this.activatedRoute.queryParams.subscribe((queryParams) => {
+    this.queryParamSubscription = this.activatedRoute.queryParams.subscribe((queryParams) => {
       const q = queryParams['sq'];
-      this.selectedQuestions = typeof(q) === 'string' ? [q] : q;
+      if (q === undefined) {
+        this.selectedQuestions = [];
+      } else {
+        this.selectedQuestions = JSON.parse(q);
+      }
     });
     this.adjustSize();
   }

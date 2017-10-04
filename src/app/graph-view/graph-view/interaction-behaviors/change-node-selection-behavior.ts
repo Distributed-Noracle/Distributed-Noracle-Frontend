@@ -5,8 +5,7 @@ import {GraphViewService} from '../graph-view.service';
 
 export class ChangeNodeSelectionBehavior extends NodeInteractionBehavior {
 
-  constructor(private network: Network, private graphViewService: GraphViewService,
-              private context: CanvasRenderingContext2D) {
+  constructor(private network: Network, private graphViewService: GraphViewService) {
     super();
   }
 
@@ -24,6 +23,7 @@ export class ChangeNodeSelectionBehavior extends NodeInteractionBehavior {
 
   private deselectNode(n: GraphNode): Promise<any> {
     n.isSelected = false;
+    this.graphViewService.updateSelectionRouteParams(n.id, n.isSelected);
     return new Promise((resolve, reject) => {
       const nodes = this.network.getNodes();
       for (let i = nodes.length - 1; i >= 0; i--) {
@@ -39,6 +39,7 @@ export class ChangeNodeSelectionBehavior extends NodeInteractionBehavior {
 
   private selectNode(n: GraphNode) {
     n.isSelected = true;
+    this.graphViewService.updateSelectionRouteParams(n.id, n.isSelected);
     let requiresUpdate = false;
     n.relations.forEach((r) => {
       if (this.graphViewService.registerQuestionForUpdate(r.firstQuestionId === n.id ? r.secondQuestionId : r.firstQuestionId)) {

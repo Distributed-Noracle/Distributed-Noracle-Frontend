@@ -15,6 +15,7 @@ import {AddChildNodeBehavior} from './interaction-behaviors/add-child-node-behav
 import {EditQuestionBehavior} from './interaction-behaviors/edit-question-behavior';
 import {AddRelationBehavior} from './interaction-behaviors/add-relation-behavior';
 import {Subscription} from 'rxjs/Subscription';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -74,6 +75,9 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
         this.initVisualization();
         this.updateInteractionMode();
       }
+      this.network.getNodes().forEach((node) => {
+        node.isSelected = (this.selectedQuestions.indexOf(node.id) !== -1);
+      });
       this.d3Sim.force('center', this.d3.forceCenter(this.width / 2, this.height / 2));
       this.d3Sim.alpha(1).restart();
       this.updateInteractionMode();
@@ -111,7 +115,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     }
     if (this.interactionMode === GraphInteractionMode.SelectAndNavigate) {
       // TODO: review: a new behavior every time?
-      this.setNodeSelectionBehavior(new ChangeNodeSelectionBehavior(this.network, this.graphViewService, this.context));
+      this.setNodeSelectionBehavior(new ChangeNodeSelectionBehavior(this.network, this.graphViewService));
     } else if (this.interactionMode === GraphInteractionMode.AddQuestion) {
       this.setNodeSelectionBehavior(new AddChildNodeBehavior(this.graphViewService));
     } else if (this.interactionMode === GraphInteractionMode.EditQuestion) {
@@ -322,10 +326,9 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     const context = this.d3Root.nativeElement.getContext('2d');
     const isSelected = this.selectedQuestions !== undefined &&
       this.selectedQuestions.findIndex((id) => id === updateData.question.questionId) !== -1;
-    if (this.network.addOrUpdateNode(
-        new GraphNode(context, updateData.question.questionId, updateData.question.text, updateData.relations, isSelected))) {
-      this.updateSimulation();
-    }
+    this.network.addOrUpdateNode(
+      new GraphNode(context, updateData.question.questionId, updateData.question.text, updateData.relations, isSelected));
+    this.updateSimulation();
     if (isSelected) {
       let updateRequired = false;
       updateData.relations.forEach((rel) => {

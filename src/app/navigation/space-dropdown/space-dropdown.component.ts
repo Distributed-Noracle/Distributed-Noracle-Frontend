@@ -11,7 +11,7 @@ import {Space} from '../../shared/rest-data-model/space';
 })
 export class SpaceDropdownComponent implements OnInit, OnDestroy {
 
-  private spaces: {space: Space, subscription: SpaceSubscription}[] = [];
+  private spaces: { space: Space, subscription: SpaceSubscription }[] = [];
   private spaceSubscription: Subscription;
 
   constructor(private myspacesService: MyspacesService) {
@@ -25,6 +25,10 @@ export class SpaceDropdownComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.spaceSubscription.unsubscribe();
+  }
+
+  getStringifiedParamArray(subscription: SpaceSubscription): string {
+    return JSON.stringify(subscription.selectedQuestionIds);
   }
 
 }

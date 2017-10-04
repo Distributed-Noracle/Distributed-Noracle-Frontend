@@ -1,6 +1,8 @@
 <button md-button [mdMenuTriggerFor]="menu">Spaces</button>
 <md-menu #menu [overlapTrigger]="false">
-  <a *ngFor="let space of spaces" md-menu-item [routerLink]="['spaces', space.space.spaceId]"
+  <a *ngFor="let space of spaces" md-menu-item
+     [routerLink]="['spaces', space.space.spaceId]"
+     [queryParams]="{sq: getStringifiedParamArray(space.subscription)}"
      routerLinkActive="router-link-active"><span>{{space.space.name}}</span></a>
   <hr *ngIf="spaces.length>0"/>
   <a md-menu-item [routerLink]="['myspaces']"><span>Show Space Overview</span></a>

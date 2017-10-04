@@ -29,11 +29,16 @@ export class Network {
   }
 
   public addOrUpdateNode(nodeToAdd: GraphNode): boolean {
-    if (this.nodes.findIndex((n) => n.id === nodeToAdd.id) !== -1) {
-      // TODO: update node
-      return false;
+    const nodeIndex = this.nodes.findIndex((n) => n.id === nodeToAdd.id);
+    let isAdd = true;
+    if (nodeIndex !== -1) {
+      const nodeToUpdate = this.nodes[nodeIndex];
+      nodeToUpdate.update(nodeToAdd);
+      nodeToAdd = nodeToUpdate;
+      isAdd = false;
+    } else {
+      this.nodes.push(nodeToAdd);
     }
-    this.nodes.push(nodeToAdd);
     nodeToAdd.relations.forEach((r) => {
       if (this.edges.findIndex((e) => e.id === r.relationId) === -1) {
         // edge not yet in network
@@ -52,7 +57,7 @@ export class Network {
         }
       }
     });
-    return true;
+    return isAdd;
   }
 
   public addRelationToNode(relation: Relation, node: GraphNode) {

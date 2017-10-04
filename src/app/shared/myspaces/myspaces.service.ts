@@ -30,7 +30,7 @@ export class MyspacesService {
             const dummySubscription = new SpaceSubscription();
             const dummySpace = new Space();
             dummySpace.spaceId = dummySubscription.spaceId = 'dummy';
-            dummySubscription.selectedQuestions = ['1'];
+            dummySubscription.selectedQuestionIds = ['1'];
             dummySpace.name = 'Dummy Subscription';
             dummySpace.spaceSecret = 'dummypassword';
             result.push({space: dummySpace, subscription: dummySubscription});
@@ -38,6 +38,10 @@ export class MyspacesService {
             return result;
           });
       });
+  }
+
+  public updateSelectionOfSubscription(spaceId: string, selection: string[]) {
+    this.agentService.putSelectionOfSubscription(spaceId, selection).then(() => this.getMySpaces().then((s) => s));
   }
 
 }

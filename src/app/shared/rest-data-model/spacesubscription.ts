@@ -3,5 +3,5 @@
  */
 export class SpaceSubscription {
   spaceId: string;
-  selectedQuestions: string[];
+  selectedQuestionIds: string[];
 }

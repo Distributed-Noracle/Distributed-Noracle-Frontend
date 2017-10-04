@@ -13,7 +13,6 @@ export class AddChildNodeBehavior extends NodeInteractionBehavior {
     return new Promise((resolve, reject) => {
       const label = window.prompt('Ask a follow up question to: ' + node.label);
       if (label !== null) {
-        // TODO: POST question, use questionId from response, POST relation
         const question =  new Question();
         question.text = label;
         this.graphViewService.addQuestionToParentAndRegisterForUpdate(question, node.id);

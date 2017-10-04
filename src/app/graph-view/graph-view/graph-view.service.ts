@@ -5,6 +5,8 @@ import {QuestionService} from '../../shared/question/question.service';
 import {RelationService} from '../../shared/relation/relation.service';
 import {Subject} from 'rxjs/Subject';
 import {Observable} from 'rxjs/Observable';
+import {MyspacesService} from '../../shared/myspaces/myspaces.service';
+import {Router} from '@angular/router';
 
 @Injectable()
 export class GraphViewService {
@@ -16,7 +18,8 @@ export class GraphViewService {
   private observedQuestionIds: string[] = [];
   private update = new Subject<{ question: Question, relations: Relation[] }>();
 
-  constructor(private questionService: QuestionService, private relationService: RelationService) {
+  constructor(private questionService: QuestionService, private relationService: RelationService,
+              private myspacesService: MyspacesService, private router: Router) {
   }
 
   public initServiceForSpace(spaceId: string) {
@@ -53,9 +56,10 @@ export class GraphViewService {
       relation.name = 'follows';
       relation.directed = true;
       this.relationService.postRelation(this.spaceId, relation).then((r) => {
-        this.registerQuestionForUpdate(q.questionId);
         this.questions.push(q);
         this.relations.push(r);
+        this.updateSelectionRouteParams(q.questionId, true);
+        this.registerQuestionForUpdate(q.questionId);
         this.notifyObservers();
       });
     });
@@ -63,11 +67,33 @@ export class GraphViewService {
 
   public requestUpdate() {
     if (this.spaceId === 'dummy') {
-      this.initDummyData(this.spaceId);
+      this.initDummyData();
     } else {
       this.fetchAll(this.spaceId);
     }
   }
+
+  public updateSelectionRouteParams(id: string, isSelected: boolean) {
+    let sq = this.router.routerState.snapshot.root.queryParams['sq'];
+    if (sq === undefined) {
+      sq = [];
+    } else {
+      sq = JSON.parse(sq);
+    }
+    const i = sq.indexOf(id);
+    if (isSelected && i === -1) {
+      sq.push(id);
+    } else if (!isSelected && i !== -1) {
+      sq.splice(i, 1);
+    }
+    this.myspacesService.updateSelectionOfSubscription(this.spaceId, sq);
+    this.router.navigate([], {
+      queryParams: {
+        sq: JSON.stringify(sq)
+      }
+    });
+  }
+
 
   private getQuestion(questionId: string): Question {
     return this.questions.find((q) => q.questionId === questionId);
@@ -117,7 +143,7 @@ export class GraphViewService {
     }
   }
 
-  private initDummyData(spaceId: string) {
+  private initDummyData() {
     this.questions = [
       {
         id: 1,

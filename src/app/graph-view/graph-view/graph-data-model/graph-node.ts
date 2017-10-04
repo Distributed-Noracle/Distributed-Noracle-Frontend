@@ -100,4 +100,13 @@ export class GraphNode implements SimulationNodeDatum {
       }
     }
   }
+
+  update(n: GraphNode) {
+    this.label = n.label;
+    this.lines = n.lines;
+    this.radius = n.radius;
+    this.textSize = n.textSize;
+    this.bubbleScaleFactor = n.bubbleScaleFactor;
+    this.relations = n.relations;
+  }
 }

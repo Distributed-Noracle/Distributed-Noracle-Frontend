@@ -28,7 +28,7 @@ export class CreateSpaceComponent implements OnInit {
   createSpace() {
     this.spaceService.postSpace(this.space).then((space) => {
       this.questionService.postQuestion(space.spaceId, this.question).then((q) => {
-        this.router.navigate(['/spaces', space.spaceId], {queryParams: {sq: q.questionId}});
+        this.router.navigate(['/spaces', space.spaceId], {queryParams: {sq: JSON.stringify([q.questionId])}});
         this.myspacesService.getMySpaces().then((s) => s);
       });
     });
