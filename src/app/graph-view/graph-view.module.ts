@@ -5,7 +5,7 @@ import {D3Service} from 'd3-ng2-service';
 import {GraphViewPageComponent} from './graph-view-page/graph-view-page.component';
 import {
   MdButtonModule, MdDialogModule, MdFormFieldModule, MdInputModule, MdProgressSpinnerModule,
-  MdRadioModule
+  MdRadioModule, MdSnackBarModule
 } from '@angular/material';
 import {FormsModule} from '@angular/forms';
 import {GraphViewService} from './graph-view/graph-view.service';
@@ -20,6 +20,7 @@ import { CreateQuestionDialogComponent } from './create-question-dialog/create-q
     MdButtonModule,
     MdRadioModule,
     MdDialogModule,
+    MdSnackBarModule,
     MdProgressSpinnerModule,
     MdFormFieldModule,
     MdInputModule,

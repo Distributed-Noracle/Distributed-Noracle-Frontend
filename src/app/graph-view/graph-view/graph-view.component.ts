@@ -15,7 +15,8 @@ import {AddChildNodeBehavior} from './interaction-behaviors/add-child-node-behav
 import {EditQuestionBehavior} from './interaction-behaviors/edit-question-behavior';
 import {AddRelationBehavior} from './interaction-behaviors/add-relation-behavior';
 import {Subscription} from 'rxjs/Subscription';
-import {MdDialog} from '@angular/material';
+import {MdDialog, MdSnackBar} from '@angular/material';
+import {AgentService} from '../../shared/agent/agent.service';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -42,7 +43,8 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
   private updateSubscription: Subscription;
 
 
-  constructor(private graphViewService: GraphViewService, private d3Service: D3Service, private dialog: MdDialog) {
+  constructor(private graphViewService: GraphViewService, private agentService: AgentService,
+              private d3Service: D3Service, private dialog: MdDialog, private snackBar: MdSnackBar) {
     this.d3 = d3Service.getD3();
     this.transform = this.d3.zoomIdentity;
   }
@@ -119,7 +121,8 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     } else if (this.interactionMode === GraphInteractionMode.AddQuestion) {
       this.setNodeSelectionBehavior(new AddChildNodeBehavior(this.graphViewService, this.dialog));
     } else if (this.interactionMode === GraphInteractionMode.EditQuestion) {
-      this.setNodeSelectionBehavior(new EditQuestionBehavior(this.graphViewService, this.dialog));
+      this.setNodeSelectionBehavior(new EditQuestionBehavior(this.graphViewService, this.agentService,
+        this.dialog, this.snackBar));
     } else if (this.interactionMode === GraphInteractionMode.AddRelation) {
       this.setNodeSelectionBehavior(new AddRelationBehavior(this.graphViewService, this.dialog));
     } else if (this.interactionMode === GraphInteractionMode.EditRelation) {
