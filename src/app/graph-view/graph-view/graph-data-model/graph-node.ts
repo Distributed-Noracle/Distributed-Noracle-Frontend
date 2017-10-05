@@ -1,4 +1,6 @@
 import {SimulationNodeDatum} from 'd3-force';
+import {Relation} from '../../../shared/rest-data-model/relation';
+import {Question} from '../../../shared/rest-data-model/question';
 
 export class GraphNode implements SimulationNodeDatum {
   private lines: string[];
@@ -7,10 +9,6 @@ export class GraphNode implements SimulationNodeDatum {
   public radius;
 
   /**
-   * Node’s zero-based index into nodes array. This property is set during the initialization process of a simulation.
-   */
-  index?: number;
-  /**
    * Node’s current x-position
    */
   x?: number;
@@ -18,29 +16,15 @@ export class GraphNode implements SimulationNodeDatum {
    * Node’s current y-position
    */
   y?: number;
-  /**
-   * Node’s current x-velocity
-   */
-  vx?: number;
-  /**
-   * Node’s current y-velocity
-   */
-  vy?: number;
-  /**
-   * Node’s fixed x-position (if position was fixed)
-   */
-  fx?: number | null;
-  /**
-   * Node’s fixed y-position (if position was fixed)
-   */
-  fy?: number | null;
 
-  constructor(context: CanvasRenderingContext2D, public id: number, public label: string, public isSelected = false) {
+
+  constructor(context: CanvasRenderingContext2D, public id: string, public question: Question,
+              public relations: Relation[], public isSelected = false) {
     this.lines = this.wrapText((s) => context.measureText(s).width);
   }
 
   public setLabel(label: string, context: CanvasRenderingContext2D) {
-    this.label = label;
+    this.question.text = label;
     this.lines = this.wrapText((s) => context.measureText(s).width);
   }
 
@@ -75,8 +59,8 @@ export class GraphNode implements SimulationNodeDatum {
 
   wrapText(measure: (string) => number) {
     const textHeight = this.getTextHeigth();
-    const totalWidth = measure(this.label);
-    const words = this.label.split(/\s+/);
+    const totalWidth = measure(this.question.text);
+    const words = this.question.text.split(/\s+/);
     const longestWordLength =
       Math.ceil(measure(words.reduce((prev, cur, i) => measure(prev) > measure(cur) ? prev : cur)));
     const blankWidth = measure(' ');
@@ -116,5 +100,14 @@ export class GraphNode implements SimulationNodeDatum {
         return lines;
       }
     }
+  }
+
+  update(n: GraphNode) {
+    this.question = n.question;
+    this.lines = n.lines;
+    this.radius = n.radius;
+    this.textSize = n.textSize;
+    this.bubbleScaleFactor = n.bubbleScaleFactor;
+    this.relations = n.relations;
   }
 }

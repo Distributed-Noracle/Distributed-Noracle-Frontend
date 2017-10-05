@@ -1,0 +1,11 @@
+<h1 md-dialog-title>{{data.title}}</h1>
+<div md-dialog-content>
+  <p>{{data.message}}</p>
+  <md-form-field>
+    <textarea mdInput tabindex="1" [(ngModel)]="data.text"></textarea>
+  </md-form-field>
+</div>
+<div md-dialog-actions>
+  <button md-button [md-dialog-close]="data.text" tabindex="2">Ok</button>
+  <button md-button (click)="onCancel()" tabindex="-1">Cancel</button>
+</div>

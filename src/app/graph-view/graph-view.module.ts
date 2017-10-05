@@ -1,29 +1,38 @@
 import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {GraphViewComponent} from './graph-view/graph-view.component';
-import {RestService} from './rest-service/rest.service';
-import {SpaceService} from './space.service';
-import {QuestionService} from './question.service';
-import {RelationService} from './relation.service';
 import {D3Service} from 'd3-ng2-service';
 import {GraphViewPageComponent} from './graph-view-page/graph-view-page.component';
-import {MdButtonModule, MdRadioModule} from '@angular/material';
+import {
+  MdButtonModule, MdDialogModule, MdFormFieldModule, MdInputModule, MdProgressSpinnerModule,
+  MdRadioModule, MdSnackBarModule
+} from '@angular/material';
 import {FormsModule} from '@angular/forms';
-import { GraphViewService } from './graph-view/graph-view.service';
+import {GraphViewService} from './graph-view/graph-view.service';
 import {FlexLayoutModule} from '@angular/flex-layout';
+import {SharedModule} from '../shared/shared.module';
+import {RelationPickerDialogComponent} from './relation-picker-dialog/relation-picker-dialog.component';
+import { CreateQuestionDialogComponent } from './create-question-dialog/create-question-dialog.component';
 
 @NgModule({
   imports: [
     CommonModule,
     MdButtonModule,
     MdRadioModule,
+    MdDialogModule,
+    MdSnackBarModule,
+    MdProgressSpinnerModule,
+    MdFormFieldModule,
+    MdInputModule,
     FormsModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    SharedModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  declarations: [GraphViewComponent, GraphViewPageComponent],
+  declarations: [GraphViewComponent, GraphViewPageComponent, RelationPickerDialogComponent, CreateQuestionDialogComponent],
+  bootstrap: [RelationPickerDialogComponent, CreateQuestionDialogComponent],
   exports: [GraphViewPageComponent],
-  providers: [RestService, SpaceService, QuestionService, RelationService, D3Service, GraphViewService]
+  providers: [D3Service, GraphViewService]
 })
 export class GraphViewModule {
 }

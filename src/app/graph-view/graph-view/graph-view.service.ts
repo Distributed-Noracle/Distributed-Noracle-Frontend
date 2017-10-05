@@ -1,25 +1,177 @@
 import {Injectable} from '@angular/core';
+import {Question} from '../../shared/rest-data-model/question';
+import {Relation} from '../../shared/rest-data-model/relation';
+import {QuestionService} from '../../shared/question/question.service';
+import {RelationService} from '../../shared/relation/relation.service';
+import {Subject} from 'rxjs/Subject';
+import {Observable} from 'rxjs/Observable';
+import {MyspacesService} from '../../shared/myspaces/myspaces.service';
+import {Router} from '@angular/router';
+import {RelationType} from './graph-data-model/relation-type.enum';
 
 @Injectable()
 export class GraphViewService {
 
-  private questions: any[];
-  private relations: any[];
+  private questions: Question[] = [];
+  private relations: Relation[] = [];
+  private spaceId = 'dummy';
+  private isPollScheduled = false;
+  private observedQuestionIds: string[] = [];
+  private update = new Subject<{ question: Question, relations: Relation[] }>();
 
-  constructor() {
-    this.initDummyData();
+  constructor(private questionService: QuestionService, private relationService: RelationService,
+              private myspacesService: MyspacesService, private router: Router) {
   }
 
-  public getQuestion(questionId: number): Promise<any> {
-    return new Promise((resolve, reject) => resolve(this.questions.find((q) => q.id === questionId)));
+  public initServiceForSpace(spaceId: string) {
+    this.spaceId = spaceId;
+    this.observedQuestionIds = [];
   }
 
-  public getRelationsForQuestion(questionId: number): Promise<any[]> {
-    return new Promise(
-      (resolve, reject) => resolve(this.relations.filter((r) => r.from === questionId || r.to === questionId))
-    );
+  public getUpdateObservable(): Observable<{ question: Question, relations: Relation[] }> {
+    return this.update;
   }
 
+  public registerQuestionForUpdate(questionId: string): boolean {
+    if (this.observedQuestionIds.indexOf(questionId) === -1) {
+      this.observedQuestionIds.push(questionId);
+      return true;
+    }
+    return false;
+  }
+
+  public unregisterQuestionForUpdate(questionId: string): boolean {
+    const index = this.observedQuestionIds.indexOf(questionId);
+    if (index !== -1) {
+      this.observedQuestionIds.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
+
+  public addQuestionToParentAndRegisterForUpdate(question: Question, parentQuestionId: string) {
+    this.questionService.postQuestion(this.spaceId, question).then((q) => {
+      const relation = new Relation();
+      relation.firstQuestionId = parentQuestionId;
+      relation.secondQuestionId = q.questionId;
+      relation.name = RelationType[RelationType.FollowUp];
+      relation.directed = true;
+      this.relationService.postRelation(this.spaceId, relation).then((r) => {
+        this.questions.push(q);
+        this.relations.push(r);
+        this.updateSelectionRouteParams(q.questionId, true);
+        this.registerQuestionForUpdate(q.questionId);
+        this.notifyObservers();
+      });
+    });
+  }
+
+  public updateQuestion(questionId: string, text: string) {
+    const question = new Question();
+    question.text = text;
+    return this.questionService.putQuestion(this.spaceId, questionId, question).then((newQ) => {
+      this.questions.splice(this.questions.findIndex((oldQ) => oldQ.questionId === newQ.questionId) , 1);
+      this.questions.push(newQ);
+      this.notifyObservers();
+      return newQ;
+    });
+  }
+
+  public updateRelation(relationId: string, relationType: string) {
+    const relation = new Relation();
+    relation.name = relationType;
+    return this.relationService.putRelation(this.spaceId, relationId, relation).then((newR) => {
+      this.relations.splice(this.relations.findIndex((oldR) => oldR.relationId === newR.relationId) , 1);
+      this.relations.push(newR);
+      this.notifyObservers();
+      return newR;
+    });
+  }
+
+  public addRelation(relation: Relation) {
+    this.relationService.postRelation(this.spaceId, relation).then((r) => {
+      this.relations.push(r);
+      this.notifyObservers();
+    });
+  }
+
+  public requestUpdate() {
+    if (this.spaceId === 'dummy') {
+      this.initDummyData();
+    } else {
+      this.fetchAll(this.spaceId);
+    }
+  }
+
+  public updateSelectionRouteParams(id: string, isSelected: boolean) {
+    let sq = this.router.routerState.snapshot.root.queryParams['sq'];
+    if (sq === undefined) {
+      sq = [];
+    } else {
+      sq = JSON.parse(sq);
+    }
+    const i = sq.indexOf(id);
+    if (isSelected && i === -1) {
+      sq.push(id);
+    } else if (!isSelected && i !== -1) {
+      sq.splice(i, 1);
+    }
+    this.myspacesService.updateSelectionOfSubscription(this.spaceId, sq);
+    this.router.navigate([], {
+      queryParams: {
+        sq: JSON.stringify(sq)
+      }
+    });
+  }
+
+
+  private getQuestion(questionId: string): Question {
+    return this.questions.find((q) => q.questionId === questionId);
+  }
+
+  private getRelationsForQuestion(questionId: string): Relation[] {
+    return this.relations.filter((r) => r.firstQuestionId === questionId || r.secondQuestionId === questionId);
+  }
+
+  private fetchAll(spaceId: string) {
+    Promise.all([this.questionService.getQuestionsOfSpace(spaceId).then((res) =>
+      this.questions = res),
+      this.relationService.getRelationsOfSpace(spaceId).then((res) =>
+        this.relations = res)]).then(() => {
+      if (this.spaceId === spaceId) {
+        this.notifyObservers();
+        this.schedulePolling();
+      }
+    });
+  }
+
+  private notifyObservers() {
+    this.observedQuestionIds.forEach((qId) => {
+      if (qId === 'seed') {
+        // trick that allows seed-question subscription without knowing the id
+        qId = this.questions[0].questionId;
+      }
+      const question = this.getQuestion(qId);
+      const relationsForQuestion = this.getRelationsForQuestion(qId);
+      if (question !== undefined && relationsForQuestion !== undefined) {
+        this.update.next({question: question, relations: relationsForQuestion});
+      }
+    });
+  }
+
+  private schedulePolling() {
+    if (!this.isPollScheduled) {
+      this.isPollScheduled = true;
+      window.setTimeout(() => this.poll(), 5000);
+    }
+  }
+
+  private poll() {
+    this.isPollScheduled = false;
+    if (this.spaceId !== 'dummy') {
+      this.fetchAll(this.spaceId);
+    }
+  }
 
   private initDummyData() {
     this.questions = [
@@ -93,7 +245,12 @@ export class GraphViewService {
         label: 'Who is actually benefiting from our work',
         title: 'asked by Bernhard'
       }
-    ];
+    ].map((obj) => {
+      const q = new Question();
+      q.questionId = obj.id.toString();
+      q.text = obj.label;
+      return q;
+    });
     this.relations = [
       {from: 1, to: 11, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
       {from: 1, to: 12, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
@@ -108,6 +265,15 @@ export class GraphViewService {
       {from: 13, to: 131, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
       {from: 131, to: 1311, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
       {from: 131, to: 1312, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-    ];
+    ].map((obj) => {
+      const r = new Relation();
+      r.relationId = '[' + obj.from + '][' + obj.to + ']';
+      r.firstQuestionId = obj.from.toString();
+      r.secondQuestionId = obj.to.toString();
+      r.name = obj.label;
+      r.directed = obj.arrows !== undefined;
+      return r;
+    });
+    this.notifyObservers();
   }
 }

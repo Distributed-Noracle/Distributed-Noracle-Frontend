@@ -1,0 +1,10 @@
+<h1>My Spaces</h1>
+<md-list>
+  <md-list-item *ngFor="let space of spaces">
+    <a md-button [routerLink]="['/spaces', space.space.spaceId]"
+       [queryParams]="{sq: getStringifiedParamArray(space.subscription)}">{{space.space.name}}</a>
+    <button md-icon-button (click)="copyInviteUrl(space)" color="primary">
+      <md-icon>share</md-icon>
+    </button>
+  </md-list-item>
+</md-list>
