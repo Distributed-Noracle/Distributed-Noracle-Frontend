@@ -15,10 +15,12 @@ import {AddChildNodeBehavior} from './interaction-behaviors/add-child-node-behav
 import {EditQuestionBehavior} from './interaction-behaviors/edit-question-behavior';
 import {AddRelationBehavior} from './interaction-behaviors/add-relation-behavior';
 import {Subscription} from 'rxjs/Subscription';
-import {MdDialog, MdSnackBar} from '@angular/material';
+import {MdDialog} from '@angular/material';
 import {AgentService} from '../../shared/agent/agent.service';
 import {EdgeInteractionBehavior} from './interaction-behaviors/edge-interaction-behavior';
 import {EditRelationBehavior} from './interaction-behaviors/edit-relation-behavior';
+import {QuestionVote} from '../../shared/rest-data-model/question-vote';
+import {RelationVote} from '../../shared/rest-data-model/relation-vote';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -46,7 +48,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
 
 
   constructor(private graphViewService: GraphViewService, private agentService: AgentService,
-              private d3Service: D3Service, private dialog: MdDialog, private snackBar: MdSnackBar) {
+              private d3Service: D3Service, private dialog: MdDialog) {
     this.d3 = d3Service.getD3();
     this.transform = this.d3.zoomIdentity;
   }
@@ -124,10 +126,10 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       this.setSelectionBehaviors(new AddChildNodeBehavior(this.graphViewService, this.dialog), null);
     } else if (this.interactionMode === GraphInteractionMode.AddRelation) {
       this.setSelectionBehaviors(new AddRelationBehavior(this.graphViewService, this.dialog), null);
-    } else if (this.interactionMode === GraphInteractionMode.Edit) {
+    } else if (this.interactionMode === GraphInteractionMode.EditAndAssess) {
       this.setSelectionBehaviors(
-        new EditQuestionBehavior(this.graphViewService, this.agentService, this.dialog, this.snackBar),
-        new EditRelationBehavior(this.graphViewService, this.agentService, this.dialog, this.snackBar)
+        new EditQuestionBehavior(this.graphViewService, this.agentService, this.dialog),
+        new EditRelationBehavior(this.graphViewService, this.agentService, this.dialog)
       );
     } else {
       this.setDragAndZoomBehavior();
@@ -319,13 +321,18 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     this.loadedSpaceId = this.spaceId;
   }
 
-  private processUpdate(updateData: { question: Question, relations: Relation[] }) {
+  private processUpdate(updateData: {
+    question: Question, relations: Relation[],
+    questionVotes: QuestionVote[], relationVotes: RelationVote[][]
+  }) {
     const context = this.d3Root.nativeElement.getContext('2d');
     const isSelected = this.selectedQuestions !== undefined &&
       this.selectedQuestions.findIndex((id) => id === updateData.question.questionId) !== -1;
-    this.network.addOrUpdateNode(
-      new GraphNode(context, updateData.question.questionId, updateData.question, updateData.relations, isSelected));
-    this.updateSimulation();
+    if (this.network.addOrUpdateNode(
+        new GraphNode(context, updateData.question.questionId,
+          updateData.question, updateData.questionVotes, updateData.relations, updateData.relationVotes, isSelected))) {
+      this.updateSimulation();
+    }
     if (isSelected) {
       let updateRequired = false;
       updateData.relations.forEach((rel) => {

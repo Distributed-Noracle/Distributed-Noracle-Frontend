@@ -1,0 +1,13 @@
+<h1 md-dialog-title>{{data.title}}</h1>
+<div md-dialog-content>
+  <span *ngFor="let line of data.lines">{{line}}<br/></span>
+  <md-radio-group [(ngModel)]="data.vote">
+    <p><md-radio-button [value]="1">{{data.upvoteText}}</md-radio-button></p>
+    <p><md-radio-button [value]="0">{{data.neutralText}}</md-radio-button></p>
+    <p><md-radio-button [value]="-1">{{data.downvoteText}}</md-radio-button></p>
+  </md-radio-group>
+</div>
+<div md-dialog-actions>
+  <button md-button [md-dialog-close]="data.vote" tabindex="2">Ok</button>
+  <button md-button (click)="onCancel()" tabindex="-1">Cancel</button>
+</div>

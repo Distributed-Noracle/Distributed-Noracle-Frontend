@@ -30,14 +30,14 @@ export class Network {
 
   public addOrUpdateNode(nodeToAdd: GraphNode): boolean {
     const nodeIndex = this.nodes.findIndex((n) => n.id === nodeToAdd.id);
-    let isAdd = true;
+    let hasChanged = false;
     if (nodeIndex !== -1) {
       const nodeToUpdate = this.nodes[nodeIndex];
-      nodeToUpdate.update(nodeToAdd);
+      hasChanged = nodeToUpdate.update(nodeToAdd);
       nodeToAdd = nodeToUpdate;
-      isAdd = false;
     } else {
       this.nodes.push(nodeToAdd);
+      hasChanged = true;
     }
     nodeToAdd.relations.forEach((r) => {
       if (this.edges.findIndex((e) => e.id === r.relationId) === -1) {
@@ -57,14 +57,7 @@ export class Network {
         }
       }
     });
-    return isAdd;
-  }
-
-  public addRelationToNode(relation: Relation, node: GraphNode) {
-    if (relation.firstQuestionId === node.id || relation.secondQuestionId === node.id) {
-      node.relations.push(relation);
-      this.updateEdgesForNode(node);
-    }
+    return hasChanged;
   }
 
   public removeNode(node: GraphNode) {

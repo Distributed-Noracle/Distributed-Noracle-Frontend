@@ -1,12 +1,16 @@
 import {SimulationNodeDatum} from 'd3-force';
 import {Relation} from '../../../shared/rest-data-model/relation';
 import {Question} from '../../../shared/rest-data-model/question';
+import {QuestionVote} from '../../../shared/rest-data-model/question-vote';
+import {RelationVote} from '../../../shared/rest-data-model/relation-vote';
+import {DrawUtil} from '../utils/draw-util';
 
 export class GraphNode implements SimulationNodeDatum {
   private lines: string[];
   private textSize = 10;
   private bubbleScaleFactor = 1.25;
   public radius;
+  public relationVotes: Map<string, RelationVote[]> = new Map<string, RelationVote[]>();
 
   /**
    * Node’s current x-position
@@ -19,8 +23,12 @@ export class GraphNode implements SimulationNodeDatum {
 
 
   constructor(context: CanvasRenderingContext2D, public id: string, public question: Question,
-              public relations: Relation[], public isSelected = false) {
+              public questionVotes: QuestionVote[], public relations: Relation[],
+              relationVotes: RelationVote[][], public isSelected = false) {
     this.lines = this.wrapText((s) => context.measureText(s).width);
+    for (let i = 0; i < relations.length; i++) {
+      this.relationVotes.set(relations[i].relationId, relationVotes[i] !== undefined ? relationVotes[i] : []);
+    }
   }
 
   public setLabel(label: string, context: CanvasRenderingContext2D) {
@@ -36,7 +44,8 @@ export class GraphNode implements SimulationNodeDatum {
     context.arc(this.x, this.y, this.radius / this.bubbleScaleFactor, 0, alpha);
     context.lineTo(this.x + Math.cos(alpha + beta / 2) * this.radius, this.y + Math.sin(alpha + beta / 2) * this.radius);
     context.arc(this.x, this.y, this.radius / this.bubbleScaleFactor, alpha + beta, 2 * Math.PI);
-    context.strokeStyle = '#000';
+    context.strokeStyle = DrawUtil.getColorCodeForValueInScale(this.questionVotes.map(v => v.value).reduce((p, c) => p + c, 0),
+      -this.questionVotes.length, this.questionVotes.length);
     context.lineWidth = this.isSelected ? 3 : 1;
     context.stroke();
     context.fillStyle = '#fff';
@@ -102,12 +111,37 @@ export class GraphNode implements SimulationNodeDatum {
     }
   }
 
-  update(n: GraphNode) {
+  update(n: GraphNode): boolean {
+    if (this.isEqual(n)) {
+      return false;
+    }
     this.question = n.question;
+    this.relations = n.relations;
     this.lines = n.lines;
     this.radius = n.radius;
     this.textSize = n.textSize;
     this.bubbleScaleFactor = n.bubbleScaleFactor;
-    this.relations = n.relations;
+    this.questionVotes = n.questionVotes;
+    this.relationVotes = n.relationVotes;
+    return true;
+  }
+
+  private isEqual(n: GraphNode): boolean {
+    return this.question.questionId === n.question.questionId &&
+      this.question.timestampLastModified === n.question.timestampLastModified &&
+      this.relations.length === n.relations.length &&
+      this.relations.map(r => n.relations
+        .findIndex(r2 => r2.relationId === r.relationId && r2.timestampLastModified === r.timestampLastModified) !== -1)
+        .reduce((prev, cur) => prev && cur, true) &&
+      this.lines.map((l, i) => l === n.lines[i]).reduce((prev, cur) => prev && cur, true) &&
+      this.radius === n.radius &&
+      this.textSize === n.textSize &&
+      this.bubbleScaleFactor === n.bubbleScaleFactor &&
+      this.questionVotes.length === n.questionVotes.length &&
+      this.relations.map(r =>
+        this.relationVotes.get(r.relationId).length === n.relationVotes.get(r.relationId).length &&
+        this.relationVotes.get(r.relationId).map((v, i) => v.value === n.relationVotes.get(r.relationId)[i].value &&
+        v.voterAgentId === n.relationVotes.get(r.relationId)[i].voterAgentId).reduce((p, c) => p && c, true)
+      ).reduce((p, c) => p && c, true);
   }
 }

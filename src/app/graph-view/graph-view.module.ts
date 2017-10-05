@@ -12,7 +12,8 @@ import {GraphViewService} from './graph-view/graph-view.service';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {SharedModule} from '../shared/shared.module';
 import {RelationPickerDialogComponent} from './relation-picker-dialog/relation-picker-dialog.component';
-import { CreateQuestionDialogComponent } from './create-question-dialog/create-question-dialog.component';
+import {CreateQuestionDialogComponent} from './create-question-dialog/create-question-dialog.component';
+import {VoteDialogComponent} from './vote-dialog/vote-dialog.component';
 
 @NgModule({
   imports: [
@@ -29,8 +30,9 @@ import { CreateQuestionDialogComponent } from './create-question-dialog/create-q
     SharedModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  declarations: [GraphViewComponent, GraphViewPageComponent, RelationPickerDialogComponent, CreateQuestionDialogComponent],
-  bootstrap: [RelationPickerDialogComponent, CreateQuestionDialogComponent],
+  declarations: [GraphViewComponent, GraphViewPageComponent, RelationPickerDialogComponent,
+    CreateQuestionDialogComponent, VoteDialogComponent],
+  bootstrap: [RelationPickerDialogComponent, CreateQuestionDialogComponent, VoteDialogComponent],
   exports: [GraphViewPageComponent],
   providers: [D3Service, GraphViewService]
 })
