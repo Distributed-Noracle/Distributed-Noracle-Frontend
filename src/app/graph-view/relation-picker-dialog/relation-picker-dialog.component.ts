@@ -11,6 +11,7 @@ export class RelationPickerDialogComponent implements OnInit {
 
   constructor(public dialogRef: MdDialogRef<RelationPickerDialogComponent>,
               @Inject(MD_DIALOG_DATA) public data: any) {
+    data.lines = data.message.split('\n');
     data.selectedRelationType = RelationType.FollowUp;
   }
 

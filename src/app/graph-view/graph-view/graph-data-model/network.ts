@@ -46,7 +46,7 @@ export class Network {
         const node2 = this.nodes.find((n) => n.id === r.secondQuestionId);
         if (node1 !== undefined && node2 !== undefined) {
           // both nodes are in the network
-          this.edges.push(new Edge(r.relationId, node1, node2, r.directed));
+          this.edges.push(new Edge(r.relationId, node1, node2, r));
           // update nodes if necessary
           if (node1.relations.findIndex((n) => n.relationId === r.relationId) === -1) {
             node1.relations.push(r);
@@ -100,7 +100,7 @@ export class Network {
             otherNode.relations.push(relation);
           }
           this.edges.push(new Edge(relation.relationId,
-            outbound ? node : otherNode, outbound ? otherNode : node, relation.directed));
+            outbound ? node : otherNode, outbound ? otherNode : node, relation));
         }
       }
     });

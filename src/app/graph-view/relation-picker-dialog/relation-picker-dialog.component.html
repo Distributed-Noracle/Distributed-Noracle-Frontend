@@ -1,6 +1,6 @@
 <h1 md-dialog-title>{{data.title}}</h1>
 <div md-dialog-content>
-  <p>{{data.message}}</p>
+  <span *ngFor="let line of data.lines">{{line}}<br/></span>
   <md-radio-group [(ngModel)]="data.selectedRelationType">
     <p *ngFor="let type of getRelationTypes()">
       <md-radio-button [value]="type">{{getRelationTypeLabel(type)}}

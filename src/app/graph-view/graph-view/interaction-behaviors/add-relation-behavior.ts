@@ -24,8 +24,8 @@ export class AddRelationBehavior extends NodeInteractionBehavior {
       const dialogRef = this.dialog.open(RelationPickerDialogComponent, {
         width: '250px',
         data: {
-          title: 'Choose the type of relation', message: 'What type of relation would you like to create from ['
-          + firstNode.question.text + '] to [' + node.question.text + ']?'
+          title: 'Choose the type of relation', message: 'What type of relation would you like to create from\n1.)'
+          + firstNode.question.text + '\nto\n2.)' + node.question.text
         }
       });
       return dialogRef.afterClosed().toPromise().then(result => {

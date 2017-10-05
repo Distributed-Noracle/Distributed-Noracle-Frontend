@@ -17,6 +17,8 @@ import {AddRelationBehavior} from './interaction-behaviors/add-relation-behavior
 import {Subscription} from 'rxjs/Subscription';
 import {MdDialog, MdSnackBar} from '@angular/material';
 import {AgentService} from '../../shared/agent/agent.service';
+import {EdgeInteractionBehavior} from './interaction-behaviors/edge-interaction-behavior';
+import {EditRelationBehavior} from './interaction-behaviors/edit-relation-behavior';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -116,26 +118,23 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
     if (this.interactionMode === GraphInteractionMode.SelectAndNavigate) {
-      // TODO: review: a new behavior every time?
-      this.setNodeSelectionBehavior(new ChangeNodeSelectionBehavior(this.network, this.graphViewService));
+      // TODO: review: a new behavior every time? maybe use services?
+      this.setSelectionBehaviors(new ChangeNodeSelectionBehavior(this.network, this.graphViewService), null);
     } else if (this.interactionMode === GraphInteractionMode.AddQuestion) {
-      this.setNodeSelectionBehavior(new AddChildNodeBehavior(this.graphViewService, this.dialog));
-    } else if (this.interactionMode === GraphInteractionMode.EditQuestion) {
-      this.setNodeSelectionBehavior(new EditQuestionBehavior(this.graphViewService, this.agentService,
-        this.dialog, this.snackBar));
+      this.setSelectionBehaviors(new AddChildNodeBehavior(this.graphViewService, this.dialog), null);
     } else if (this.interactionMode === GraphInteractionMode.AddRelation) {
-      this.setNodeSelectionBehavior(new AddRelationBehavior(this.graphViewService, this.dialog));
-    } else if (this.interactionMode === GraphInteractionMode.EditRelation) {
-      this.setEdgeSelectionBehavior((e: Edge) => {
-        this.network.getEdges().forEach((edge) => edge.isSelected = false);
-        e.isSelected = true;
-      });
+      this.setSelectionBehaviors(new AddRelationBehavior(this.graphViewService, this.dialog), null);
+    } else if (this.interactionMode === GraphInteractionMode.Edit) {
+      this.setSelectionBehaviors(
+        new EditQuestionBehavior(this.graphViewService, this.agentService, this.dialog, this.snackBar),
+        new EditRelationBehavior(this.graphViewService, this.agentService, this.dialog, this.snackBar)
+      );
     } else {
-      this.setExploreBehavior();
+      this.setDragAndZoomBehavior();
     }
   }
 
-  private  setExploreBehavior() {
+  private  setDragAndZoomBehavior() {
     const canvas = this.canvas;
     const d3Sim = this.d3Sim;
 
@@ -196,43 +195,6 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
         }));
   }
 
-  private setNodeSelectionBehavior(nodeInteractionBehavior: NodeInteractionBehavior) {
-    const canvas = this.canvas;
-    // drag behavior
-    this.d3.select(canvas)
-      .call(this.d3.drag()
-        .container(canvas)
-        .subject(() => {
-          // console.log('subject: (' + this.d3.event.x + '/' + this.d3.event.y + ')')
-          this.hasDragSubject = false;
-          const nodes = this.network.getNodes();
-          for (let i = nodes.length - 1; i >= 0; i--) {
-            const n = nodes[i];
-            const dx = this.transform.invertX(this.d3.event.x) - n.x;
-            const dy = this.transform.invertY(this.d3.event.y) - n.y;
-            if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
-              n.x = this.transform.applyX(n.x);
-              n.y = this.transform.applyY(n.y);
-              this.hasDragSubject = true;
-              return n;
-            }
-          }
-        })
-        .on('start', () => false)
-        .on('drag', () => false)
-        .on('end', () => {
-          const n = this.d3.event.subject as GraphNode;
-          const dx = this.transform.invertX(this.d3.event.x) - n.x;
-          const dy = this.transform.invertY(this.d3.event.y) - n.y;
-          if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
-            nodeInteractionBehavior.interactWith(n).then(() => {
-              this.updateSimulation();
-            });
-          }
-        }))
-      .call(this.d3.zoom().filter(() => false));
-  }
-
   private updateSimulation() {
     this.d3Sim.nodes(this.network.getNodes());
     this.d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.network.getEdges())
@@ -240,7 +202,8 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     this.d3Sim.alpha(1).restart();
   }
 
-  private setEdgeSelectionBehavior(editFunction: (e: Edge) => void) {
+  private setSelectionBehaviors(nodeInteractionBehavior: NodeInteractionBehavior,
+                                edgeInteractionBehavior: EdgeInteractionBehavior) {
     const canvas = this.canvas;
     const d3Sim = this.d3Sim;
     const squaredDistanceThreshold = 100;
@@ -252,34 +215,65 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
         .subject(() => {
           // console.log('subject: (' + this.d3.event.x + '/' + this.d3.event.y + ')')
           this.hasDragSubject = false;
-          const edges = this.network.getEdges();
-          for (let i = edges.length - 1; i >= 0; i--) {
-            const edge = edges[i];
-            const d_sqr = this.getPointToLineSegmentSquaredDistance(
-              (edge.source as GraphNode).x, (edge.source as GraphNode).y,
-              (edge.target as GraphNode).x, (edge.target as GraphNode).y,
-              this.transform.invertX(this.d3.event.x), this.transform.invertY(this.d3.event.y)
-            );
-            if (d_sqr <= squaredDistanceThreshold) {
-              return edge;
+          if (nodeInteractionBehavior !== undefined && nodeInteractionBehavior !== null) {
+            const nodes = this.network.getNodes();
+            for (let i = nodes.length - 1; i >= 0; i--) {
+              const n = nodes[i];
+              const dx = this.transform.invertX(this.d3.event.x) - n.x;
+              const dy = this.transform.invertY(this.d3.event.y) - n.y;
+              if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
+                n.x = this.transform.applyX(n.x);
+                n.y = this.transform.applyY(n.y);
+                this.hasDragSubject = true;
+                return n;
+              }
+            }
+          }
+          if (edgeInteractionBehavior !== undefined && edgeInteractionBehavior !== null) {
+            const edges = this.network.getEdges();
+            let index = -1;
+            let d_sqr_min = squaredDistanceThreshold;
+            for (let i = edges.length - 1; i >= 0; i--) {
+              const edge = edges[i];
+              const d_sqr = this.getPointToLineSegmentSquaredDistance(
+                (edge.source as GraphNode).x, (edge.source as GraphNode).y,
+                (edge.target as GraphNode).x, (edge.target as GraphNode).y,
+                this.transform.invertX(this.d3.event.x), this.transform.invertY(this.d3.event.y)
+              );
+              if (d_sqr < d_sqr_min) {
+                d_sqr_min = d_sqr;
+                index = i;
+              }
+            }
+            if (index !== -1) {
+              return edges[index];
             }
           }
         })
         .on('start', () => false)
         .on('drag', () => false)
         .on('end', () => {
-          const edge = this.d3.event.subject as Edge;
-          const d_sqr = this.getPointToLineSegmentSquaredDistance(
-            (edge.source as GraphNode).x, (edge.source as GraphNode).y,
-            (edge.target as GraphNode).x, (edge.target as GraphNode).y,
-            this.transform.invertX(this.d3.event.x), this.transform.invertY(this.d3.event.y)
-          );
-          if (d_sqr <= squaredDistanceThreshold) {
-            editFunction(edge);
-            d3Sim.nodes(this.network.getNodes());
-            d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.network.getEdges())
-              .distance((link, i, links) => (link as Edge).getDistance());
-            d3Sim.alpha(1).restart();
+          if (this.d3.event.subject !== undefined && this.d3.event.subject.question !== undefined) {
+            const n = this.d3.event.subject as GraphNode;
+            const dx = this.transform.invertX(this.d3.event.x) - n.x;
+            const dy = this.transform.invertY(this.d3.event.y) - n.y;
+            if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
+              nodeInteractionBehavior.interactWith(n).then(() => {
+                this.updateSimulation();
+              });
+            }
+          } else if (this.d3.event.subject !== undefined && this.d3.event.subject.relation !== undefined) {
+            const edge = this.d3.event.subject as Edge;
+            const d_sqr = this.getPointToLineSegmentSquaredDistance(
+              (edge.source as GraphNode).x, (edge.source as GraphNode).y,
+              (edge.target as GraphNode).x, (edge.target as GraphNode).y,
+              this.transform.invertX(this.d3.event.x), this.transform.invertY(this.d3.event.y)
+            );
+            if (d_sqr <= squaredDistanceThreshold) {
+              edgeInteractionBehavior.interactWith(edge).then(() => {
+                this.updateSimulation();
+              });
+            }
           }
         }))
       .call(this.d3.zoom().filter(() => false));

@@ -77,6 +77,17 @@ export class GraphViewService {
     });
   }
 
+  public updateRelation(relationId: string, relationType: string) {
+    const relation = new Relation();
+    relation.name = relationType;
+    return this.relationService.putRelation(this.spaceId, relationId, relation).then((newR) => {
+      this.relations.splice(this.relations.findIndex((oldR) => oldR.relationId === newR.relationId) , 1);
+      this.relations.push(newR);
+      this.notifyObservers();
+      return newR;
+    });
+  }
+
   public addRelation(relation: Relation) {
     this.relationService.postRelation(this.spaceId, relation).then((r) => {
       this.relations.push(r);

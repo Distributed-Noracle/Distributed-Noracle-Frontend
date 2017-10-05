@@ -1,5 +1,6 @@
 import {SimulationLinkDatum} from 'd3-force';
 import {GraphNode} from './graph-node';
+import {Relation} from '../../../shared/rest-data-model/relation';
 
 export class Edge implements SimulationLinkDatum<GraphNode> {
 
@@ -7,7 +8,7 @@ export class Edge implements SimulationLinkDatum<GraphNode> {
 
   constructor(public id: string,
               public source: string | number | GraphNode,
-              public target: string | number | GraphNode, public isDirected) {
+              public target: string | number | GraphNode, public relation: Relation) {
   }
 
   getDistance() {
@@ -15,7 +16,7 @@ export class Edge implements SimulationLinkDatum<GraphNode> {
   }
 
   draw(context: CanvasRenderingContext2D) {
-    if (this.isDirected) {
+    if (this.relation.directed) {
       this.drawDirected(context);
     } else {
       this.drawUndirected(context);

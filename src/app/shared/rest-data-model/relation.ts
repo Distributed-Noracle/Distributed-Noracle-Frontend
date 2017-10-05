@@ -8,6 +8,7 @@ export class Relation {
   firstQuestionId: string;
   secondQuestionId: string;
   directed: boolean;
+  authorId: string;
   timestampCreated: string;
   timestampLastModified: string;
 
