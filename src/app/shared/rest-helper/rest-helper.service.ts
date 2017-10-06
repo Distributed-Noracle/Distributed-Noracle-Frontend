@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Headers, Http} from '@angular/http';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
 
-const HOST_URL = 'https://steen.informatik.rwth-aachen.de:9082';
+const HOST_URL = /* 'https://localhost:9082'; */ 'https://steen.informatik.rwth-aachen.de:9082';
 
 @Injectable()
 export class RestHelperService {

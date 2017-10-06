@@ -12,6 +12,9 @@ import {QuestionVoteService} from '../../shared/question-vote/question-vote.serv
 import {RelationVoteService} from '../../shared/relation-vote/relation-vote.service';
 import {QuestionVote} from '../../shared/rest-data-model/question-vote';
 import {RelationVote} from '../../shared/rest-data-model/relation-vote';
+import {AgentService} from '../../shared/agent/agent.service';
+import {UpdateData} from './graph-data-model/update-data';
+import {AuthGuardService} from '../../shared/auth-guard/auth-guard.service';
 
 @Injectable()
 export class GraphViewService {
@@ -20,17 +23,17 @@ export class GraphViewService {
   private relations: Relation[] = [];
   private questionVotes: Map<string, QuestionVote[]> = new Map<string, QuestionVote[]>();
   private relationVotes: Map<string, RelationVote[]> = new Map<string, RelationVote[]>();
-  private spaceId = 'dummy';
+  private questionAuthors: Map<string, string> = new Map<string, string>();
+  private relationAuthors: Map<string, string> = new Map<string, string>();
+  private spaceId = null;
   private isPollScheduled = false;
   private observedQuestionIds: string[] = [];
-  private update = new Subject<{
-    question: Question, relations: Relation[],
-    questionVotes: QuestionVote[], relationVotes: RelationVote[][]
-  }>();
+  private update = new Subject<UpdateData>();
 
   constructor(private questionService: QuestionService, private relationService: RelationService,
               private questionVoteService: QuestionVoteService, private relationVoteService: RelationVoteService,
-              private myspacesService: MyspacesService, private router: Router) {
+              private myspacesService: MyspacesService, private agentService: AgentService,
+              private authGuardService: AuthGuardService, private router: Router) {
   }
 
   public initServiceForSpace(spaceId: string) {
@@ -38,10 +41,7 @@ export class GraphViewService {
     this.observedQuestionIds = [];
   }
 
-  public getUpdateObservable(): Observable<{
-    question: Question, relations: Relation[],
-    questionVotes: QuestionVote[], relationVotes: RelationVote[][]
-  }> {
+  public getUpdateObservable(): Observable<UpdateData> {
     return this.update;
   }
 
@@ -75,6 +75,8 @@ export class GraphViewService {
         // there cannot be votes on the newly created question and relation yet
         this.questionVotes.set(q.questionId, []);
         this.relationVotes.set(r.relationId, []);
+        this.questionAuthors.set(q.questionId, this.authGuardService.getUserData().preferred_username);
+        this.relationAuthors.set(r.relationId, this.authGuardService.getUserData().preferred_username);
         this.updateSelectionRouteParams(q.questionId, true);
         this.registerQuestionForUpdate(q.questionId);
         this.notifyObservers();
@@ -140,12 +142,15 @@ export class GraphViewService {
     this.relationService.postRelation(this.spaceId, relation).then((r) => {
       this.relations.push(r);
       this.relationVotes.set(r.relationId, []);
+      this.relationAuthors.set(r.relationId, this.authGuardService.getUserData().preferred_username);
       this.notifyObservers();
     });
   }
 
   public requestUpdate() {
-    this.fetchAll(this.spaceId);
+    if (this.spaceId !== null) {
+      this.fetchAll(this.spaceId);
+    }
   }
 
   public updateSelectionRouteParams(id: string, isSelected: boolean) {
@@ -169,7 +174,6 @@ export class GraphViewService {
     });
   }
 
-
   private getQuestion(questionId: string): Question {
     return this.questions.find((q) => q.questionId === questionId);
   }
@@ -182,28 +186,69 @@ export class GraphViewService {
     return this.questionVotes.get(questionId);
   }
 
+  private getAuthorForQuestion(questionId: string): string {
+    return this.questionAuthors.get(questionId);
+  }
+
   private getVotesForRelation(relationId: string): RelationVote[] {
     return this.relationVotes.get(relationId);
   }
 
+  private getAuthorForRelation(relationId: string): string {
+    return this.relationAuthors.get(relationId);
+  }
+
   private fetchAll(spaceId: string) {
-    Promise.all([this.questionService.getQuestionsOfSpace(spaceId).then((res) =>
-      this.questions = res),
+    // load all questions and all relations of the space
+    const questionsAndRelationsPromise = Promise.all([this.questionService.getQuestionsOfSpace(spaceId).then((res) => {
+      this.questions = res;
+      const seedIndex = this.observedQuestionIds.indexOf('seed');
+      if (seedIndex !== -1 && this.questions.length > 0) {
+        this.observedQuestionIds.splice(seedIndex, 1);
+        this.observedQuestionIds.push(this.questions[0].questionId);
+      }
+      return this.questions;
+    }),
       this.relationService.getRelationsOfSpace(spaceId).then((res) =>
-        this.relations = res)]).then(() => {
+        this.relations = res)]);
+
+    // when all questions and relations are loaded
+    questionsAndRelationsPromise.then(() => {
       if (this.spaceId === spaceId) {
-        Promise.all(this.questions.filter(q => this.observedQuestionIds.indexOf(q.questionId) !== -1).map(
-          q => this.questionVoteService.getQuestionVotes(spaceId, q.questionId)
-            .then((qv) => this.questionVotes.set(q.questionId, qv))).concat(
-          this.relations.filter(r => this.observedQuestionIds.indexOf(r.firstQuestionId) !== -1
-          && this.observedQuestionIds.indexOf(r.secondQuestionId) !== -1).map(
-            r => this.relationVoteService.getRelationVotes(spaceId, r.relationId)
-              .then((rv) => this.relationVotes.set(r.relationId, rv))))).then(() => {
+        // load all related data for observed questions and relations
+        const allRelatedDataPromise = Promise.all(this.questions.filter(
+          q => this.observedQuestionIds.indexOf(q.questionId) !== -1)
+          .map(q => this.loadQuestionRelatedData(spaceId, q))
+          .concat(
+            this.relations.filter(r => this.observedQuestionIds.indexOf(r.firstQuestionId) !== -1
+            && this.observedQuestionIds.indexOf(r.secondQuestionId) !== -1)
+              .map(r => this.loadRelationRelatedData(spaceId, r))));
+
+        // when all related data is fetched
+        allRelatedDataPromise.then(() => {
           this.notifyObservers();
           this.schedulePolling();
         });
       }
     });
+  }
+
+  private loadRelationRelatedData(spaceId: string, r: Relation): Promise<any> {
+    return Promise.all([
+      this.relationVoteService.getRelationVotes(spaceId, r.relationId)
+        .then((rv) => this.relationVotes.set(r.relationId, rv)),
+      this.agentService.getAgentName(r.authorId)
+        .then(ra => this.relationAuthors.set(r.relationId, ra))
+    ]);
+  }
+
+  private loadQuestionRelatedData(spaceId: string, q: Question): Promise<any> {
+    return Promise.all([
+      this.questionVoteService.getQuestionVotes(spaceId, q.questionId)
+        .then((qv) => this.questionVotes.set(q.questionId, qv)),
+      this.agentService.getAgentName(q.authorId)
+        .then(qa => this.questionAuthors.set(q.questionId, qa))
+    ]);
   }
 
   private notifyObservers() {
@@ -213,13 +258,18 @@ export class GraphViewService {
         qId = this.questions[0].questionId;
       }
       const question = this.getQuestion(qId);
-      const relationsForQuestion = this.getRelationsForQuestion(qId);
+      const questionAuthor = this.questionAuthors.get(qId);
       const votesForQuestion = this.getVotesForQuestion(qId);
+      const relationsForQuestion = this.getRelationsForQuestion(qId);
       const votesForRelations = relationsForQuestion.map(r => this.getVotesForRelation(r.relationId));
+      const authorsForRelations = relationsForQuestion.map(r => this.getAuthorForRelation(r.relationId));
       if (question !== undefined && relationsForQuestion !== undefined) {
         this.update.next({
-          question: question, relations: relationsForQuestion,
+          question: question,
+          questionAuthor: questionAuthor,
           questionVotes: votesForQuestion !== undefined ? votesForQuestion : [],
+          relations: relationsForQuestion,
+          relationAuthors: authorsForRelations,
           relationVotes: votesForRelations !== undefined ? votesForRelations : []
         });
       }
@@ -235,7 +285,9 @@ export class GraphViewService {
 
   private poll() {
     this.isPollScheduled = false;
-    this.fetchAll(this.spaceId);
+    if (this.spaceId !== null) {
+      this.fetchAll(this.spaceId);
+    }
   }
 
 }

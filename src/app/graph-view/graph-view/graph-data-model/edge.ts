@@ -10,7 +10,8 @@ export class Edge implements SimulationLinkDatum<GraphNode> {
   constructor(public id: string,
               public source: string | number | GraphNode,
               public target: string | number | GraphNode,
-              public relation: Relation) {
+              public relation: Relation,
+              public relationAuthor: string) {
   }
 
   getDistance() {
@@ -27,6 +28,11 @@ export class Edge implements SimulationLinkDatum<GraphNode> {
     } else {
       this.drawUndirected(context);
     }
+    context.beginPath();
+    const dx = (this.target as GraphNode).x - (this.source as GraphNode).x;
+    const dy = (this.target as GraphNode).y - (this.source as GraphNode).y;
+    context.fillText(this.relationAuthor, (this.source as GraphNode).x + dx / 2, (this.source as GraphNode).y + dy / 2);
+    context.stroke();
   }
 
   drawDirected(context: CanvasRenderingContext2D) {

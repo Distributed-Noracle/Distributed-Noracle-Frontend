@@ -22,9 +22,10 @@ export class GraphNode implements SimulationNodeDatum {
   y?: number;
 
 
-  constructor(context: CanvasRenderingContext2D, public id: string, public question: Question,
-              public questionVotes: QuestionVote[], public relations: Relation[],
-              relationVotes: RelationVote[][], public isSelected = false) {
+  constructor(context: CanvasRenderingContext2D, public id: string,
+              public question: Question, public questionAuthor: string, public questionVotes: QuestionVote[],
+              public relations: Relation[], public relationAuthors: string[], relationVotes: RelationVote[][],
+              public isSelected = false) {
     this.lines = this.wrapText((s) => context.measureText(s).width);
     for (let i = 0; i < relations.length; i++) {
       this.relationVotes.set(relations[i].relationId, relationVotes[i] !== undefined ? relationVotes[i] : []);
@@ -69,7 +70,7 @@ export class GraphNode implements SimulationNodeDatum {
   wrapText(measure: (string) => number) {
     const textHeight = this.getTextHeigth();
     const totalWidth = measure(this.question.text);
-    const words = this.question.text.split(/\s+/);
+    const words = [this.questionAuthor + ':'].concat(this.question.text.split(/\s+/));
     const longestWordLength =
       Math.ceil(measure(words.reduce((prev, cur, i) => measure(prev) > measure(cur) ? prev : cur)));
     const blankWidth = measure(' ');

@@ -3,5 +3,6 @@
  */
 export const environment = {
   production: true,
-  redirectUrl: 'http://localhost:8080/files/noracle/login'
+  redirectUrl: 'http://localhost:8080/files/noracle/login',
+  hostUrl: 'http://localhost:8080'
 };

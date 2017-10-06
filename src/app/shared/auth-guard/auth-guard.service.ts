@@ -8,16 +8,23 @@ import {Subscription} from 'rxjs/Subscription';
 export class AuthGuardService implements CanActivate {
   private isAuthorizedSubscription: Subscription;
   private _isAuthorized = false;
+  private userDataSubscription: Subscription;
+  private userData: any;
 
   constructor(private oidcSecurityService: OidcSecurityService, private router: Router) {
     this.isAuthorizedSubscription = this.oidcSecurityService.getIsAuthorized().subscribe(
       (isAuthorized: boolean) => {
         this._isAuthorized = isAuthorized;
       });
+    this.userDataSubscription = this.oidcSecurityService.getUserData().subscribe(userData => this.userData = userData);
   }
 
   isAuthorized() {
     return this._isAuthorized;
+  }
+
+  getUserData(): { preferred_username} {
+    return this.userData;
   }
 
   getLastRouteRequested() {

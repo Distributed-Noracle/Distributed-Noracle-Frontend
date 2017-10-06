@@ -6,8 +6,6 @@ import {Edge} from './graph-data-model/edge';
 import {ZoomTransform} from 'd3-zoom';
 import {GraphInteractionMode} from './graph-data-model/graph-interaction-mode.enum';
 import {GraphViewService} from './graph-view.service';
-import {Relation} from '../../shared/rest-data-model/relation';
-import {Question} from '../../shared/rest-data-model/question';
 import {Network} from './graph-data-model/network';
 import {ChangeNodeSelectionBehavior} from './interaction-behaviors/change-node-selection-behavior';
 import {NodeInteractionBehavior} from './interaction-behaviors/node-interaction-behavior';
@@ -19,8 +17,7 @@ import {MdDialog} from '@angular/material';
 import {AgentService} from '../../shared/agent/agent.service';
 import {EdgeInteractionBehavior} from './interaction-behaviors/edge-interaction-behavior';
 import {EditRelationBehavior} from './interaction-behaviors/edit-relation-behavior';
-import {QuestionVote} from '../../shared/rest-data-model/question-vote';
-import {RelationVote} from '../../shared/rest-data-model/relation-vote';
+import {UpdateData} from './graph-data-model/update-data';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -72,6 +69,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy() {
     this.updateSubscription.unsubscribe();
+    this.graphViewService.initServiceForSpace(null);
   }
 
   ngOnChanges() {
@@ -321,16 +319,14 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     this.loadedSpaceId = this.spaceId;
   }
 
-  private processUpdate(updateData: {
-    question: Question, relations: Relation[],
-    questionVotes: QuestionVote[], relationVotes: RelationVote[][]
-  }) {
+  private processUpdate(updateData: UpdateData) {
     const context = this.d3Root.nativeElement.getContext('2d');
     const isSelected = this.selectedQuestions !== undefined &&
       this.selectedQuestions.findIndex((id) => id === updateData.question.questionId) !== -1;
     if (this.network.addOrUpdateNode(
         new GraphNode(context, updateData.question.questionId,
-          updateData.question, updateData.questionVotes, updateData.relations, updateData.relationVotes, isSelected))) {
+          updateData.question, updateData.questionAuthor, updateData.questionVotes,
+          updateData.relations, updateData.relationAuthors, updateData.relationVotes, isSelected))) {
       this.updateSimulation();
     }
     if (isSelected) {

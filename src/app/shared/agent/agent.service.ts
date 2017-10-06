@@ -6,11 +6,12 @@ import {SpaceSubscription} from '../rest-data-model/spacesubscription';
 export class AgentService {
 
   private cachedAgent;
+  private cachedAgentNames: Map<string, string> = new Map<string, string>();
 
   constructor(private restHelperService: RestHelperService) {
   }
 
-  public getAgent(): Promise<{ agentid }> {
+  public getAgent(): Promise<{ agentid: string }> {
     if (this.cachedAgent !== undefined) {
       return Promise.resolve(this.cachedAgent);
     } else {
@@ -18,6 +19,23 @@ export class AgentService {
         this.cachedAgent = res.json();
         return this.cachedAgent;
       });
+    }
+  }
+
+  public putAgentName(agentId: string, name: string): Promise<string> {
+    this.cachedAgentNames.set(agentId, name);
+    return this.restHelperService.put(`/agents/${agentId}`, {agentName: name}).toPromise()
+      .then((res) => res.json().name as string);
+  }
+
+  public getAgentName(agentId: string): Promise<string> {
+    if (this.cachedAgentNames.has(agentId)) {
+      return Promise.resolve(this.cachedAgentNames.get(agentId));
+    } else {
+      return this.restHelperService.get(`/agents/${agentId}`).toPromise().then(res => {
+        this.cachedAgentNames.set(agentId, res.json().name);
+        return res.json().name as string;
+      }, reason => 'unknown');
     }
   }
 
