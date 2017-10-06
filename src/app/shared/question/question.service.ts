@@ -10,20 +10,20 @@ export class QuestionService {
 
   public getQuestionsOfSpace(spaceId: string): Promise<Question[]> {
     // TODO: proper pagination
-    return this.restHelperService.get(`/spaces/${spaceId}/questions?limit=1000`).toPromise().then((res) => {
+    return this.restHelperService.get(`/spaces/${spaceId}/questions?limit=1000`).then((res) => {
       return res.json() as Question[];
     });
   }
 
   public postQuestion(spaceId: string, question: Question): Promise<Question> {
-    return this.restHelperService.post(`/spaces/${spaceId}/questions`, question).toPromise().then((res) => {
-      return this.restHelperService.getAbsoulte(res.headers.get('location')).toPromise()
+    return this.restHelperService.post(`/spaces/${spaceId}/questions`, question).then((res) => {
+      return this.restHelperService.getAbsoulte(res.headers.get('location'))
         .then((r) => r.json() as Question);
     });
   }
 
   public putQuestion(spaceId: string, questionId: string, question: Question): Promise<Question> {
-    return this.restHelperService.put(`/spaces/${spaceId}/questions/${questionId}`, question).toPromise()
+    return this.restHelperService.put(`/spaces/${spaceId}/questions/${questionId}`, question)
       .then((r) => r.json() as Question);
   }
 

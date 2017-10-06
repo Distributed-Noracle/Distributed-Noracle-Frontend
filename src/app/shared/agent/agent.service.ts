@@ -15,7 +15,7 @@ export class AgentService {
     if (this.cachedAgent !== undefined) {
       return Promise.resolve(this.cachedAgent);
     } else {
-      return this.restHelperService.getCurrentAgent().toPromise().then((res) => {
+      return this.restHelperService.getCurrentAgent().then((res) => {
         this.cachedAgent = res.json();
         return this.cachedAgent;
       });
@@ -24,7 +24,7 @@ export class AgentService {
 
   public putAgentName(agentId: string, name: string): Promise<string> {
     this.cachedAgentNames.set(agentId, name);
-    return this.restHelperService.put(`/agents/${agentId}`, {agentName: name}).toPromise()
+    return this.restHelperService.put(`/agents/${agentId}`, {agentName: name})
       .then((res) => res.json().name as string);
   }
 
@@ -32,7 +32,7 @@ export class AgentService {
     if (this.cachedAgentNames.has(agentId)) {
       return Promise.resolve(this.cachedAgentNames.get(agentId));
     } else {
-      return this.restHelperService.get(`/agents/${agentId}`).toPromise().then(res => {
+      return this.restHelperService.get(`/agents/${agentId}`).then(res => {
         this.cachedAgentNames.set(agentId, res.json().name);
         return res.json().name as string;
       }, reason => 'unknown');
@@ -42,7 +42,7 @@ export class AgentService {
   public getSpaceSubscriptions(): Promise<SpaceSubscription[]> {
     return this.getAgent()
       .then((agent) => {
-        return this.restHelperService.get(`/agents/${agent.agentid}/spacesubscriptions`).toPromise()
+        return this.restHelperService.get(`/agents/${agent.agentid}/spacesubscriptions`)
           .then(res2 => res2.json() as SpaceSubscription[]);
       });
   }
@@ -50,9 +50,9 @@ export class AgentService {
   public postSpaceSubscription(postData: { spaceId: string, spaceSecret: string }): Promise<SpaceSubscription> {
     return this.getAgent()
       .then((agent) => {
-        return this.restHelperService.post(`/agents/${agent.agentid}/spacesubscriptions`, postData).toPromise()
+        return this.restHelperService.post(`/agents/${agent.agentid}/spacesubscriptions`, postData)
           .then(res => {
-            return this.restHelperService.getAbsoulte(res.headers.get('location')).toPromise()
+            return this.restHelperService.getAbsoulte(res.headers.get('location'))
               .then((res2) => res2.json() as SpaceSubscription);
           });
       });
@@ -62,7 +62,7 @@ export class AgentService {
     return this.getAgent().then((agent) => {
       return this.restHelperService
         .put(`/agents/${agent.agentid}/spacesubscriptions/${spaceId}/selectedQuestions`,
-          {selectedQuestions: selection}).toPromise()
+          {selectedQuestions: selection})
         .then((res) => {
           return res;
         });

@@ -9,14 +9,14 @@ export class SpaceService {
   }
 
   public getSpace(id) {
-    return this.restHelperService.get(`/spaces/${id}`).toPromise()
+    return this.restHelperService.get(`/spaces/${id}`)
       .then(res => res.json() as Space);
   }
 
   public postSpace(space: Space): Promise<Space> {
-    return this.restHelperService.post('/spaces', space).toPromise()
+    return this.restHelperService.post('/spaces', space)
       .then((res) => {
-        return this.restHelperService.getAbsoulte(res.headers.get('location')).toPromise()
+        return this.restHelperService.getAbsoulte(res.headers.get('location'))
           .then((r) => r.json() as Space);
       });
   }
