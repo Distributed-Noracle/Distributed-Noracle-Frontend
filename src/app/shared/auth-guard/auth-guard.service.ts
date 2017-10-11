@@ -36,7 +36,7 @@ export class AuthGuardService implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | Observable<boolean> | Promise<boolean> {
     if (!this._isAuthorized) {
       document.cookie = 'rejectedPath=' + encodeURIComponent(JSON.stringify({
-          url: route.url.map((v) => v.path).reduce((prev, cur) => prev + '/' + cur, '/'),
+          url: route.url.map((v) => v.path).reduce((prev, cur) => prev + '/' + cur, ''),
           queryParams: route.queryParams
         })) + '; path=/; expires=' + new Date(Date.now() + ((3 * 60 * 1000))).toUTCString();
       this.router.navigate(['/login'], {replaceUrl: true});

@@ -17,31 +17,31 @@ export class RestHelperService {
   public get(path: string): Promise<Response> {
     return this.http.get(this.BASE_URL + path,
       {headers: this.getHeaders()}
-    ).toPromise();
+    ).retry(3).toPromise();
   }
 
   public getAbsoulte(absolutePath: string): Promise<Response> {
     return this.http.get(absolutePath,
       {headers: this.getHeaders()}
-    ).toPromise();
+    ).retry(3).toPromise();
   }
 
   public put(path: string, body: any): Promise<Response> {
     return this.http.put(this.BASE_URL + path,
       body,
       {headers: this.getHeaders()}
-    ).toPromise();
+    ).retry(3).toPromise();
   }
 
   public post(path: string, body: any): Promise<Response> {
     return this.http.post(this.BASE_URL + path,
       body,
       {headers: this.getHeaders()}
-    ).toPromise();
+    ).retry(3).toPromise();
   }
 
   public getCurrentAgent(): Promise<Response> {
-    return this.http.get(this.CORE_BASE_URL + '/currentagent', {headers: this.getHeaders()}).toPromise();
+    return this.http.get(this.CORE_BASE_URL + '/currentagent', {headers: this.getHeaders()}).retry(3).toPromise();
   }
 
   private getHeaders(): Headers {
