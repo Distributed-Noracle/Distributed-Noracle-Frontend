@@ -16,7 +16,7 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
   private below;
   private elementRef: ElementRef;
 
-  private subscriptionInProgress = false;
+  public subscriptionInProgress = false;
   private interactionMode = GraphInteractionMode.SelectAndNavigate;
   private height = 600;
   private width = 800;

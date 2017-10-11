@@ -11,7 +11,7 @@ import {Space} from '../../shared/rest-data-model/space';
 })
 export class SpaceDropdownComponent implements OnInit, OnDestroy {
 
-  private spaces: { space: Space, subscription: SpaceSubscription }[] = [];
+  public spaces: { space: Space, subscription: SpaceSubscription }[] = [];
   private spaceSubscription: Subscription;
 
   constructor(private myspacesService: MyspacesService) {

@@ -26,8 +26,8 @@ import {UpdateData} from './graph-data-model/update-data';
 })
 export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('d3root') private d3Root;
-  @Input('height') private height = 400;
-  @Input('width') private width = 400;
+  @Input('height') public height = 400;
+  @Input('width') public width = 400;
   @Input('interactionMode') private interactionMode: GraphInteractionMode;
   @Input('spaceId') private spaceId = 'dummy';
   @Input('selectedQuestions') private selectedQuestions: string[];

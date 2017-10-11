@@ -11,7 +11,7 @@ import {MdSnackBar} from '@angular/material';
   styleUrls: ['./subscribed-spaces-overview.component.css']
 })
 export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
-  private spaces: { space: Space, subscription: SpaceSubscription }[];
+  public spaces: { space: Space, subscription: SpaceSubscription }[];
   private spaceSubscription: Subscription;
 
   constructor(private myspacesService: MyspacesService, private snackBar: MdSnackBar) {

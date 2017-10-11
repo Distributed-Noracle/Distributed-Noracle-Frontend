@@ -13,8 +13,8 @@ import {MyspacesService} from '../../shared/myspaces/myspaces.service';
 })
 export class CreateSpaceComponent implements OnInit {
 
-  private space = new Space();
-  private question = new Question();
+  public space = new Space();
+  public question = new Question();
 
   constructor(private spaceService: SpaceService, private questionService: QuestionService,
               private myspacesService: MyspacesService, private router: Router) {
