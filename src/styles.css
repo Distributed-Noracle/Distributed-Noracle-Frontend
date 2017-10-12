@@ -7,6 +7,14 @@ pink-bluegrey.css
 purple-green.css
  */
 
+div.mat-form-field-underline {
+  background-color: gray;
+}
+
+label.mat-form-field-placeholder {
+  color: gray;
+}
+
 @-ms-viewport {
   width: device-width;
 }
