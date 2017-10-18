@@ -1,7 +1,5 @@
-/**
- * Created by bgoeschlberger on 04.10.2017.
- */
 export const environment = {
   production: true,
-  redirectUrl: 'http://localhost:8080/files/noracle/login'
+  redirectUrl: 'http://localhost:9082/fileservice/v2.2.0/files/noracle/login',
+  hostUrl: 'http://localhost:9082'
 };

@@ -8,16 +8,23 @@ import {Subscription} from 'rxjs/Subscription';
 export class AuthGuardService implements CanActivate {
   private isAuthorizedSubscription: Subscription;
   private _isAuthorized = false;
+  private userDataSubscription: Subscription;
+  private userData: any;
 
   constructor(private oidcSecurityService: OidcSecurityService, private router: Router) {
     this.isAuthorizedSubscription = this.oidcSecurityService.getIsAuthorized().subscribe(
       (isAuthorized: boolean) => {
         this._isAuthorized = isAuthorized;
       });
+    this.userDataSubscription = this.oidcSecurityService.getUserData().subscribe(userData => this.userData = userData);
   }
 
   isAuthorized() {
     return this._isAuthorized;
+  }
+
+  getUserData(): { preferred_username} {
+    return this.userData;
   }
 
   getLastRouteRequested() {
@@ -29,7 +36,7 @@ export class AuthGuardService implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | Observable<boolean> | Promise<boolean> {
     if (!this._isAuthorized) {
       document.cookie = 'rejectedPath=' + encodeURIComponent(JSON.stringify({
-          url: route.url.map((v) => v.path).reduce((prev, cur) => prev + '/' + cur, '/'),
+          url: route.url.map((v) => v.path).reduce((prev, cur) => prev + '/' + cur, ''),
           queryParams: route.queryParams
         })) + '; path=/; expires=' + new Date(Date.now() + ((3 * 60 * 1000))).toUTCString();
       this.router.navigate(['/login'], {replaceUrl: true});

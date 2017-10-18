@@ -1,6 +1,7 @@
 import {SimulationLinkDatum} from 'd3-force';
 import {GraphNode} from './graph-node';
 import {Relation} from '../../../shared/rest-data-model/relation';
+import {DrawUtil} from '../utils/draw-util';
 
 export class Edge implements SimulationLinkDatum<GraphNode> {
 
@@ -8,11 +9,17 @@ export class Edge implements SimulationLinkDatum<GraphNode> {
 
   constructor(public id: string,
               public source: string | number | GraphNode,
-              public target: string | number | GraphNode, public relation: Relation) {
+              public target: string | number | GraphNode,
+              public relation: Relation,
+              public relationAuthor: string) {
   }
 
   getDistance() {
     return (this.source as GraphNode).radius + (this.target as GraphNode).radius + 10;
+  }
+
+  getRelationVotes() {
+    return (this.source as GraphNode).relationVotes.get(this.id);
   }
 
   draw(context: CanvasRenderingContext2D) {
@@ -21,6 +28,11 @@ export class Edge implements SimulationLinkDatum<GraphNode> {
     } else {
       this.drawUndirected(context);
     }
+    context.beginPath();
+    const dx = (this.target as GraphNode).x - (this.source as GraphNode).x;
+    const dy = (this.target as GraphNode).y - (this.source as GraphNode).y;
+    context.fillText(this.relationAuthor, (this.source as GraphNode).x + dx / 2, (this.source as GraphNode).y + dy / 2);
+    context.stroke();
   }
 
   drawDirected(context: CanvasRenderingContext2D) {
@@ -40,7 +52,9 @@ export class Edge implements SimulationLinkDatum<GraphNode> {
       context.lineTo(x - dx0 * arrowSize + dy0 * arrowSize, y - dy0 * arrowSize - dx0 * arrowSize);
     }
     context.lineWidth = this.isSelected ? 3 : 1;
-    context.strokeStyle = '#000';
+    const relationVotes = this.getRelationVotes();
+    context.strokeStyle = DrawUtil.getColorCodeForValueInScale(relationVotes.map(v => v.value).reduce((p, c) => p + c, 0),
+      -relationVotes.length, relationVotes.length);
     context.stroke();
   }
 
@@ -49,7 +63,9 @@ export class Edge implements SimulationLinkDatum<GraphNode> {
     context.moveTo((this.source as GraphNode).x, (this.source as GraphNode).y);
     context.lineTo((this.target as GraphNode).x, (this.target as GraphNode).y);
     context.lineWidth = this.isSelected ? 3 : 1;
-    context.strokeStyle = '#000';
+    const relationVotes = this.getRelationVotes();
+    context.strokeStyle = DrawUtil.getColorCodeForValueInScale(relationVotes.map(v => v.value).reduce((p, c) => p + c, 0),
+      -relationVotes.length, relationVotes.length);
     context.stroke();
   }
 }

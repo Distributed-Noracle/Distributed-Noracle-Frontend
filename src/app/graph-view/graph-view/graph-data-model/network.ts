@@ -1,6 +1,5 @@
 import {GraphNode} from './graph-node';
 import {Edge} from './edge';
-import {Relation} from '../../../shared/rest-data-model/relation';
 /**
  * Created by bgoeschlberger on 28.09.2017.
  */
@@ -30,23 +29,23 @@ export class Network {
 
   public addOrUpdateNode(nodeToAdd: GraphNode): boolean {
     const nodeIndex = this.nodes.findIndex((n) => n.id === nodeToAdd.id);
-    let isAdd = true;
+    let hasChanged = false;
     if (nodeIndex !== -1) {
       const nodeToUpdate = this.nodes[nodeIndex];
-      nodeToUpdate.update(nodeToAdd);
+      hasChanged = nodeToUpdate.update(nodeToAdd);
       nodeToAdd = nodeToUpdate;
-      isAdd = false;
     } else {
       this.nodes.push(nodeToAdd);
+      hasChanged = true;
     }
-    nodeToAdd.relations.forEach((r) => {
+    nodeToAdd.relations.forEach((r, i) => {
       if (this.edges.findIndex((e) => e.id === r.relationId) === -1) {
         // edge not yet in network
         const node1 = this.nodes.find((n) => r.firstQuestionId === n.id);
         const node2 = this.nodes.find((n) => n.id === r.secondQuestionId);
         if (node1 !== undefined && node2 !== undefined) {
           // both nodes are in the network
-          this.edges.push(new Edge(r.relationId, node1, node2, r));
+          this.edges.push(new Edge(r.relationId, node1, node2, r, nodeToAdd.relationAuthors[i]));
           // update nodes if necessary
           if (node1.relations.findIndex((n) => n.relationId === r.relationId) === -1) {
             node1.relations.push(r);
@@ -57,14 +56,7 @@ export class Network {
         }
       }
     });
-    return isAdd;
-  }
-
-  public addRelationToNode(relation: Relation, node: GraphNode) {
-    if (relation.firstQuestionId === node.id || relation.secondQuestionId === node.id) {
-      node.relations.push(relation);
-      this.updateEdgesForNode(node);
-    }
+    return hasChanged;
   }
 
   public removeNode(node: GraphNode) {
@@ -90,7 +82,7 @@ export class Network {
   }
 
   private updateEdgesForNode(node: GraphNode) {
-    node.relations.forEach(relation => {
+    node.relations.forEach((relation, i) => {
       if (this.edges.findIndex(edge => edge.id === relation.relationId) === -1) {
         const outbound = relation.firstQuestionId === node.id;
         const otherNodeId = (outbound ? relation.secondQuestionId : relation.firstQuestionId);
@@ -100,7 +92,7 @@ export class Network {
             otherNode.relations.push(relation);
           }
           this.edges.push(new Edge(relation.relationId,
-            outbound ? node : otherNode, outbound ? otherNode : node, relation));
+            outbound ? node : otherNode, outbound ? otherNode : node, relation, node.relationAuthors[i]));
         }
       }
     });

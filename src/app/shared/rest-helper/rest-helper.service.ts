@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Headers, Http} from '@angular/http';
+import {Headers, Http, Response} from '@angular/http';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
+import {environment} from '../../../environments/environment';
 
-const HOST_URL = 'https://steen.informatik.rwth-aachen.de:9082';
+const HOST_URL = environment.hostUrl;
 
 @Injectable()
 export class RestHelperService {
@@ -13,34 +14,34 @@ export class RestHelperService {
   constructor(private OidcSecurityService: OidcSecurityService, private http: Http) {
   }
 
-  public get(path: string) {
+  public get(path: string): Promise<Response> {
     return this.http.get(this.BASE_URL + path,
       {headers: this.getHeaders()}
-    );
+    ).retry(3).toPromise();
   }
 
-  public getAbsoulte(absolutePath: string) {
+  public getAbsoulte(absolutePath: string): Promise<Response> {
     return this.http.get(absolutePath,
       {headers: this.getHeaders()}
-    );
+    ).retry(3).toPromise();
   }
 
-  public put(path: string, body: any) {
+  public put(path: string, body: any): Promise<Response> {
     return this.http.put(this.BASE_URL + path,
       body,
       {headers: this.getHeaders()}
-    );
+    ).retry(3).toPromise();
   }
 
-  public post(path: string, body: any) {
+  public post(path: string, body: any): Promise<Response> {
     return this.http.post(this.BASE_URL + path,
       body,
       {headers: this.getHeaders()}
-    );
+    ).retry(3).toPromise();
   }
 
-  public getCurrentAgent() {
-    return this.http.get(this.CORE_BASE_URL + '/currentagent', {headers: this.getHeaders()});
+  public getCurrentAgent(): Promise<Response> {
+    return this.http.get(this.CORE_BASE_URL + '/currentagent', {headers: this.getHeaders()}).retry(3).toPromise();
   }
 
   private getHeaders(): Headers {

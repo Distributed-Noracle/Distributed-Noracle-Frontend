@@ -11,7 +11,7 @@ import {Router} from '@angular/router';
 })
 export class NavComponent implements OnInit {
 
-  constructor(private oidcSecurityService: OidcSecurityService, private authGuardService: AuthGuardService,
+  constructor(private oidcSecurityService: OidcSecurityService, public authGuardService: AuthGuardService,
               private router: Router) {
   }
 

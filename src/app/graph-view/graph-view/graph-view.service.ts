@@ -8,19 +8,32 @@ import {Observable} from 'rxjs/Observable';
 import {MyspacesService} from '../../shared/myspaces/myspaces.service';
 import {Router} from '@angular/router';
 import {RelationType} from './graph-data-model/relation-type.enum';
+import {QuestionVoteService} from '../../shared/question-vote/question-vote.service';
+import {RelationVoteService} from '../../shared/relation-vote/relation-vote.service';
+import {QuestionVote} from '../../shared/rest-data-model/question-vote';
+import {RelationVote} from '../../shared/rest-data-model/relation-vote';
+import {AgentService} from '../../shared/agent/agent.service';
+import {UpdateData} from './graph-data-model/update-data';
+import {AuthGuardService} from '../../shared/auth-guard/auth-guard.service';
 
 @Injectable()
 export class GraphViewService {
 
   private questions: Question[] = [];
   private relations: Relation[] = [];
-  private spaceId = 'dummy';
+  private questionVotes: Map<string, QuestionVote[]> = new Map<string, QuestionVote[]>();
+  private relationVotes: Map<string, RelationVote[]> = new Map<string, RelationVote[]>();
+  private questionAuthors: Map<string, string> = new Map<string, string>();
+  private relationAuthors: Map<string, string> = new Map<string, string>();
+  private spaceId = null;
   private isPollScheduled = false;
   private observedQuestionIds: string[] = [];
-  private update = new Subject<{ question: Question, relations: Relation[] }>();
+  private update = new Subject<UpdateData>();
 
   constructor(private questionService: QuestionService, private relationService: RelationService,
-              private myspacesService: MyspacesService, private router: Router) {
+              private questionVoteService: QuestionVoteService, private relationVoteService: RelationVoteService,
+              private myspacesService: MyspacesService, private agentService: AgentService,
+              private authGuardService: AuthGuardService, private router: Router) {
   }
 
   public initServiceForSpace(spaceId: string) {
@@ -28,7 +41,7 @@ export class GraphViewService {
     this.observedQuestionIds = [];
   }
 
-  public getUpdateObservable(): Observable<{ question: Question, relations: Relation[] }> {
+  public getUpdateObservable(): Observable<UpdateData> {
     return this.update;
   }
 
@@ -59,6 +72,11 @@ export class GraphViewService {
       this.relationService.postRelation(this.spaceId, relation).then((r) => {
         this.questions.push(q);
         this.relations.push(r);
+        // there cannot be votes on the newly created question and relation yet
+        this.questionVotes.set(q.questionId, []);
+        this.relationVotes.set(r.relationId, []);
+        this.questionAuthors.set(q.questionId, this.authGuardService.getUserData().preferred_username);
+        this.relationAuthors.set(r.relationId, this.authGuardService.getUserData().preferred_username);
         this.updateSelectionRouteParams(q.questionId, true);
         this.registerQuestionForUpdate(q.questionId);
         this.notifyObservers();
@@ -70,7 +88,7 @@ export class GraphViewService {
     const question = new Question();
     question.text = text;
     return this.questionService.putQuestion(this.spaceId, questionId, question).then((newQ) => {
-      this.questions.splice(this.questions.findIndex((oldQ) => oldQ.questionId === newQ.questionId) , 1);
+      this.questions.splice(this.questions.findIndex((oldQ) => oldQ.questionId === newQ.questionId), 1);
       this.questions.push(newQ);
       this.notifyObservers();
       return newQ;
@@ -81,24 +99,56 @@ export class GraphViewService {
     const relation = new Relation();
     relation.name = relationType;
     return this.relationService.putRelation(this.spaceId, relationId, relation).then((newR) => {
-      this.relations.splice(this.relations.findIndex((oldR) => oldR.relationId === newR.relationId) , 1);
+      this.relations.splice(this.relations.findIndex((oldR) => oldR.relationId === newR.relationId), 1);
       this.relations.push(newR);
       this.notifyObservers();
       return newR;
     });
   }
 
+  public updateQuestionVote(questionId: string, agentId: string, vote: number) {
+    const questionVote = new QuestionVote();
+    questionVote.value = vote;
+    return this.questionVoteService.putQuestionVote(this.spaceId, questionId, agentId, questionVote)
+      .then((newQV) => {
+        const qvArr = this.questionVotes.get(questionId);
+        const index = qvArr.findIndex((oldQV) => oldQV.voterAgentId === newQV.voterAgentId);
+        if (index !== -1) {
+          qvArr.splice(index, 1);
+        }
+        qvArr.push(newQV);
+        this.notifyObservers();
+        return newQV;
+      });
+  }
+
+  public updateRelationVote(relationId: string, agentId: string, vote: number) {
+    const relationVote = new RelationVote();
+    relationVote.value = vote;
+    return this.relationVoteService.putRelationVote(this.spaceId, relationId, agentId, relationVote)
+      .then((newRV) => {
+        const rvArr = this.relationVotes.get(relationId);
+        const index = rvArr.findIndex((oldRV) => oldRV.voterAgentId === newRV.voterAgentId);
+        if (index !== -1) {
+          rvArr.splice(index, 1);
+        }
+        rvArr.push(newRV);
+        this.notifyObservers();
+        return newRV;
+      });
+  }
+
   public addRelation(relation: Relation) {
     this.relationService.postRelation(this.spaceId, relation).then((r) => {
       this.relations.push(r);
+      this.relationVotes.set(r.relationId, []);
+      this.relationAuthors.set(r.relationId, this.authGuardService.getUserData().preferred_username);
       this.notifyObservers();
     });
   }
 
   public requestUpdate() {
-    if (this.spaceId === 'dummy') {
-      this.initDummyData();
-    } else {
+    if (this.spaceId !== null) {
       this.fetchAll(this.spaceId);
     }
   }
@@ -124,7 +174,6 @@ export class GraphViewService {
     });
   }
 
-
   private getQuestion(questionId: string): Question {
     return this.questions.find((q) => q.questionId === questionId);
   }
@@ -133,16 +182,73 @@ export class GraphViewService {
     return this.relations.filter((r) => r.firstQuestionId === questionId || r.secondQuestionId === questionId);
   }
 
+  private getVotesForQuestion(questionId: string): QuestionVote[] {
+    return this.questionVotes.get(questionId);
+  }
+
+  private getAuthorForQuestion(questionId: string): string {
+    return this.questionAuthors.get(questionId);
+  }
+
+  private getVotesForRelation(relationId: string): RelationVote[] {
+    return this.relationVotes.get(relationId);
+  }
+
+  private getAuthorForRelation(relationId: string): string {
+    return this.relationAuthors.get(relationId);
+  }
+
   private fetchAll(spaceId: string) {
-    Promise.all([this.questionService.getQuestionsOfSpace(spaceId).then((res) =>
-      this.questions = res),
+    // load all questions and all relations of the space
+    const questionsAndRelationsPromise = Promise.all([this.questionService.getQuestionsOfSpace(spaceId).then((res) => {
+      this.questions = res;
+      const seedIndex = this.observedQuestionIds.indexOf('seed');
+      if (seedIndex !== -1 && this.questions.length > 0) {
+        this.observedQuestionIds.splice(seedIndex, 1);
+        this.observedQuestionIds.push(this.questions[0].questionId);
+      }
+      return this.questions;
+    }),
       this.relationService.getRelationsOfSpace(spaceId).then((res) =>
-        this.relations = res)]).then(() => {
+        this.relations = res)]);
+
+    // when all questions and relations are loaded
+    questionsAndRelationsPromise.then(() => {
       if (this.spaceId === spaceId) {
-        this.notifyObservers();
-        this.schedulePolling();
+        // load all related data for observed questions and relations
+        const allRelatedDataPromise = Promise.all(this.questions.filter(
+          q => this.observedQuestionIds.indexOf(q.questionId) !== -1)
+          .map(q => this.loadQuestionRelatedData(spaceId, q))
+          .concat(
+            this.relations.filter(r => this.observedQuestionIds.indexOf(r.firstQuestionId) !== -1
+            && this.observedQuestionIds.indexOf(r.secondQuestionId) !== -1)
+              .map(r => this.loadRelationRelatedData(spaceId, r))));
+
+        // when all related data is fetched
+        allRelatedDataPromise.then(() => {
+          this.notifyObservers();
+          this.schedulePolling();
+        });
       }
     });
+  }
+
+  private loadRelationRelatedData(spaceId: string, r: Relation): Promise<any> {
+    return Promise.all([
+      this.relationVoteService.getRelationVotes(spaceId, r.relationId)
+        .then((rv) => this.relationVotes.set(r.relationId, rv)),
+      this.agentService.getAgentName(r.authorId)
+        .then(ra => this.relationAuthors.set(r.relationId, ra))
+    ]);
+  }
+
+  private loadQuestionRelatedData(spaceId: string, q: Question): Promise<any> {
+    return Promise.all([
+      this.questionVoteService.getQuestionVotes(spaceId, q.questionId)
+        .then((qv) => this.questionVotes.set(q.questionId, qv)),
+      this.agentService.getAgentName(q.authorId)
+        .then(qa => this.questionAuthors.set(q.questionId, qa))
+    ]);
   }
 
   private notifyObservers() {
@@ -152,9 +258,20 @@ export class GraphViewService {
         qId = this.questions[0].questionId;
       }
       const question = this.getQuestion(qId);
+      const questionAuthor = this.questionAuthors.get(qId);
+      const votesForQuestion = this.getVotesForQuestion(qId);
       const relationsForQuestion = this.getRelationsForQuestion(qId);
+      const votesForRelations = relationsForQuestion.map(r => this.getVotesForRelation(r.relationId));
+      const authorsForRelations = relationsForQuestion.map(r => this.getAuthorForRelation(r.relationId));
       if (question !== undefined && relationsForQuestion !== undefined) {
-        this.update.next({question: question, relations: relationsForQuestion});
+        this.update.next({
+          question: question,
+          questionAuthor: questionAuthor,
+          questionVotes: votesForQuestion !== undefined ? votesForQuestion : [],
+          relations: relationsForQuestion,
+          relationAuthors: authorsForRelations,
+          relationVotes: votesForRelations !== undefined ? votesForRelations : []
+        });
       }
     });
   }
@@ -168,112 +285,9 @@ export class GraphViewService {
 
   private poll() {
     this.isPollScheduled = false;
-    if (this.spaceId !== 'dummy') {
+    if (this.spaceId !== null) {
       this.fetchAll(this.spaceId);
     }
   }
 
-  private initDummyData() {
-    this.questions = [
-      {
-        id: 1,
-        label: 'What is the most imporatant challenge for European Youth Workers?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 11,
-        label: 'How do we finance our work',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 111,
-        label: 'Are we administrators or pedagogues?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 112,
-        label: 'How do we finance our lives?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 12,
-        label: 'Do our intentions match our actions?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 121,
-        label: 'Do we have the same intentions?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 122,
-        label: 'How can you evaluate the connection between ideology and practice?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 13,
-        label: 'If you have an answer, what question have you asked yourself to arrive at that answer?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 131,
-        label: 'What are the barriers to participation?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 1311,
-        label: 'Which barriers do we think we can address?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 1312,
-        label: 'Do we even know who we are serving?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 14,
-        label: 'Why am I doing this',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 15,
-        label: 'How do I know what I do is effective?',
-        title: 'asked by Bernhard'
-      },
-      {
-        id: 16,
-        label: 'Who is actually benefiting from our work',
-        title: 'asked by Bernhard'
-      }
-    ].map((obj) => {
-      const q = new Question();
-      q.questionId = obj.id.toString();
-      q.text = obj.label;
-      return q;
-    });
-    this.relations = [
-      {from: 1, to: 11, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 1, to: 12, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 1, to: 13, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 1, to: 14, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 1, to: 15, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 1, to: 16, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 11, to: 111, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 11, to: 112, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 12, to: 121, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 12, to: 122, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 13, to: 131, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 131, to: 1311, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-      {from: 131, to: 1312, label: 'follow up', title: 'related by Bernhard', arrows: 'to'},
-    ].map((obj) => {
-      const r = new Relation();
-      r.relationId = '[' + obj.from + '][' + obj.to + ']';
-      r.firstQuestionId = obj.from.toString();
-      r.secondQuestionId = obj.to.toString();
-      r.name = obj.label;
-      r.directed = obj.arrows !== undefined;
-      return r;
-    });
-    this.notifyObservers();
-  }
 }

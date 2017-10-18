@@ -18,7 +18,7 @@ export class RelationPickerDialogComponent implements OnInit {
   ngOnInit() {
   }
 
-  private getRelationTypes() {
+  public getRelationTypes() {
     const types = [];
     for (const mode in RelationType) {
       if (typeof RelationType[mode] === 'number') {
@@ -28,7 +28,7 @@ export class RelationPickerDialogComponent implements OnInit {
     return types;
   }
 
-  private getRelationTypeLabel(type: number): string {
+  public getRelationTypeLabel(type: number): string {
     return RelationType[type];
   }
 

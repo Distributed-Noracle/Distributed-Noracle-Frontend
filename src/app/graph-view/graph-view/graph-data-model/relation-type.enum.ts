@@ -1,6 +1,6 @@
 export enum RelationType {
   FollowUp,
-  Similarity
+  Link
 }
 
 
