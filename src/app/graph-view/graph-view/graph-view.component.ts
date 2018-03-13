@@ -18,6 +18,7 @@ import {AgentService} from '../../shared/agent/agent.service';
 import {EdgeInteractionBehavior} from './interaction-behaviors/edge-interaction-behavior';
 import {EditRelationBehavior} from './interaction-behaviors/edit-relation-behavior';
 import {UpdateData} from './graph-data-model/update-data';
+import { Question } from '../../shared/rest-data-model/question';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -43,6 +44,8 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
   private activatedInteractionMode: GraphInteractionMode;
   private updateSubscription: Subscription;
 
+  private rootQuestion: string = null;
+
 
   constructor(private graphViewService: GraphViewService, private agentService: AgentService,
               private d3Service: D3Service, private dialog: MdDialog) {
@@ -60,11 +63,21 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     this.d3Sim.force('collide', this.d3.forceCollide((node) => (node as GraphNode).radius * 1.2));
 
     this.updateSubscription =
-      this.graphViewService.getUpdateObservable().subscribe((updateData) => this.processUpdate(updateData));
+      this.graphViewService.getUpdateObservable().subscribe(updateData => this.processUpdate(updateData));
+/*
+    this.graphViewService.getUpdateObservable()
+    .min((a, b) => {
+      console.log('compare', new Date(a.question.timestampCreated) >= new Date(b.question.timestampCreated));
+      return new Date(a.question.timestampCreated) >= new Date(b.question.timestampCreated) ? 1 : -1;
+    })
+    .subscribe(updateData => {
+      console.log('min', updateData.question.questionId);
+      this.rootQuestion = updateData.question.questionId;
+    });*/
+
     this.initData();
     this.initVisualization();
     this.updateInteractionMode();
-
   }
 
   ngOnDestroy() {
@@ -97,6 +110,17 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       context.clearRect(0, 0, this.width, this.height);
       context.translate(this.transform.x, this.transform.y);
       context.scale(this.transform.k, this.transform.k);
+
+      const seedQuestion = this.graphViewService.getSeedQuestion();
+      if (seedQuestion !== null) {
+        context.fillStyle = '#bbb';
+        context.font = 'bold italic 25px sans-serif';
+        context.textAlign = 'center';
+        context.textBaseline = 'top';
+
+        context.fillText(seedQuestion.text, this.width / 2, 20);
+      }
+
       this.network.getEdges().forEach((e: Edge) => {
         // draw edge
         e.draw(context as CanvasRenderingContext2D);
@@ -322,11 +346,14 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
   private processUpdate(updateData: UpdateData) {
     const context = this.d3Root.nativeElement.getContext('2d');
     const isSelected = this.selectedQuestions !== undefined &&
-      this.selectedQuestions.findIndex((id) => id === updateData.question.questionId) !== -1;
+    this.selectedQuestions.findIndex((id) => id === updateData.question.questionId) !== -1;
+    const seedQuestion = this.graphViewService.getSeedQuestion();
+    const isSeed = (seedQuestion ? seedQuestion.questionId : null) === updateData.question.questionId;
     if (this.network.addOrUpdateNode(
         new GraphNode(context, updateData.question.questionId,
           updateData.question, updateData.questionAuthor, updateData.questionVotes,
-          updateData.relations, updateData.relationAuthors, updateData.relationVotes, isSelected))) {
+          updateData.relations, updateData.relationAuthors, updateData.relationVotes, 
+          isSelected, isSeed))) {
       this.updateSimulation();
     }
     if (isSelected) {

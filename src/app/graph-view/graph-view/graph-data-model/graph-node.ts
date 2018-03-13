@@ -25,7 +25,7 @@ export class GraphNode implements SimulationNodeDatum {
   constructor(context: CanvasRenderingContext2D, public id: string,
               public question: Question, public questionAuthor: string, public questionVotes: QuestionVote[],
               public relations: Relation[], public relationAuthors: string[], relationVotes: RelationVote[][],
-              public isSelected = false) {
+              public isSelected = false, public isSeed = false) {
     this.lines = this.wrapText((s) => context.measureText(s).width);
     for (let i = 0; i < relations.length; i++) {
       this.relationVotes.set(relations[i].relationId, relationVotes[i] !== undefined ? relationVotes[i] : []);
@@ -53,7 +53,7 @@ export class GraphNode implements SimulationNodeDatum {
     context.fill();
     context.beginPath();
     context.fillStyle = '#000';
-    context.font = this.textSize + 'px sans-serif';
+    context.font = (this.isSeed ? 'italic ' : '') + this.textSize + 'px sans-serif';
     context.textAlign = 'center';
     context.textBaseline = 'top';
 

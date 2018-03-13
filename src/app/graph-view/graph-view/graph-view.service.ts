@@ -42,7 +42,7 @@ export class GraphViewService {
   }
 
   public getUpdateObservable(): Observable<UpdateData> {
-    return this.update;
+    return this.update.asObservable();
   }
 
   public registerQuestionForUpdate(questionId: string): boolean {
@@ -172,6 +172,10 @@ export class GraphViewService {
         sq: JSON.stringify(sq)
       }
     });
+  }
+
+  public getSeedQuestion(): Question {
+    return this.questions.length > 0 ? this.questions[0] : null;
   }
 
   private getQuestion(questionId: string): Question {
