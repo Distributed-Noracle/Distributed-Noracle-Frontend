@@ -64,17 +64,6 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
 
     this.updateSubscription =
       this.graphViewService.getUpdateObservable().subscribe(updateData => this.processUpdate(updateData));
-/*
-    this.graphViewService.getUpdateObservable()
-    .min((a, b) => {
-      console.log('compare', new Date(a.question.timestampCreated) >= new Date(b.question.timestampCreated));
-      return new Date(a.question.timestampCreated) >= new Date(b.question.timestampCreated) ? 1 : -1;
-    })
-    .subscribe(updateData => {
-      console.log('min', updateData.question.questionId);
-      this.rootQuestion = updateData.question.questionId;
-    });*/
-
     this.initData();
     this.initVisualization();
     this.updateInteractionMode();
@@ -108,8 +97,6 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     d3Sim.nodes(this.network.getNodes()).on('tick', () => {
       context.save();
       context.clearRect(0, 0, this.width, this.height);
-      context.translate(this.transform.x, this.transform.y);
-      context.scale(this.transform.k, this.transform.k);
 
       const seedQuestion = this.graphViewService.getSeedQuestion();
       if (seedQuestion !== null) {
@@ -120,6 +107,9 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
 
         context.fillText(seedQuestion.text, this.width / 2, 20);
       }
+
+      context.translate(this.transform.x, this.transform.y);
+      context.scale(this.transform.k, this.transform.k);
 
       this.network.getEdges().forEach((e: Edge) => {
         // draw edge
