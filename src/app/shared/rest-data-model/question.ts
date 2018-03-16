@@ -9,6 +9,8 @@ export class Question {
   timestampCreated: string;
   timestampLastModified: string;
 
+  followUps: number;
+
   constructor() {
   }
 }

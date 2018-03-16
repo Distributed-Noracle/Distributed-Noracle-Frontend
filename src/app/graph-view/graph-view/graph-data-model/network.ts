@@ -97,4 +97,15 @@ export class Network {
       }
     });
   }
+
+  public countInvisibleFollowUps(node: GraphNode) {
+    let sum = 0;
+    node.relations.forEach(relation => {
+      if (relation.directed && relation.firstQuestionId === node.question.questionId &&
+          this.nodes.findIndex(n => n.question.questionId === relation.secondQuestionId) === -1) {
+        sum++;
+      }
+    });
+    return sum;
+  }
 }

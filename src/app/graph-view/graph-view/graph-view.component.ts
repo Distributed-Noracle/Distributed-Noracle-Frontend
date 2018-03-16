@@ -44,8 +44,6 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
   private activatedInteractionMode: GraphInteractionMode;
   private updateSubscription: Subscription;
 
-  private rootQuestion: string = null;
-
 
   constructor(private graphViewService: GraphViewService, private agentService: AgentService,
               private d3Service: D3Service, private dialog: MdDialog) {
@@ -148,7 +146,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  private  setDragAndZoomBehavior() {
+  private setDragAndZoomBehavior() {
     const canvas = this.canvas;
     const d3Sim = this.d3Sim;
 
@@ -214,6 +212,9 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     this.d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.network.getEdges())
       .distance((link, i, links) => (link as Edge).getDistance());
     this.d3Sim.alpha(1).restart();
+    this.network.getNodes().forEach(node => {
+      node.question.followUps = this.network.countInvisibleFollowUps(node);
+    });
   }
 
   private setSelectionBehaviors(nodeInteractionBehavior: NodeInteractionBehavior,
@@ -339,11 +340,11 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     this.selectedQuestions.findIndex((id) => id === updateData.question.questionId) !== -1;
     const seedQuestion = this.graphViewService.getSeedQuestion();
     const isSeed = (seedQuestion ? seedQuestion.questionId : null) === updateData.question.questionId;
-    if (this.network.addOrUpdateNode(
-        new GraphNode(context, updateData.question.questionId,
+    const node = new GraphNode(context, updateData.question.questionId,
           updateData.question, updateData.questionAuthor, updateData.questionVotes,
-          updateData.relations, updateData.relationAuthors, updateData.relationVotes, 
-          isSelected, isSeed))) {
+          updateData.relations, updateData.relationAuthors, updateData.relationVotes,
+          isSelected, isSeed);
+    if (this.network.addOrUpdateNode(node)) {
       this.updateSimulation();
     }
     if (isSelected) {
