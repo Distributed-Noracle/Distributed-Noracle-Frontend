@@ -82,8 +82,8 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       this.network.getNodes().forEach((node) => {
         node.isSelected = (this.selectedQuestions.indexOf(node.id) !== -1);
       });
-      this.d3Sim.force('center', this.d3.forceCenter(this.width / 2, this.height / 2));
-      this.d3Sim.alpha(1).restart();
+      // this.d3Sim.force('center', this.d3.forceCenter(this.width / 2, this.height / 2));
+      // this.d3Sim.alpha(1).restart();
       this.updateInteractionMode();
     }
   }
