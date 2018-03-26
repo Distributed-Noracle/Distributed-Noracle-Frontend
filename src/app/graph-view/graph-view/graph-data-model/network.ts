@@ -98,11 +98,11 @@ export class Network {
     });
   }
 
-  public countInvisibleFollowUps(node: GraphNode) {
+  public countInvisibleNeighbors(node: GraphNode) {
     let sum = 0;
     node.relations.forEach(relation => {
-      if (relation.directed && relation.firstQuestionId === node.question.questionId &&
-          this.nodes.findIndex(n => n.question.questionId === relation.secondQuestionId) === -1) {
+      const other = relation.firstQuestionId === node.question.questionId ? relation.secondQuestionId : relation.firstQuestionId;
+      if (this.nodes.findIndex(n => n.question.questionId === other) === -1) {
         sum++;
       }
     });

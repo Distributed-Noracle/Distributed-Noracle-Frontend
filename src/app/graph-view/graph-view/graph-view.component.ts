@@ -213,7 +213,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       .distance((link, i, links) => (link as Edge).getDistance());
     this.d3Sim.alpha(1).restart();
     this.network.getNodes().forEach(node => {
-      node.question.followUps = this.network.countInvisibleFollowUps(node);
+      node.question.followUps = this.network.countInvisibleNeighbors(node);
     });
   }
 
