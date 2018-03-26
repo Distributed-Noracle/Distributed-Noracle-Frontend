@@ -1,4 +1,10 @@
 <!--<h1>Noracle Graph</h1>-->
+<div class="memberList" *ngIf="!subscriptionInProgress" style="position:absolute">
+  <h4>Participants</h4>
+  <ul>
+    <li *ngFor="let m of spaceMembers">{{m}}</li>
+  </ul> 
+</div>
 <div #graphContainer>
   <div *ngIf="subscriptionInProgress" fxLayout="column" fxLayoutAlign="space-around center">
     <p>Subscribing to space&hellip;</p>

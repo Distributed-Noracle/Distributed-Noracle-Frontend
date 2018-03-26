@@ -3,6 +3,7 @@ import {GraphInteractionMode} from '../graph-view/graph-data-model/graph-interac
 import {ActivatedRoute, Router} from '@angular/router';
 import {Subscription} from 'rxjs/Subscription';
 import {MyspacesService} from '../../shared/myspaces/myspaces.service';
+import {SpaceSubscriber} from '../../shared/rest-data-model/spacesubscriber';
 
 @Component({
   selector: 'dnor-graph-view-page',
@@ -24,6 +25,7 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
   private queryParamSubscription: Subscription;
   private spaceId = '1';
   private selectedQuestions;
+  private spaceMembers = [];
 
   private adjustSize() {
     this.height = (window.innerHeight
@@ -40,6 +42,9 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.paramSubscription = this.activatedRoute.params.subscribe((params) => {
       this.spaceId = params['spaceId'];
+      this.myspacesService.getSubscribersObservable(this.spaceId).subscribe(subs => {
+        this.spaceMembers = subs.map(sub => sub.name);
+      });
     });
     this.queryParamSubscription = this.activatedRoute.queryParams.subscribe((queryParams) => {
       const pw = queryParams['pw'];
@@ -84,6 +89,17 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
   }
 
   private getInteractionModeLabel(mode: number) {
-    return GraphInteractionMode[mode];
+    switch (GraphInteractionMode[mode]) {
+      case 'SelectAndNavigate':
+        return 'Select/Navigate';
+      case 'DragAndZoom':
+        return 'Drag/Zoom';
+      case 'AddQuestion':
+        return 'Add Question';
+      case 'AddRelation':
+        return 'Add Relation';
+      case 'EditAndAssess':
+        return 'Edit/Assess';
+    }
   }
 }

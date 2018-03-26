@@ -150,6 +150,7 @@ export class GraphViewService {
   public requestUpdate() {
     if (this.spaceId !== null) {
       this.fetchAll(this.spaceId);
+      this.fetchSubscribers(this.spaceId);
     }
   }
 
@@ -237,6 +238,10 @@ export class GraphViewService {
     });
   }
 
+  private fetchSubscribers(spaceId: string) {
+    this.myspacesService.getSpaceSubscribers(this.spaceId);
+  }
+
   private loadRelationRelatedData(spaceId: string, r: Relation): Promise<any> {
     return Promise.all([
       this.relationVoteService.getRelationVotes(spaceId, r.relationId)
@@ -289,9 +294,7 @@ export class GraphViewService {
 
   private poll() {
     this.isPollScheduled = false;
-    if (this.spaceId !== null) {
-      this.fetchAll(this.spaceId);
-    }
+    this.requestUpdate();
   }
 
 }

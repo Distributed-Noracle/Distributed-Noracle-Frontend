@@ -1,0 +1,9 @@
+.memberList {
+    opacity: 0.3;
+    right: 10px;
+    direction: rtl;
+}
+
+.memberList h4 {
+    margin-bottom: 10px;
+}
