@@ -262,7 +262,7 @@ export class GraphViewService {
 
   private notifyObservers() {
     this.observedQuestionIds.forEach((qId) => {
-      if (qId === 'seed') {
+      if (qId === 'seed' && this.questions.length > 0) {
         // trick that allows seed-question subscription without knowing the id
         qId = this.questions[0].questionId;
       }

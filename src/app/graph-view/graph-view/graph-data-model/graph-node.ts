@@ -158,7 +158,8 @@ export class GraphNode implements SimulationNodeDatum {
   }
 
   private isEqual(n: GraphNode): boolean {
-    return this.question.questionId === n.question.questionId &&
+    return this.question && n.question &&
+      this.question.questionId === n.question.questionId &&
       this.question.timestampLastModified === n.question.timestampLastModified &&
       this.relations.length === n.relations.length &&
       this.relations.map(r => n.relations
