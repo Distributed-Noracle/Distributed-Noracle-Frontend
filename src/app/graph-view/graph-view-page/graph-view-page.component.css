@@ -1,0 +1,27 @@
+.mat-expansion-panel {
+    color: rgba(0, 0, 0, 0.4);
+    background-color: transparent;
+    box-shadow: none !important;
+}
+
+.mat-expansion-panel-header {
+    font-weight: bold;
+}
+
+.memberList {
+    padding-top: 15px;
+    right: 10px;
+    text-align: right;
+    direction: rtl;
+}
+
+.memberList ul {
+    padding-right: 10px;
+    text-align: right;
+    direction: ltr;
+    list-style-type: none;
+}
+
+.memberList li {
+    direction: ltr;
+}

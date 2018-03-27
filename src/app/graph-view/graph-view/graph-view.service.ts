@@ -42,7 +42,7 @@ export class GraphViewService {
   }
 
   public getUpdateObservable(): Observable<UpdateData> {
-    return this.update;
+    return this.update.asObservable();
   }
 
   public registerQuestionForUpdate(questionId: string): boolean {
@@ -150,6 +150,7 @@ export class GraphViewService {
   public requestUpdate() {
     if (this.spaceId !== null) {
       this.fetchAll(this.spaceId);
+      this.fetchSubscribers(this.spaceId);
     }
   }
 
@@ -172,6 +173,10 @@ export class GraphViewService {
         sq: JSON.stringify(sq)
       }
     });
+  }
+
+  public getSeedQuestion(): Question {
+    return this.questions.length > 0 ? this.questions[0] : null;
   }
 
   private getQuestion(questionId: string): Question {
@@ -233,6 +238,10 @@ export class GraphViewService {
     });
   }
 
+  private fetchSubscribers(spaceId: string) {
+    this.myspacesService.getSpaceSubscribers(this.spaceId);
+  }
+
   private loadRelationRelatedData(spaceId: string, r: Relation): Promise<any> {
     return Promise.all([
       this.relationVoteService.getRelationVotes(spaceId, r.relationId)
@@ -253,7 +262,7 @@ export class GraphViewService {
 
   private notifyObservers() {
     this.observedQuestionIds.forEach((qId) => {
-      if (qId === 'seed') {
+      if (qId === 'seed' && this.questions.length > 0) {
         // trick that allows seed-question subscription without knowing the id
         qId = this.questions[0].questionId;
       }
@@ -285,9 +294,7 @@ export class GraphViewService {
 
   private poll() {
     this.isPollScheduled = false;
-    if (this.spaceId !== null) {
-      this.fetchAll(this.spaceId);
-    }
+    this.requestUpdate();
   }
 
 }

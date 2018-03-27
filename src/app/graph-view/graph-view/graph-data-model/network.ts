@@ -97,4 +97,15 @@ export class Network {
       }
     });
   }
+
+  public countInvisibleNeighbors(node: GraphNode) {
+    let sum = 0;
+    node.relations.forEach(relation => {
+      const other = relation.firstQuestionId === node.question.questionId ? relation.secondQuestionId : relation.firstQuestionId;
+      if (this.nodes.findIndex(n => n.question.questionId === other) === -1) {
+        sum++;
+      }
+    });
+    return sum;
+  }
 }

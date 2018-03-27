@@ -5,6 +5,7 @@ import {DrawUtil} from '../utils/draw-util';
 
 export class Edge implements SimulationLinkDatum<GraphNode> {
 
+  private textSize = 10;
   public isSelected = false;
 
   constructor(public id: string,
@@ -31,6 +32,12 @@ export class Edge implements SimulationLinkDatum<GraphNode> {
     context.beginPath();
     const dx = (this.target as GraphNode).x - (this.source as GraphNode).x;
     const dy = (this.target as GraphNode).y - (this.source as GraphNode).y;
+
+    context.fillStyle = '#000';
+    context.font = this.textSize + 'px sans-serif';
+    context.textAlign = 'center';
+    context.textBaseline = 'top';
+
     context.fillText(this.relationAuthor, (this.source as GraphNode).x + dx / 2, (this.source as GraphNode).y + dy / 2);
     context.stroke();
   }
