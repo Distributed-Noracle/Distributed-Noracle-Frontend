@@ -18,7 +18,7 @@ import {AgentService} from '../../shared/agent/agent.service';
 import {EdgeInteractionBehavior} from './interaction-behaviors/edge-interaction-behavior';
 import {EditRelationBehavior} from './interaction-behaviors/edit-relation-behavior';
 import {UpdateData} from './graph-data-model/update-data';
-import { Question } from '../../shared/rest-data-model/question';
+import {Question} from '../../shared/rest-data-model/question';
 
 @Component({
   selector: 'dnor-graph-view',

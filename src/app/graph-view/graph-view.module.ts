@@ -1,5 +1,6 @@
 import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
+import {MatExpansionModule} from '@angular/material/expansion';
 import {GraphViewComponent} from './graph-view/graph-view.component';
 import {D3Service} from 'd3-ng2-service';
 import {GraphViewPageComponent} from './graph-view-page/graph-view-page.component';
@@ -27,7 +28,8 @@ import {VoteDialogComponent} from './vote-dialog/vote-dialog.component';
     MdInputModule,
     FormsModule,
     FlexLayoutModule,
-    SharedModule
+    SharedModule,
+    MatExpansionModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [GraphViewComponent, GraphViewPageComponent, RelationPickerDialogComponent,

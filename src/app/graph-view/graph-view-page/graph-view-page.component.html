@@ -1,9 +1,27 @@
 <!--<h1>Noracle Graph</h1>-->
 <div class="memberList" *ngIf="!subscriptionInProgress" style="position:absolute">
-  <h4>Participants</h4>
-  <ul>
-    <li *ngFor="let m of spaceMembers">{{m}}</li>
-  </ul> 
+  <mat-accordion displayMode="flat" multi="true">
+    <mat-expansion-panel expanded="true">
+      <mat-expansion-panel-header expandedHeight="30px" collapsedHeight="30px">
+        Participants
+      </mat-expansion-panel-header>
+      <ul>
+        <li *ngFor="let m of spaceMembers">{{m}}</li>
+      </ul>
+    </mat-expansion-panel>
+  
+    <mat-expansion-panel>
+      <mat-expansion-panel-header expandedHeight="30px" collapsedHeight="30px">
+        Help
+      </mat-expansion-panel-header>
+      <ul>
+        <li><span style="font-weight: bold">🗨</span> selected / 🗨 deselected</li>
+        <li><span style="color: green">🗨</span> rated positively / <span style="color: rgb(255, 0, 0)">🗨</span> rated negatively</li>
+        <li><span style="font-weight: bold">>>></span> follow-up question</li>
+        <li><span style="font-weight: bold">――</span> related question</li>
+      </ul>
+    </mat-expansion-panel>    
+  </mat-accordion>       
 </div>
 <div #graphContainer>
   <div *ngIf="subscriptionInProgress" fxLayout="column" fxLayoutAlign="space-around center">
