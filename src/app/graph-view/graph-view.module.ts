@@ -6,7 +6,7 @@ import {D3Service} from 'd3-ng2-service';
 import {GraphViewPageComponent} from './graph-view-page/graph-view-page.component';
 import {
   MdButtonModule, MdDialogModule, MdFormFieldModule, MdInputModule, MdProgressSpinnerModule,
-  MdRadioModule, MdSnackBarModule
+  MdRadioModule, MdSnackBarModule, MdIconModule
 } from '@angular/material';
 import {FormsModule} from '@angular/forms';
 import {GraphViewService} from './graph-view/graph-view.service';
@@ -29,6 +29,7 @@ import {VoteDialogComponent} from './vote-dialog/vote-dialog.component';
     FormsModule,
     FlexLayoutModule,
     SharedModule,
+    MdIconModule,
     MatExpansionModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

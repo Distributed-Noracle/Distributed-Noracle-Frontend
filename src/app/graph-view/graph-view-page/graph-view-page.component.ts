@@ -25,7 +25,7 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
   private queryParamSubscription: Subscription;
   private spaceId = '1';
   private selectedQuestions;
-  private spaceMembers = [];
+  protected spaceMembers = [];
 
   private adjustSize() {
     this.height = (window.innerHeight

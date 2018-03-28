@@ -25,3 +25,7 @@
 .memberList li {
     direction: ltr;
 }
+
+md-icon {
+    font-size: 15px;
+}
