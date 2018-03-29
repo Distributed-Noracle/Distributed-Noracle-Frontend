@@ -35,7 +35,7 @@
 </div>
 <div #below>
   <md-radio-group *ngIf="!subscriptionInProgress"
-    fxLayout="row" fxLayoutGap="20px" [(ngModel)]="interactionMode">
+    fxLayout="row" fxLayoutGap="20px" fxLayoutWrap [(ngModel)]="interactionMode">
     <md-radio-button color="primary" *ngFor="let m of getInteractionModes()" [value]="m">
       {{getInteractionModeLabel(m)}}
     </md-radio-button>
