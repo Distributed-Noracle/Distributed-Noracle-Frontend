@@ -6,6 +6,5 @@
 export const environment = {
   production: false,
   redirectUrl: 'http://localhost:4200/login',
-  hostUrls: ['http://localhost:9082',
-             'http://localhost:9083']
+  hostUrls: ['http://localhost:9082']
 };
