@@ -6,5 +6,5 @@
 export const environment = {
   production: false,
   redirectUrl: 'http://localhost:4200/login',
-  hostUrl: 'http://steen.informatik.rwth-aachen.de:9082'
+  hostUrls: ['http://localhost:9082']
 };

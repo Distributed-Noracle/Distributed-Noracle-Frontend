@@ -6,6 +6,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build_multiplex": "ng build --environment=multiplex --base-href=/noracle/ --prod",
+    "build_bundle": "ng build --environment=las2peer --base-href=/fileservice/v2.2.5/files/noracle/ --prod",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"

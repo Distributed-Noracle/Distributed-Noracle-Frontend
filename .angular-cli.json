@@ -29,7 +29,8 @@
         "dev": "environments/environment.ts",
         "prod": "environments/environment.prod.ts",
         "las2peer": "environments/environment.las2peer.ts",
-        "contdep": "environments/environment.contdep.ts"
+        "contdep": "environments/environment.contdep.ts",
+        "multiplex": "environments/environment.multiplex.ts"
       }
     }
   ],
