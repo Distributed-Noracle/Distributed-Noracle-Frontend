@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
   redirectUrl: 'http://dbis.rwth-aachen.de/noracle/login',
-  hostUrls: ['http://las2peer.dbis.rwth-aachen.de:9070',
+  hostUrls: ['http://las2peer.dbis.rwth-aachen.de:9071',
   'http://las2peer.dbis.rwth-aachen.de:9071',
   'http://las2peer.dbis.rwth-aachen.de:9072',
   'http://las2peer.dbis.rwth-aachen.de:9073',

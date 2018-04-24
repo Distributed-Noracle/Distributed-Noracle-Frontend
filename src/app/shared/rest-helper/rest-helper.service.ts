@@ -83,10 +83,20 @@ export class RestHelperService {
     return this.getHostURL() + this.CORE_BASE_URL;
   }
 
+  /**
+   * Determines the API URL to be used by mapping the oidc email address of the
+   * logged in user to one of the provided URLs using a hash function.
+   * This was introduced to simulate a distributed setting with users who can't
+   * host a node themselves.
+   */
   private getHostURL(): string {
     return HOST_URLS[Math.abs(this.hash(this.oidcName) % HOST_URLS.length)];
   }
 
+  /**
+   * Maps the input string to a 32bit signed integer
+   * @param str The string to be hashed
+   */
   private hash(str): number {
     let hash = 0, i, chr;
     if (!str || str.length === 0) {
