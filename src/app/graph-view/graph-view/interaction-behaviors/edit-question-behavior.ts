@@ -2,19 +2,41 @@ import {NodeInteractionBehavior} from './node-interaction-behavior';
 import {GraphNode} from '../graph-data-model/graph-node';
 import {GraphViewService} from '../graph-view.service';
 import {MdDialog} from '@angular/material';
-import {CreateQuestionDialogComponent} from '../../create-question-dialog/create-question-dialog.component';
+import {InspectDialogComponent} from '../../inspect-dialog/inspect-dialog.component';
 import {AgentService} from '../../../shared/agent/agent.service';
+import {QuestionVoteService} from '../../../shared/question-vote/question-vote.service'
 import {VoteDialogComponent} from '../../vote-dialog/vote-dialog.component';
+import { timestamp } from 'rxjs/operator/timestamp';
 
 export class EditQuestionBehavior extends NodeInteractionBehavior {
 
   constructor(private graphViewService: GraphViewService, private agentService: AgentService,
-              private dialog: MdDialog) {
+              private questionVoteService: QuestionVoteService, private dialog: MdDialog) {
     super();
   }
 
-  interactWith(node: GraphNode): Promise<any> {
+  async interactWith(node: GraphNode, spaceId: string): Promise<any> {
+    const agent = await this.agentService.getAgent();
+    const authorName = await this.agentService.getAgentName(node.question.authorId);
+    const votes = this.questionVoteService.count(
+      await this.questionVoteService.getQuestionVotes(spaceId, node.id)
+    );
+
     return this.agentService.getAgent().then((agent) => {
+      const dialogRef = this.dialog.open(InspectDialogComponent, {
+          data: {
+            isAuthor: agent.agentid === node.question.authorId,
+            text: node.question.text,
+            authorName: authorName,
+            lastModified: new Date(node.question.timestampLastModified).toLocaleString(),
+            inputHeading: `${authorName} (${node.question.timestampLastModified})`,
+            votes: votes,
+            upvoteText: 'I like that question. It is particularly helpful for me.',
+            neutralText: 'I am undecided whether this question is helpful for me.',
+            downvoteText: 'This question did not help me.'
+          }
+        });
+      /*
       if (agent.agentid === node.question.authorId) {
         const dialogRef = this.dialog.open(CreateQuestionDialogComponent, {
           width: '250px',
@@ -48,6 +70,7 @@ export class EditQuestionBehavior extends NodeInteractionBehavior {
           }
         });
       }
+      */
     });
   }
 }

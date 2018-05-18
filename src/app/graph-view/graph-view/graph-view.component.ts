@@ -15,6 +15,7 @@ import {AddRelationBehavior} from './interaction-behaviors/add-relation-behavior
 import {Subscription} from 'rxjs/Subscription';
 import {MdDialog} from '@angular/material';
 import {AgentService} from '../../shared/agent/agent.service';
+import {QuestionVoteService} from '../../shared/question-vote/question-vote.service';
 import {EdgeInteractionBehavior} from './interaction-behaviors/edge-interaction-behavior';
 import {EditRelationBehavior} from './interaction-behaviors/edit-relation-behavior';
 import {UpdateData} from './graph-data-model/update-data';
@@ -46,7 +47,8 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
 
 
   constructor(private graphViewService: GraphViewService, private agentService: AgentService,
-              private d3Service: D3Service, private dialog: MdDialog) {
+              private questionVoteService: QuestionVoteService, private d3Service: D3Service, 
+              private dialog: MdDialog) {
     this.d3 = d3Service.getD3();
     this.transform = this.d3.zoomIdentity;
   }
@@ -136,9 +138,9 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       this.setSelectionBehaviors(new AddChildNodeBehavior(this.graphViewService, this.dialog), null);
     } else if (this.interactionMode === GraphInteractionMode.AddRelation) {
       this.setSelectionBehaviors(new AddRelationBehavior(this.graphViewService, this.dialog), null);
-    } else if (this.interactionMode === GraphInteractionMode.EditAndAssess) {
+    } else if (this.interactionMode === GraphInteractionMode.Inspect) {
       this.setSelectionBehaviors(
-        new EditQuestionBehavior(this.graphViewService, this.agentService, this.dialog),
+        new EditQuestionBehavior(this.graphViewService, this.agentService, this.questionVoteService, this.dialog),
         new EditRelationBehavior(this.graphViewService, this.agentService, this.dialog)
       );
     } else {
