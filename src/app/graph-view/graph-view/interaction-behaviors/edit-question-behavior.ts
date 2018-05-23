@@ -6,7 +6,8 @@ import {InspectDialogComponent} from '../../inspect-dialog/inspect-dialog.compon
 import {AgentService} from '../../../shared/agent/agent.service';
 import {QuestionVoteService} from '../../../shared/question-vote/question-vote.service'
 import {VoteDialogComponent} from '../../vote-dialog/vote-dialog.component';
-import { timestamp } from 'rxjs/operator/timestamp';
+import {timestamp} from 'rxjs/operator/timestamp';
+import {VoteUtil} from '../utils/vote-util';
 
 export class EditQuestionBehavior extends NodeInteractionBehavior {
 
@@ -19,7 +20,7 @@ export class EditQuestionBehavior extends NodeInteractionBehavior {
     const agent = await this.agentService.getAgent();
     const authorName = await this.agentService.getAgentName(node.question.authorId);
     const questionVotes = await this.questionVoteService.getQuestionVotes(spaceId, node.id);
-    const votes = this.questionVoteService.count(questionVotes);
+    const votes = VoteUtil.countVotes(questionVotes);
 
     const isAuthor = agent.agentid === node.question.authorId;
     const myVote = questionVotes.find(vote => agent.agentid === vote.voterAgentId);

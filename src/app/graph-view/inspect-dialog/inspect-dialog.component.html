@@ -18,9 +18,9 @@
   <br>
   <div class="votes" style="width: 100px">
     <dnor-vote-donut descriptor="vote">
-      <dnor-donut-item name="Good" [count]="data.votes.good" color="#31ca31"></dnor-donut-item>
-      <dnor-donut-item name="Bad" [count]="data.votes.bad" color="red"></dnor-donut-item>
-      <dnor-donut-item name="Neutral" [count]="(data.votes.total === 0 ? 1 : data.votes.neutral)" color="grey"></dnor-donut-item>
+      <dnor-donut-item name="Good" color="#31ca31" [count]="data.votes.good"></dnor-donut-item>
+      <dnor-donut-item name="Bad" color="red" [count]="data.votes.bad"></dnor-donut-item>
+      <dnor-donut-item name="Neutral" color="grey" [count]="data.votes.neutral"></dnor-donut-item>
     </dnor-vote-donut>
   </div>
 
