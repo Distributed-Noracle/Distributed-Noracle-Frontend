@@ -8,15 +8,12 @@ import {MD_DIALOG_DATA, MdDialogRef} from '@angular/material';
 })
 export class InspectDialogComponent implements OnInit {
 
-  public items:Array<{name: string, count: number, color: string}>;
-  private total: number = 0;
+  protected items: Array<{name: string, count: number, color: string}>;
+  protected editingQuestion = false;
+  private total = 0;
 
   constructor(public dialogRef: MdDialogRef<InspectDialogComponent>,
               @Inject(MD_DIALOG_DATA) public data: any) {
-    data.votes.good = 10;
-    data.votes.bad = 5;
-    data.votes.neutral = 2;
-    data.votes.total = 17;
     this.items = [
       {name: 'Good', count: data.votes.good, color: '#31ca31'},
       {name: 'Bad', count: data.votes.bad, color: 'red'},

@@ -1,31 +1,35 @@
 <!--- <h1 md-dialog-title>{{data.authorName}}</h1> -->
 <div md-dialog-content>
-  <blockquote>"{{data.text}}" 
-    <button md-icon-button *ngIf="data.isAuthor" color="secondary">
-      <md-icon>edit</md-icon>
+  <div>
+    <blockquote *ngIf="!editingQuestion">"{{data.text}}" 
+      <button md-icon-button (click)="editingQuestion=true;" *ngIf="data.isAuthor" color="secondary">
+        <md-icon>edit</md-icon>
+      </button>
+    </blockquote>
+    <md-form-field *ngIf="editingQuestion">
+      <textarea mdInput tabindex="1" [(ngModel)]="data.text"></textarea>
+    </md-form-field>
+    <button md-icon-button *ngIf="editingQuestion" (click)="editingQuestion=false;" color="secondary">
+      <md-icon>arrow_back</md-icon>
     </button>
-  </blockquote>
+  </div>
   <div class="by">
     {{data.authorName}} ({{data.lastModified}}) 
   </div>
   <br>
-  <!-- <md-form-field>
-    <textarea mdInput [placeholder]="data.inputHeading" 
-    tabindex="1" [(ngModel)]="data.text" disabled></textarea>
-  </md-form-field> -->
   <div class="votes" style="width: 100px">
     <svg height="150px" width="100px" viewBox="0 0 120 120">
       <circle *ngFor="let item of items;let i=index" cx="60" cy="60" r="50" fill="transparent" stroke-width="3  " [attr.stroke-dasharray]="getPerimeter(50)"
         [attr.stroke-dashoffset]="getOffset(50,i)" [attr.stroke]="item.color" />
       <text x="50%" y="46%" alignment-baseline="middle" text-anchor="middle" fill="white" font-size="40px" font-weight="italic">{{data.votes.total}}</text>
-      <text x="50%" y="68%" alignment-baseline="middle" text-anchor="middle" fill="white" font-size="15px">votes</text>
+      <text x="50%" y="68%" alignment-baseline="middle" text-anchor="middle" fill="white" font-size="15px">{{data.votes.total === 1 ? "vote" : "votes"}}</text>
     </svg>
   </div>
 
   <md-radio-group *ngIf="!data.isAuthor" [(ngModel)]="data.vote">
-    <p><md-radio-button [value]="1">{{data.upvoteText}}</md-radio-button></p>
-    <p><md-radio-button [value]="0">{{data.neutralText}}</md-radio-button></p>
-    <p><md-radio-button [value]="-1">{{data.downvoteText}}</md-radio-button></p>
+    <p><md-radio-button [value]="1">I like that question. It is particularly helpful for me.</md-radio-button></p>
+    <p><md-radio-button [value]="0">I am undecided whether this question is helpful for me.</md-radio-button></p>
+    <p><md-radio-button [value]="-1">This question did not help me.</md-radio-button></p>
   </md-radio-group>
 
 </div>
