@@ -1,4 +1,3 @@
-<!--- <h1 md-dialog-title>{{data.authorName}}</h1> -->
 <div md-dialog-content>
   <div>
     <blockquote *ngIf="!editingQuestion">"{{data.text}}" 
@@ -18,12 +17,11 @@
   </div>
   <br>
   <div class="votes" style="width: 100px">
-    <svg height="150px" width="100px" viewBox="0 0 120 120">
-      <circle *ngFor="let item of items;let i=index" cx="60" cy="60" r="50" fill="transparent" stroke-width="3  " [attr.stroke-dasharray]="getPerimeter(50)"
-        [attr.stroke-dashoffset]="getOffset(50,i)" [attr.stroke]="item.color" />
-      <text x="50%" y="46%" alignment-baseline="middle" text-anchor="middle" fill="white" font-size="40px" font-weight="italic">{{data.votes.total}}</text>
-      <text x="50%" y="68%" alignment-baseline="middle" text-anchor="middle" fill="white" font-size="15px">{{data.votes.total === 1 ? "vote" : "votes"}}</text>
-    </svg>
+    <dnor-vote-donut descriptor="vote">
+      <dnor-donut-item name="Good" [count]="data.votes.good" color="#31ca31"></dnor-donut-item>
+      <dnor-donut-item name="Bad" [count]="data.votes.bad" color="red"></dnor-donut-item>
+      <dnor-donut-item name="Neutral" [count]="(data.votes.total === 0 ? 1 : data.votes.neutral)" color="grey"></dnor-donut-item>
+    </dnor-vote-donut>
   </div>
 
   <md-radio-group *ngIf="!data.isAuthor" [(ngModel)]="data.vote">
@@ -33,6 +31,7 @@
   </md-radio-group>
 
 </div>
+
 <div md-dialog-actions>
   <button md-button [md-dialog-close]="data.text" tabindex="2">Save</button>
   <button md-button (click)="onCancel()" tabindex="-1">Cancel</button>

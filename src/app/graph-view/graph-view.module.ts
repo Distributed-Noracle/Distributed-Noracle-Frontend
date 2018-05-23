@@ -16,6 +16,7 @@ import {RelationPickerDialogComponent} from './relation-picker-dialog/relation-p
 import {CreateQuestionDialogComponent} from './create-question-dialog/create-question-dialog.component';
 import {VoteDialogComponent} from './vote-dialog/vote-dialog.component';
 import {InspectDialogComponent} from './inspect-dialog/inspect-dialog.component';
+import {VoteDonutComponent, ItemDirective} from './vote-donut/vote-donut.component';
 
 @NgModule({
   imports: [
@@ -35,8 +36,10 @@ import {InspectDialogComponent} from './inspect-dialog/inspect-dialog.component'
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [GraphViewComponent, GraphViewPageComponent, RelationPickerDialogComponent,
-    CreateQuestionDialogComponent, VoteDialogComponent, InspectDialogComponent],
-  bootstrap: [RelationPickerDialogComponent, CreateQuestionDialogComponent, VoteDialogComponent, InspectDialogComponent],
+    CreateQuestionDialogComponent, VoteDialogComponent, InspectDialogComponent, VoteDonutComponent,
+    ItemDirective],
+  bootstrap: [RelationPickerDialogComponent, CreateQuestionDialogComponent, VoteDialogComponent, 
+    InspectDialogComponent, VoteDonutComponent],
   exports: [GraphViewPageComponent],
   providers: [D3Service, GraphViewService]
 })

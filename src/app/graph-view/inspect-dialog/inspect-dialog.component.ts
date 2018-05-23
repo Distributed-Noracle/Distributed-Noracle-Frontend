@@ -1,5 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {MD_DIALOG_DATA, MdDialogRef} from '@angular/material';
+import {VoteDonutComponent, ItemDirective} from './../vote-donut/vote-donut.component';
 
 @Component({
   selector: 'dnor-inspect-dialog',
@@ -8,18 +9,10 @@ import {MD_DIALOG_DATA, MdDialogRef} from '@angular/material';
 })
 export class InspectDialogComponent implements OnInit {
 
-  protected items: Array<{name: string, count: number, color: string}>;
   protected editingQuestion = false;
-  private total = 0;
 
   constructor(public dialogRef: MdDialogRef<InspectDialogComponent>,
               @Inject(MD_DIALOG_DATA) public data: any) {
-    this.items = [
-      {name: 'Good', count: data.votes.good, color: '#31ca31'},
-      {name: 'Bad', count: data.votes.bad, color: 'red'},
-      {name: 'Neutral', count: data.votes.total === 0 ? 1 : data.votes.neutral, color: 'grey'}
-    ];
-    this.total = this.items.map(a => a.count).reduce((x, y) => x + y);
   }
 
   ngOnInit() {
@@ -27,19 +20,6 @@ export class InspectDialogComponent implements OnInit {
 
   onCancel(): void {
     this.dialogRef.close();
-  }
-
-  getPerimeter(radius: number): number {
-    return Math.PI * 2 * radius;
-  }
-
-  getOffset(radius: number, index: number): number {
-    let percent = 0;
-    for (let i = 0; i < index; i++) {
-      percent += ((this.items[i].count) / this.total);
-    }
-    const perimeter = this.getPerimeter(radius);
-    return perimeter * percent;
   }
 
 }
