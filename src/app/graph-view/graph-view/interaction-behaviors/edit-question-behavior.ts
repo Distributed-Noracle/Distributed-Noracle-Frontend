@@ -5,7 +5,6 @@ import {MdDialog} from '@angular/material';
 import {InspectDialogComponent} from '../../inspect-dialog/inspect-dialog.component';
 import {AgentService} from '../../../shared/agent/agent.service';
 import {QuestionVoteService} from '../../../shared/question-vote/question-vote.service'
-import {VoteDialogComponent} from '../../vote-dialog/vote-dialog.component';
 import {timestamp} from 'rxjs/operator/timestamp';
 import {VoteUtil} from '../utils/vote-util';
 
