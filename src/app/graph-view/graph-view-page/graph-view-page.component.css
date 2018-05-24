@@ -8,6 +8,10 @@
     font-weight: bold;
 }
 
+.bw {
+    background-color: white;
+}
+
 .memberList {
     padding-top: 15px;
     right: 10px;

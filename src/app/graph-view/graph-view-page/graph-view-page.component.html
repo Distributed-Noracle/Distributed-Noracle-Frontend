@@ -3,24 +3,24 @@
   <mat-accordion displayMode="flat" multi="true">
     <mat-expansion-panel expanded="true">
       <mat-expansion-panel-header expandedHeight="30px" collapsedHeight="30px">
-        Participants
+        <span class="bw">Participants</span>
       </mat-expansion-panel-header>
       <ul>
-        <li *ngFor="let m of spaceMembers">{{m}}</li>
+        <li *ngFor="let m of spaceMembers"><span class="bw">{{m}}</span></li>
       </ul>
     </mat-expansion-panel>
   
     <mat-expansion-panel>
       <mat-expansion-panel-header expandedHeight="30px" collapsedHeight="30px">
-        Help
+        <span class="bw">Help</span>
       </mat-expansion-panel-header>
       <ul>
-        <li><md-icon style="font-weight: bold">chat_bubble_outline</md-icon> selected / <md-icon>chat_bubble_outline</md-icon> deselected</li>
-        <li><md-icon style="color: green">chat_bubble_outline</md-icon> rated positively / <md-icon style="color: rgb(255, 0, 0)">chat_bubble_outline</md-icon> rated negatively</li>
-        <li><span style="font-weight: bold">>>></span> follow-up question</li>
-        <li><span style="font-weight: bold">――</span> related question</li>
-        <li>―――――――――――――――――――――</li>
-        <li>More questions? <a href="mailto:noracle@dbis.rwth-aachen.de">noracle@dbis.rwth-aachen.de</a></li>
+        <li><span class="bw"><md-icon style="font-weight: bold">chat_bubble_outline</md-icon> selected / <md-icon>chat_bubble_outline</md-icon> deselected</span></li>
+        <li><span class="bw"><md-icon style="color: green">chat_bubble_outline</md-icon> rated positively / <md-icon style="color: rgb(255, 0, 0)">chat_bubble_outline</md-icon> rated negatively</span></li>
+        <li><span class="bw"><span style="font-weight: bold">>>></span> follow-up question</span></li>
+        <li><span class="bw"><span style="font-weight: bold">――</span> related question</span></li>
+        <li><span class="bw">―――――――――――――――――――――</span></li>
+        <li><span class="bw">More questions? <a href="mailto:noracle@dbis.rwth-aachen.de">noracle@dbis.rwth-aachen.de</a></span></li>
       </ul>
     </mat-expansion-panel>    
   </mat-accordion>       
