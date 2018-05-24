@@ -99,7 +99,7 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
       case 'AddRelation':
         return 'Add Relation';
       case 'Inspect':
-        return 'Inspect';
+        return 'Vote/Edit';
     }
   }
 }

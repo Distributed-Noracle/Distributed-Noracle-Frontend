@@ -170,10 +170,11 @@ export class GraphNode implements SimulationNodeDatum {
       this.textSize === n.textSize &&
       this.bubbleScaleFactor === n.bubbleScaleFactor &&
       this.questionVotes.length === n.questionVotes.length &&
+      this.questionVotes.map((v, i) => v.value === n.questionVotes[i].value).reduce((p, c) => p && c, true) &&
       this.relations.map(r =>
         this.relationVotes.get(r.relationId).length === n.relationVotes.get(r.relationId).length &&
         this.relationVotes.get(r.relationId).map((v, i) => v.value === n.relationVotes.get(r.relationId)[i].value &&
-          v.voterAgentId === n.relationVotes.get(r.relationId)[i].voterAgentId).reduce((p, c) => p && c, true)
+        v.voterAgentId === n.relationVotes.get(r.relationId)[i].voterAgentId).reduce((p, c) => p && c, true)
       ).reduce((p, c) => p && c, true);
   }
 }

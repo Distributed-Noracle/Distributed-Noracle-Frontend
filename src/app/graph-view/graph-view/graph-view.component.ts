@@ -140,7 +140,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       this.setSelectionBehaviors(new AddRelationBehavior(this.graphViewService, this.dialog), null);
     } else if (this.interactionMode === GraphInteractionMode.Inspect) {
       this.setSelectionBehaviors(
-        new EditQuestionBehavior(this.graphViewService, this.agentService, this.questionVoteService, this.dialog),
+        new EditQuestionBehavior(this.graphViewService, this.agentService, this.dialog),
         new EditRelationBehavior(this.graphViewService, this.agentService, this.dialog)
       );
     } else {
@@ -210,6 +210,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private updateSimulation() {
+    console.log("updating");
     this.d3Sim.nodes(this.network.getNodes());
     this.d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.network.getEdges())
       .distance((link, i, links) => (link as Edge).getDistance());

@@ -12,14 +12,14 @@ import {VoteUtil} from '../utils/vote-util';
 export class EditQuestionBehavior extends NodeInteractionBehavior {
 
   constructor(private graphViewService: GraphViewService, private agentService: AgentService,
-              private questionVoteService: QuestionVoteService, private dialog: MdDialog) {
+              private dialog: MdDialog) {
     super();
   }
 
-  async interactWith(node: GraphNode, spaceId: string): Promise<any> {
+  async interactWith(node: GraphNode): Promise<any> {
     const agent = await this.agentService.getAgent();
     const authorName = await this.agentService.getAgentName(node.question.authorId);
-    const questionVotes = await this.questionVoteService.getQuestionVotes(spaceId, node.id);
+    const questionVotes = node.questionVotes;
     const votes = VoteUtil.countVotes(questionVotes);
 
     const isAuthor = agent.agentid === node.question.authorId;
