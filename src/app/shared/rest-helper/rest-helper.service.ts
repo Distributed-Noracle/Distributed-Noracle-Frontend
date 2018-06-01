@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Headers, Http, Response} from '@angular/http';
+import {Router} from '@angular/router';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
 import {environment} from '../../../environments/environment';
 
@@ -12,16 +13,25 @@ export class RestHelperService {
   private isMock = false;
   private oidcName = '';
 
-  constructor(private OidcSecurityService: OidcSecurityService, private http: Http) {
+  constructor(private OidcSecurityService: OidcSecurityService, private http: Http, 
+    private router: Router) {
     OidcSecurityService.getUserData().subscribe((userData: any) => {
       this.oidcName = userData.email;
     });
   }
 
-  public get(path: string): Promise<Response> {
-    return this.http.get(this.getBaseURL() + path,
-      {headers: this.getHeaders()}
-    ).retry(3).toPromise();
+  public async get(path: string): Promise<Response> {
+    try {
+      const res = await this.http.get(this.getBaseURL() + path,
+        { headers: this.getHeaders() }
+      ).retry(3).toPromise();
+      return res;
+    } catch (error) {
+      if (error.status === 401) {
+        this.router.navigate(['/login'], {replaceUrl: true});
+      }
+      throw error;
+    }
   }
 
   public getAbsoulte(absolutePath: string): Promise<Response> {
