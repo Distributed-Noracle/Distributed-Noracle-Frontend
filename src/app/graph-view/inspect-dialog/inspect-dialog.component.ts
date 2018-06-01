@@ -9,7 +9,7 @@ import {VoteDonutComponent, ItemDirective} from './../vote-donut/vote-donut.comp
 })
 export class InspectDialogComponent implements OnInit {
 
-  protected editingQuestion = false;
+  public editingQuestion = false;
 
   constructor(public dialogRef: MdDialogRef<InspectDialogComponent>,
               @Inject(MD_DIALOG_DATA) public data: any) {

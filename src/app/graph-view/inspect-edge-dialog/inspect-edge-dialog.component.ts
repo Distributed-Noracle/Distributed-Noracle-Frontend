@@ -9,7 +9,7 @@ import {VoteDonutComponent, ItemDirective} from './../vote-donut/vote-donut.comp
 })
 export class InspectEdgeDialogComponent implements OnInit {
 
-  protected editingRelation = false;
+  public editingRelation = false;
 
   constructor(public dialogRef: MdDialogRef<InspectEdgeDialogComponent>,
               @Inject(MD_DIALOG_DATA) public data: any) {

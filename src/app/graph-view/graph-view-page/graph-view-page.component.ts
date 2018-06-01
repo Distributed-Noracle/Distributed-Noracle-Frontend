@@ -31,7 +31,7 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
     this.height = (window.innerHeight
       - this.graphContainer.nativeElement.getBoundingClientRect().top
       - this.below.nativeElement.getBoundingClientRect().height) * 0.9;
-    this.width = window.innerWidth * 0.9;
+    this.width = window.innerWidth * 0.95;
   }
 
   constructor(elementRef: ElementRef, private activatedRoute: ActivatedRoute,

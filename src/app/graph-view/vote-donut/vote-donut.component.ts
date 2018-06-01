@@ -22,7 +22,7 @@ export class VoteDonutComponent implements OnInit, AfterContentInit {
   @Input() width = '100px';
   @Input() height = '150px';
 
-  protected total = 0;
+  public total = 0;
 
   ngOnInit() {}
 
