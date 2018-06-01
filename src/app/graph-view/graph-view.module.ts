@@ -12,6 +12,7 @@ import {FormsModule} from '@angular/forms';
 import {GraphViewService} from './graph-view/graph-view.service';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {SharedModule} from '../shared/shared.module';
+import {RelationPickerDialogComponent} from './relation-picker-dialog/relation-picker-dialog.component';
 import {CreateQuestionDialogComponent} from './create-question-dialog/create-question-dialog.component';
 import {InspectDialogComponent} from './inspect-dialog/inspect-dialog.component';
 import {VoteDonutComponent, ItemDirective} from './vote-donut/vote-donut.component';
@@ -34,12 +35,12 @@ import {InspectEdgeDialogComponent} from './inspect-edge-dialog/inspect-edge-dia
     MatExpansionModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  declarations: [GraphViewComponent, GraphViewPageComponent,
+  declarations: [GraphViewComponent, GraphViewPageComponent, RelationPickerDialogComponent,
     CreateQuestionDialogComponent, InspectDialogComponent, VoteDonutComponent,
     ItemDirective,
     InspectEdgeDialogComponent],
-  bootstrap: [CreateQuestionDialogComponent, InspectDialogComponent, VoteDonutComponent, 
-    InspectEdgeDialogComponent],
+  bootstrap: [RelationPickerDialogComponent, CreateQuestionDialogComponent,
+    InspectDialogComponent, VoteDonutComponent, InspectEdgeDialogComponent],
   exports: [GraphViewPageComponent],
   providers: [D3Service, GraphViewService]
 })
