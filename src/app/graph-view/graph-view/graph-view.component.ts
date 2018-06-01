@@ -84,8 +84,6 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       this.network.getNodes().forEach((node) => {
         node.isSelected = (this.selectedQuestions.indexOf(node.id) !== -1);
       });
-      // this.d3Sim.force('center', this.d3.forceCenter(this.width / 2, this.height / 2));
-      // this.d3Sim.alpha(1).restart();
       this.updateInteractionMode();
     }
   }
@@ -131,6 +129,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       // no change
       return;
     }
+
     if (this.interactionMode === GraphInteractionMode.SelectAndNavigate) {
       // TODO: review: a new behavior every time? maybe use services?
       this.setSelectionBehaviors(new ChangeNodeSelectionBehavior(this.network, this.graphViewService), null);
@@ -146,6 +145,8 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     } else {
       this.setDragAndZoomBehavior();
     }
+
+    this.activatedInteractionMode = this.interactionMode;
   }
 
   private setDragAndZoomBehavior() {
@@ -210,7 +211,6 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private updateSimulation() {
-    console.log("updating");
     this.d3Sim.nodes(this.network.getNodes());
     this.d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.network.getEdges())
       .distance((link, i, links) => (link as Edge).getDistance());

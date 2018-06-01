@@ -14,4 +14,16 @@ export class Relation {
 
   constructor() {
   }
+
+  public equals(r: Relation) {
+    return this.relationId === r.relationId &&
+    this.spaceId === r.spaceId &&
+    this.name === r.name &&
+    this.firstQuestionId === r.firstQuestionId &&
+    this.secondQuestionId === r.secondQuestionId &&
+    this.directed === r.directed &&
+    this.authorId === r.authorId &&
+    this.timestampCreated === r.timestampCreated &&
+    this.timestampLastModified === r.timestampLastModified;
+  }
 }

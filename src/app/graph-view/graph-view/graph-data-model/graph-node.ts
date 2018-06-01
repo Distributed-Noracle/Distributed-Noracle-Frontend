@@ -11,6 +11,7 @@ export class GraphNode implements SimulationNodeDatum {
   private bubbleScaleFactor = 1.25;
   public radius;
   public relationVotes: Map<string, RelationVote[]> = new Map<string, RelationVote[]>();
+  public relations: Relation[];
 
   /**
    * Node’s current x-position
@@ -24,8 +25,9 @@ export class GraphNode implements SimulationNodeDatum {
 
   constructor(context: CanvasRenderingContext2D, public id: string,
     public question: Question, public questionAuthor: string, public questionVotes: QuestionVote[],
-    public relations: Relation[], public relationAuthors: string[], relationVotes: RelationVote[][],
+    relations: Relation[], public relationAuthors: string[], relationVotes: RelationVote[][],
     public isSelected = false, public isSeed = false) {
+    this.relations = relations.slice(0);
     this.lines = this.wrapText((s) => context.measureText(s).width);
     for (let i = 0; i < relations.length; i++) {
       this.relationVotes.set(relations[i].relationId, relationVotes[i] !== undefined ? relationVotes[i] : []);
@@ -147,7 +149,7 @@ export class GraphNode implements SimulationNodeDatum {
       return false;
     }
     this.question = n.question;
-    this.relations = n.relations;
+    this.relations = n.relations.splice(0);
     this.lines = n.lines;
     this.radius = n.radius;
     this.textSize = n.textSize;
@@ -162,9 +164,7 @@ export class GraphNode implements SimulationNodeDatum {
       this.question.questionId === n.question.questionId &&
       this.question.timestampLastModified === n.question.timestampLastModified &&
       this.relations.length === n.relations.length &&
-      this.relations.map(r => n.relations
-        .findIndex(r2 => r2.relationId === r.relationId && r2.timestampLastModified === r.timestampLastModified) !== -1)
-        .reduce((prev, cur) => prev && cur, true) &&
+      JSON.stringify(this.relations) === JSON.stringify(n.relations) &&
       this.lines.map((l, i) => l === n.lines[i]).reduce((prev, cur) => prev && cur, true) &&
       this.radius === n.radius &&
       this.textSize === n.textSize &&
