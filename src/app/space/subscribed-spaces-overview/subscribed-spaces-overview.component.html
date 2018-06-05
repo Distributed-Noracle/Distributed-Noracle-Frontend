@@ -6,7 +6,22 @@
     <button md-icon-button (click)="copyInviteUrl(space)" color="primary">
       <md-icon>share</md-icon>
     </button>
+    <button md-icon-button [mdMenuTriggerFor]="menu" color="primary">
+      <md-icon svgIcon="img:bot"></md-icon>
+    </button>
+    <md-menu #menu [overlapTrigger]="false">
+      <a md-menu-item (click)="addBot(space)">
+          <md-icon class="menuItem" svgIcon="img:add"></md-icon>
+          <span>Add Bot to Space</span>
+        </a>
+      <a md-menu-item target="_blank" href="http://127.0.0.1:7888/methodselector/src/widgets/train.html?unit={{space.space.spaceId}}">
+        <md-icon class="menuItem" svgIcon="img:train"></md-icon>
+        <span>Train Bot</span></a>
+    </md-menu>
   </md-list-item>
 </md-list>
+
+
+
 <br>
 <button md-raised-button color="primary" routerLink="/spaces/create">Create new Space</button>
