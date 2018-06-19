@@ -8,6 +8,7 @@ import {MdSnackBar} from '@angular/material';
 import { MdIconRegistry } from '@angular/material';
 import { DomSanitizer } from '@angular/platform-browser';
 import {environment} from '../../../environments/environment';
+import {RestHelperService} from '../../shared/rest-helper/rest-helper.service';
 
 
 @Component({
@@ -17,9 +18,10 @@ import {environment} from '../../../environments/environment';
 })
 export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
   public spaces: { space: Space, subscription: SpaceSubscription }[];
+  public botWidgetUrl: string;
   private spaceSubscription: Subscription;
 
-  constructor(private myspacesService: MyspacesService, private snackBar: MdSnackBar,private mdIconRegistry: MdIconRegistry, private sanitizer: DomSanitizer) {
+  constructor(private myspacesService: MyspacesService, private snackBar: MdSnackBar,private mdIconRegistry: MdIconRegistry, private sanitizer: DomSanitizer, private rh: RestHelperService) {
   }
 
   ngOnInit() {
@@ -32,6 +34,7 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
         this.sanitizer.bypassSecurityTrustResourceUrl('/assets/add.svg'));
     this.mdIconRegistry.addSvgIconInNamespace('img', 'train',
         this.sanitizer.bypassSecurityTrustResourceUrl('/assets/train.svg'));
+    this.botWidgetUrl = this.rh.getHostURL() + '/fileservice/v2.2.5/files/sbf';
   }
 
   ngOnDestroy() {
@@ -101,7 +104,7 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
     textArea.select();
 
     var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
-    xmlhttp.open("POST", environment.hostUrls[0] + "/SBFManager/join");
+    xmlhttp.open("POST", this.rh.getHostURL() + "/SBFManager/join");
     xmlhttp.setRequestHeader("Content-Type", "application/json");
     xmlhttp.send(JSON.stringify({basePath: environment.hostUrls[0]+ "/distributed-noracle", joinPath:"agents/$botId/spacesubscriptions",spaceId: myspace.space.spaceId, spaceSecret: myspace.space.spaceSecret}));
     var snackBar = this.snackBar;
