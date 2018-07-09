@@ -205,17 +205,22 @@ export class GraphViewService {
 
   private fetchAll(spaceId: string) {
     // load all questions and all relations of the space
-    const questionsAndRelationsPromise = Promise.all([this.questionService.getQuestionsOfSpace(spaceId).then((res) => {
-      this.questions = res;
-      const seedIndex = this.observedQuestionIds.indexOf('seed');
-      if (seedIndex !== -1 && this.questions.length > 0) {
-        this.observedQuestionIds.splice(seedIndex, 1);
-        this.observedQuestionIds.push(this.questions[0].questionId);
-      }
-      return this.questions;
-    }),
-      this.relationService.getRelationsOfSpace(spaceId).then((res) =>
-        this.relations = res)]);
+    const questionsAndRelationsPromise = Promise.all([
+      this.questionService.getQuestionsOfSpace(spaceId).then((res) => {
+        this.questions = res;
+        this.questions.forEach(q => this.questionVotes.set(q.questionId, q.votes));
+        const seedIndex = this.observedQuestionIds.indexOf('seed');
+        if (seedIndex !== -1 && this.questions.length > 0) {
+          this.observedQuestionIds.splice(seedIndex, 1);
+          this.observedQuestionIds.push(this.questions[0].questionId);
+        }
+        return this.questions;
+      }),
+      this.relationService.getRelationsOfSpace(spaceId).then((res) => {
+        this.relations = res;
+        this.relations.forEach(r => this.relationVotes.set(r.relationId, r.votes));
+      })
+    ]);
 
     // when all questions and relations are loaded
     questionsAndRelationsPromise.then(() => {
@@ -244,8 +249,6 @@ export class GraphViewService {
 
   private loadRelationRelatedData(spaceId: string, r: Relation): Promise<any> {
     return Promise.all([
-      this.relationVoteService.getRelationVotes(spaceId, r.relationId)
-        .then((rv) => this.relationVotes.set(r.relationId, rv)),
       this.agentService.getAgentName(r.authorId)
         .then(ra => this.relationAuthors.set(r.relationId, ra))
     ]);
@@ -253,8 +256,6 @@ export class GraphViewService {
 
   private loadQuestionRelatedData(spaceId: string, q: Question): Promise<any> {
     return Promise.all([
-      this.questionVoteService.getQuestionVotes(spaceId, q.questionId)
-        .then((qv) => this.questionVotes.set(q.questionId, qv)),
       this.agentService.getAgentName(q.authorId)
         .then(qa => this.questionAuthors.set(q.questionId, qa))
     ]);
