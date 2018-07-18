@@ -99,7 +99,7 @@ export class RestHelperService {
    * This was introduced to simulate a distributed setting with users who can't
    * host a node themselves.
    */
-  private getHostURL(): string {
+  public getHostURL(): string {
     return HOST_URLS[Math.abs(this.hash(this.oidcName) % HOST_URLS.length)];
   }
 
