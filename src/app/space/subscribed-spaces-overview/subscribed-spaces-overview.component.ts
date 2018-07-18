@@ -29,11 +29,11 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
       this.myspacesService.getMySpacesObservable().subscribe((myspaces) => this.spaces = myspaces);
     this.myspacesService.getMySpaces().then((s) => s);
     this.mdIconRegistry.addSvgIconInNamespace('img', 'bot',
-        this.sanitizer.bypassSecurityTrustResourceUrl('/assets/bot.svg'));
+        this.sanitizer.bypassSecurityTrustResourceUrl('assets/bot.svg'));
     this.mdIconRegistry.addSvgIconInNamespace('img', 'add',
-        this.sanitizer.bypassSecurityTrustResourceUrl('/assets/add.svg'));
+        this.sanitizer.bypassSecurityTrustResourceUrl('assets/add.svg'));
     this.mdIconRegistry.addSvgIconInNamespace('img', 'train',
-        this.sanitizer.bypassSecurityTrustResourceUrl('/assets/train.svg'));
+        this.sanitizer.bypassSecurityTrustResourceUrl('assets/train.svg'));
     this.botWidgetUrl = this.rh.getHostURL() + '/fileservice/v2.2.5/files/sbf';
   }
 
