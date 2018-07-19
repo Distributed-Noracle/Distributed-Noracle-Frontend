@@ -1,0 +1,43 @@
+<div md-dialog-content>
+  <blockquote>"{{data.targetText}}"</blockquote>
+  <div style="width:100%; text-align: center">
+    <div *ngIf="!editingRelation">
+      ... {{data.relationTypeText}} ...
+      <button md-icon-button (click)="editingRelation=true;" *ngIf="data.isAuthor" color="secondary">
+        <md-icon>edit</md-icon>
+      </button>
+    </div>
+
+    <md-radio-group *ngIf="editingRelation" [(ngModel)]="data.relationType">
+      <p><md-radio-button [value]="data.relationTypes[0]">{{data.relationTypesText[0]}}</md-radio-button></p>
+      <p><md-radio-button [value]="data.relationTypes[1]">{{data.relationTypesText[1]}}</md-radio-button></p>
+    </md-radio-group>
+    <button md-icon-button *ngIf="editingRelation" (click)="editingRelation=false;" color="secondary">
+      <md-icon>arrow_back</md-icon>
+    </button>
+  </div>
+  <blockquote>"{{data.sourceText}}"</blockquote>
+  <div class="by">
+    {{data.authorName}} ({{data.lastModified}}) 
+  </div>
+  <br>
+  <div class="votes" style="width: 100px">
+    <dnor-vote-donut descriptor="vote">
+      <dnor-donut-item name="Good" color="#31ca31" [count]="data.votes.good"></dnor-donut-item>
+      <dnor-donut-item name="Bad" color="red" [count]="data.votes.bad"></dnor-donut-item>
+      <dnor-donut-item name="Neutral" color="grey" [count]="data.votes.neutral"></dnor-donut-item>
+    </dnor-vote-donut>
+  </div>
+
+  <md-radio-group *ngIf="!data.isAuthor" [(ngModel)]="data.vote">
+    <p><md-radio-button [value]="1">I agree with this relation. It makes sense to me.</md-radio-button></p>
+    <p><md-radio-button [value]="0">I am undecided whether this relation makes sense to me.</md-radio-button></p>
+    <p><md-radio-button [value]="-1">I do not agree. I really cannot see the connection.</md-radio-button></p>
+  </md-radio-group>
+
+</div>
+
+<div md-dialog-actions>
+  <button md-button [md-dialog-close]="data.sourceText" tabindex="2">Save</button>
+  <button md-button (click)="onCancel()" tabindex="-1">Cancel</button>
+</div>

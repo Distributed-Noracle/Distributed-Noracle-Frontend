@@ -3,9 +3,11 @@ import {MdDialog} from '@angular/material';
 import {AgentService} from '../../../shared/agent/agent.service';
 import {EdgeInteractionBehavior} from './edge-interaction-behavior';
 import {Edge} from '../graph-data-model/edge';
-import {RelationPickerDialogComponent} from '../../relation-picker-dialog/relation-picker-dialog.component';
 import {GraphNode} from '../graph-data-model/graph-node';
-import {VoteDialogComponent} from '../../vote-dialog/vote-dialog.component';
+import {RelationVote} from '../../../shared/rest-data-model/relation-vote';
+import {VoteUtil} from '../utils/vote-util';
+import {InspectEdgeDialogComponent} from '../../inspect-edge-dialog/inspect-edge-dialog.component';
+import { RelationType } from '../graph-data-model/relation-type.enum';
 
 export class EditRelationBehavior extends EdgeInteractionBehavior {
 
@@ -14,46 +16,37 @@ export class EditRelationBehavior extends EdgeInteractionBehavior {
     super();
   }
 
-  interactWith(edge: Edge): Promise<any> {
-    return this.agentService.getAgent().then((agent) => {
-      if (agent.agentid === edge.relation.authorId) {
-        const dialogRef = this.dialog.open(RelationPickerDialogComponent, {
-          width: '250px',
-          data: {
-            title: 'Edit Relation',
-            message: 'You can change the relation type of the relation between:\n1.) '
-            + (edge.source as GraphNode).question.text + '\nand\n2.) '
-            + (edge.target as GraphNode).question.text,
-            selectedRelationType: edge.relation.name
-          }
-        });
-        return dialogRef.afterClosed().toPromise().then(result => {
-          if (result !== undefined) {
-            return this.graphViewService.updateRelation(edge.id, result);
-          }
-        });
-      } else {
-        const myVote = edge.getRelationVotes().find(vote => agent.agentid === vote.voterAgentId);
-        const dialogRef = this.dialog.open(VoteDialogComponent, {
-          width: '80%',
-          data: {
-            title: 'Assess Relation',
-            message: 'Do you agree with this relation:\n'
-            + (edge.source as GraphNode).question.text + '\n'
-            + edge.relation.name + '\n'
-            + (edge.source as GraphNode).question.text,
-            upvoteText: 'I agree with this relation. It makes sense to me.',
-            neutralText: 'I am undecided whether this relation makes sense to me.',
-            downvoteText: 'I do not agree. I really cannot see the connection.',
-            vote: myVote !== undefined ? myVote.value : 0
-          }
-        });
-        return dialogRef.afterClosed().toPromise().then(result => {
-          if (result !== undefined) {
-            this.graphViewService.updateRelationVote(edge.id, agent.agentid, result);
-          }
-        });
+  async interactWith(edge: Edge): Promise<any> {
+    const agent = await this.agentService.getAgent();
+    const authorName = await this.agentService.getAgentName(edge.relation.authorId);
+    const relationVotes = edge.getRelationVotes();
+    const votes = VoteUtil.countVotes(relationVotes);
+
+    const isAuthor = agent.agentid === edge.relation.authorId;
+    const myVote = relationVotes.find(vote => agent.agentid === vote.voterAgentId);
+
+    const data = {
+      isAuthor: isAuthor,
+      sourceText: (edge.source as GraphNode).question.text,
+      targetText: (edge.target as GraphNode).question.text,
+      authorName: authorName,
+      lastModified: new Date(edge.relation.timestampLastModified).toLocaleString(),
+      votes: votes,
+      vote: myVote ? myVote.value : undefined,
+      relationType: edge.relation.name,
+      relationTypes: Object.keys(RelationType).filter(k => typeof RelationType[k as any] === 'number'),
+      relationTypeText: edge.relation.name === 'FollowUp' ? 'follows from' : 'is linked to',
+      relationTypesText: ['follows from', 'is linked to'],
+    };
+
+    const dialogRef = this.dialog.open(InspectEdgeDialogComponent, {data: data});
+    const result = await dialogRef.afterClosed().toPromise();
+    if (result !== undefined) {
+      if (isAuthor) {
+          await this.graphViewService.updateRelation(edge.id, data.relationType);
+      } else if (data.vote !== undefined) {
+        await this.graphViewService.updateRelationVote(edge.id, agent.agentid, data.vote);
       }
-    });
+    }
   }
 }

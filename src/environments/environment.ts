@@ -6,5 +6,6 @@
 export const environment = {
   production: false,
   redirectUrl: 'http://localhost:4200/login',
+  mobsosUrl: 'http://localhost:8080',
   hostUrls: ['http://localhost:9082']
 };

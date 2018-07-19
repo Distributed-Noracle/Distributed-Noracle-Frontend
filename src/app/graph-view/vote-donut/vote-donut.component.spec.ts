@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { VoteDialogComponent } from './vote-dialog.component';
+import { VoteDonutComponent } from './vote-donut.component';
 
-describe('VoteDialogComponent', () => {
-  let component: VoteDialogComponent;
-  let fixture: ComponentFixture<VoteDialogComponent>;
+describe('VoteDonutComponent', () => {
+  let component: VoteDonutComponent;
+  let fixture: ComponentFixture<VoteDonutComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ VoteDialogComponent ]
+      declarations: [ VoteDonutComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(VoteDialogComponent);
+    fixture = TestBed.createComponent(VoteDonutComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {RestHelperService} from '../rest-helper/rest-helper.service';
 import {QuestionVote} from '../rest-data-model/question-vote';
+import {Vote} from '../rest-data-model/vote';
 
 @Injectable()
 export class QuestionVoteService {

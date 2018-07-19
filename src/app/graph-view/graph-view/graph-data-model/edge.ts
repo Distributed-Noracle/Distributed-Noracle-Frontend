@@ -2,6 +2,7 @@ import {SimulationLinkDatum} from 'd3-force';
 import {GraphNode} from './graph-node';
 import {Relation} from '../../../shared/rest-data-model/relation';
 import {DrawUtil} from '../utils/draw-util';
+import { RelationType } from './relation-type.enum';
 
 export class Edge implements SimulationLinkDatum<GraphNode> {
 
@@ -24,7 +25,7 @@ export class Edge implements SimulationLinkDatum<GraphNode> {
   }
 
   draw(context: CanvasRenderingContext2D) {
-    if (this.relation.directed) {
+    if (this.relation.name === 'FollowUp') {
       this.drawDirected(context);
     } else {
       this.drawUndirected(context);

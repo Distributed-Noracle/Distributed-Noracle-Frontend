@@ -3,9 +3,9 @@
 <form #creationForm="ngForm" (ngSubmit)="createSpace()">
   <p>
     <md-form-field>
-      <input mdInput id="name" name="space.name" placeholder="Space Name" [(ngModel)]="space.name" maxlength="20"
+      <input mdInput id="name" name="space.name" placeholder="Space Name" [(ngModel)]="space.name" maxlength="40"
              required/>
-      <md-hint align="end">{{space.name.length}} / 20</md-hint>
+      <md-hint align="end">{{space.name.length}} / 40</md-hint>
     </md-form-field>
   </p>
   <p>

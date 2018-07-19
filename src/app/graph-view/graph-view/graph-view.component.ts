@@ -15,6 +15,7 @@ import {AddRelationBehavior} from './interaction-behaviors/add-relation-behavior
 import {Subscription} from 'rxjs/Subscription';
 import {MdDialog} from '@angular/material';
 import {AgentService} from '../../shared/agent/agent.service';
+import {QuestionVoteService} from '../../shared/question-vote/question-vote.service';
 import {EdgeInteractionBehavior} from './interaction-behaviors/edge-interaction-behavior';
 import {EditRelationBehavior} from './interaction-behaviors/edit-relation-behavior';
 import {UpdateData} from './graph-data-model/update-data';
@@ -46,7 +47,8 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
 
 
   constructor(private graphViewService: GraphViewService, private agentService: AgentService,
-              private d3Service: D3Service, private dialog: MdDialog) {
+              private questionVoteService: QuestionVoteService, private d3Service: D3Service, 
+              private dialog: MdDialog) {
     this.d3 = d3Service.getD3();
     this.transform = this.d3.zoomIdentity;
   }
@@ -82,8 +84,6 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       this.network.getNodes().forEach((node) => {
         node.isSelected = (this.selectedQuestions.indexOf(node.id) !== -1);
       });
-      // this.d3Sim.force('center', this.d3.forceCenter(this.width / 2, this.height / 2));
-      // this.d3Sim.alpha(1).restart();
       this.updateInteractionMode();
     }
   }
@@ -129,6 +129,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       // no change
       return;
     }
+
     if (this.interactionMode === GraphInteractionMode.SelectAndNavigate) {
       // TODO: review: a new behavior every time? maybe use services?
       this.setSelectionBehaviors(new ChangeNodeSelectionBehavior(this.network, this.graphViewService), null);
@@ -136,7 +137,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       this.setSelectionBehaviors(new AddChildNodeBehavior(this.graphViewService, this.dialog), null);
     } else if (this.interactionMode === GraphInteractionMode.AddRelation) {
       this.setSelectionBehaviors(new AddRelationBehavior(this.graphViewService, this.dialog), null);
-    } else if (this.interactionMode === GraphInteractionMode.EditAndAssess) {
+    } else if (this.interactionMode === GraphInteractionMode.Inspect) {
       this.setSelectionBehaviors(
         new EditQuestionBehavior(this.graphViewService, this.agentService, this.dialog),
         new EditRelationBehavior(this.graphViewService, this.agentService, this.dialog)
@@ -144,6 +145,8 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     } else {
       this.setDragAndZoomBehavior();
     }
+
+    this.activatedInteractionMode = this.interactionMode;
   }
 
   private setDragAndZoomBehavior() {
