@@ -9,7 +9,7 @@ const HOST_URLS = environment.hostUrls;
 @Injectable()
 export class RestHelperService {
   private CORE_BASE_URL = '/las2peer';
-  private BASE_URL = '/distributed-noracle/v0.6.0';
+  private BASE_URL = '/distributed-noracle/v0.7.0';
   private isMock = false;
   private oidcName = '';
 
