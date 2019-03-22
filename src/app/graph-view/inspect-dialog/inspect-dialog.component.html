@@ -1,19 +1,19 @@
-<div md-dialog-content>
+<div mat-dialog-content>
   <div>
-    <blockquote *ngIf="!editingQuestion">"{{data.text}}" 
-      <button md-icon-button (click)="editingQuestion=true;" *ngIf="data.isAuthor" color="secondary">
-        <md-icon>edit</md-icon>
+    <blockquote *ngIf="!editingQuestion">"{{data.text}}"
+      <button mat-icon-button (click)="editingQuestion=true;" *ngIf="data.isAuthor" color="secondary">
+        <mat-icon>edit</mat-icon>
       </button>
     </blockquote>
-    <md-form-field *ngIf="editingQuestion">
-      <textarea mdInput tabindex="1" [(ngModel)]="data.text"></textarea>
-    </md-form-field>
-    <button md-icon-button *ngIf="editingQuestion" (click)="editingQuestion=false;" color="secondary">
-      <md-icon>arrow_back</md-icon>
+    <mat-form-field *ngIf="editingQuestion">
+      <textarea matInput tabindex="1" [(ngModel)]="data.text"></textarea>
+    </mat-form-field>
+    <button mat-icon-button *ngIf="editingQuestion" (click)="editingQuestion=false;" color="secondary">
+      <mat-icon>arrow_back</mat-icon>
     </button>
   </div>
   <div class="by">
-    {{data.authorName}} ({{data.lastModified}}) 
+    {{data.authorName}} ({{data.lastModified}})
   </div>
   <br>
   <div class="votes" style="width: 100px">
@@ -24,15 +24,15 @@
     </dnor-vote-donut>
   </div>
 
-  <md-radio-group *ngIf="!data.isAuthor" [(ngModel)]="data.vote">
-    <p><md-radio-button [value]="1">I like that question. It is particularly helpful for me.</md-radio-button></p>
-    <p><md-radio-button [value]="0">I am undecided whether this question is helpful for me.</md-radio-button></p>
-    <p><md-radio-button [value]="-1">This question did not help me.</md-radio-button></p>
-  </md-radio-group>
+  <mat-radio-group *ngIf="!data.isAuthor" [(ngModel)]="data.vote">
+    <p><mat-radio-button [value]="1">I like that question. It is particularly helpful for me.</mat-radio-button></p>
+    <p><mat-radio-button [value]="0">I am undecided whether this question is helpful for me.</mat-radio-button></p>
+    <p><mat-radio-button [value]="-1">This question did not help me.</mat-radio-button></p>
+  </mat-radio-group>
 
 </div>
 
-<div md-dialog-actions>
-  <button md-button [md-dialog-close]="data.text" tabindex="2">Save</button>
-  <button md-button (click)="onCancel()" tabindex="-1">Cancel</button>
+<div mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="data.text" tabindex="2">Save</button>
+  <button mat-button (click)="onCancel()" tabindex="-1">Cancel</button>
 </div>
