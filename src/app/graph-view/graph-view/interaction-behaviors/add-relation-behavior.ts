@@ -2,7 +2,7 @@ import {NodeInteractionBehavior} from './node-interaction-behavior';
 import {GraphNode} from '../graph-data-model/graph-node';
 import {Relation} from '../../../shared/rest-data-model/relation';
 import {RelationPickerDialogComponent} from '../../relation-picker-dialog/relation-picker-dialog.component';
-import {MdDialog} from '@angular/material';
+import {MatDialog} from '@angular/material';
 import {GraphViewService} from '../graph-view.service';
 import {RelationType} from '../graph-data-model/relation-type.enum';
 
@@ -10,7 +10,7 @@ export class AddRelationBehavior extends NodeInteractionBehavior {
 
   private firstSelectedNode: GraphNode;
 
-  constructor(private graphViewService: GraphViewService, private dialog: MdDialog) {
+  constructor(private graphViewService: GraphViewService, private dialog: MatDialog) {
     super();
   }
 

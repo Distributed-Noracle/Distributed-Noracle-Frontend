@@ -1,9 +1,9 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {SpaceSubscription} from '../../shared/rest-data-model/spacesubscription';
-import {Subscription} from 'rxjs/Subscription';
+import {Subscription} from 'rxjs';
 import {Space} from '../../shared/rest-data-model/space';
 import {MyspacesService} from '../../shared/myspaces/myspaces.service';
-import {MdSnackBar} from '@angular/material';
+import {MatSnackBar} from '@angular/material';
 
 @Component({
   selector: 'dnor-subscribed-spaces-overview',
@@ -14,7 +14,7 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
   public spaces: { space: Space, subscription: SpaceSubscription }[];
   private spaceSubscription: Subscription;
 
-  constructor(private myspacesService: MyspacesService, private snackBar: MdSnackBar) {
+  constructor(private myspacesService: MyspacesService, private snackBar: MatSnackBar) {
   }
 
   ngOnInit() {

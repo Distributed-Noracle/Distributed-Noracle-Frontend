@@ -2,17 +2,17 @@
 
 <form #creationForm="ngForm" (ngSubmit)="createSpace()">
   <p>
-    <md-form-field>
-      <input mdInput id="name" name="space.name" placeholder="Space Name" [(ngModel)]="space.name" maxlength="20"
+    <mat-form-field>
+      <input matInput id="name" name="space.name" placeholder="Space Name" [(ngModel)]="space.name" maxlength="20"
              required/>
-      <md-hint align="end">{{space.name.length}} / 20</md-hint>
-    </md-form-field>
+      <mat-hint align="end">{{space.name.length}} / 20</mat-hint>
+    </mat-form-field>
   </p>
   <p>
-    <md-form-field>
-    <textarea mdInput id="question" name="question.text" placeholder="Seed Question" [(ngModel)]="question.text"
+    <mat-form-field>
+    <textarea matInput id="question" name="question.text" placeholder="Seed Question" [(ngModel)]="question.text"
               maxlength="140" required></textarea>
-    </md-form-field>
+    </mat-form-field>
   </p>
-  <button type="submit" md-raised-button color="primary" [disabled]="!creationForm.form.valid">Create</button>
+  <button type="submit" mat-raised-button color="primary" [disabled]="!creationForm.form.valid">Create</button>
 </form>

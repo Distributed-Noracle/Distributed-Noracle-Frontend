@@ -12,8 +12,8 @@ import {NodeInteractionBehavior} from './interaction-behaviors/node-interaction-
 import {AddChildNodeBehavior} from './interaction-behaviors/add-child-node-behavior';
 import {EditQuestionBehavior} from './interaction-behaviors/edit-question-behavior';
 import {AddRelationBehavior} from './interaction-behaviors/add-relation-behavior';
-import {Subscription} from 'rxjs/Subscription';
-import {MdDialog} from '@angular/material';
+import {Subscription} from 'rxjs';
+import {MatDialog} from '@angular/material';
 import {AgentService} from '../../shared/agent/agent.service';
 import {EdgeInteractionBehavior} from './interaction-behaviors/edge-interaction-behavior';
 import {EditRelationBehavior} from './interaction-behaviors/edit-relation-behavior';
@@ -45,7 +45,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
 
 
   constructor(private graphViewService: GraphViewService, private agentService: AgentService,
-              private d3Service: D3Service, private dialog: MdDialog) {
+              private d3Service: D3Service, private dialog: MatDialog) {
     this.d3 = d3Service.getD3();
     this.transform = this.d3.zoomIdentity;
   }

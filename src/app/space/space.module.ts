@@ -4,8 +4,7 @@ import {CreateSpaceComponent} from './create-space/create-space.component';
 import {SubscribedSpacesOverviewComponent} from './subscribed-spaces-overview/subscribed-spaces-overview.component';
 import {SharedModule} from '../shared/shared.module';
 import {RouterModule} from '@angular/router';
-import {MdButtonModule, MdIconModule, MdInputModule, MdListModule, MdSnackBarModule} from '@angular/material';
-import {IronElementsModule, PaperElementsModule} from '@codebakery/origami/collections';
+import {MatButtonModule, MatIconModule, MatInputModule, MatListModule, MatSnackBarModule} from '@angular/material';
 import {FormsModule} from '@angular/forms';
 
 @NgModule({
@@ -14,13 +13,11 @@ import {FormsModule} from '@angular/forms';
     SharedModule,
     RouterModule,
     FormsModule,
-    IronElementsModule,
-    PaperElementsModule,
-    MdInputModule,
-    MdButtonModule,
-    MdListModule,
-    MdIconModule,
-    MdSnackBarModule
+    MatInputModule,
+    MatButtonModule,
+    MatListModule,
+    MatIconModule,
+    MatSnackBarModule
   ],
   declarations: [CreateSpaceComponent, SubscribedSpacesOverviewComponent],
   exports: [CreateSpaceComponent, SubscribedSpacesOverviewComponent]

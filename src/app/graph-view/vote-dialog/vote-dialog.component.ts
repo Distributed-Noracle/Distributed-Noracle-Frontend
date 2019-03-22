@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MD_DIALOG_DATA, MdDialogRef} from '@angular/material';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {RelationPickerDialogComponent} from '../relation-picker-dialog/relation-picker-dialog.component';
 
 @Component({
@@ -9,8 +9,8 @@ import {RelationPickerDialogComponent} from '../relation-picker-dialog/relation-
 })
 export class VoteDialogComponent implements OnInit {
 
-  constructor(public dialogRef: MdDialogRef<RelationPickerDialogComponent>,
-              @Inject(MD_DIALOG_DATA) public data: any) {
+  constructor(public dialogRef: MatDialogRef<RelationPickerDialogComponent>,
+              @Inject(MAT_DIALOG_DATA) public data: any) {
     data.lines = data.message.split('\n');
   }
 

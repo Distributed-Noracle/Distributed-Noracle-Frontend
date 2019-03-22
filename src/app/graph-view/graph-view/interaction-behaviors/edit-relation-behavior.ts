@@ -1,5 +1,5 @@
 import {GraphViewService} from '../graph-view.service';
-import {MdDialog} from '@angular/material';
+import {MatDialog} from '@angular/material';
 import {AgentService} from '../../../shared/agent/agent.service';
 import {EdgeInteractionBehavior} from './edge-interaction-behavior';
 import {Edge} from '../graph-data-model/edge';
@@ -10,7 +10,7 @@ import {VoteDialogComponent} from '../../vote-dialog/vote-dialog.component';
 export class EditRelationBehavior extends EdgeInteractionBehavior {
 
   constructor(private graphViewService: GraphViewService, private agentService: AgentService,
-              private dialog: MdDialog) {
+              private dialog: MatDialog) {
     super();
   }
 
@@ -27,7 +27,7 @@ export class EditRelationBehavior extends EdgeInteractionBehavior {
             selectedRelationType: edge.relation.name
           }
         });
-        return dialogRef.afterClosed().toPromise().then(result => {
+        return <Promise<any>>dialogRef.afterClosed().toPromise().then(result => {
           if (result !== undefined) {
             return this.graphViewService.updateRelation(edge.id, result);
           }
@@ -48,9 +48,9 @@ export class EditRelationBehavior extends EdgeInteractionBehavior {
             vote: myVote !== undefined ? myVote.value : 0
           }
         });
-        return dialogRef.afterClosed().toPromise().then(result => {
+        return <Promise<any>>dialogRef.afterClosed().toPromise().then(result => {
           if (result !== undefined) {
-            this.graphViewService.updateRelationVote(edge.id, agent.agentid, result);
+            return this.graphViewService.updateRelationVote(edge.id, agent.agentid, result);
           }
         });
       }

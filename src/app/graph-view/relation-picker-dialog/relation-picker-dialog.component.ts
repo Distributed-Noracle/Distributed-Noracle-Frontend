@@ -1,6 +1,6 @@
 import {Component, Inject, Input, OnInit} from '@angular/core';
 import {RelationType} from '../graph-view/graph-data-model/relation-type.enum';
-import {MD_DIALOG_DATA, MdDialogRef} from '@angular/material';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 @Component({
   selector: 'dnor-relation-picker-dialog',
@@ -9,8 +9,8 @@ import {MD_DIALOG_DATA, MdDialogRef} from '@angular/material';
 })
 export class RelationPickerDialogComponent implements OnInit {
 
-  constructor(public dialogRef: MdDialogRef<RelationPickerDialogComponent>,
-              @Inject(MD_DIALOG_DATA) public data: any) {
+  constructor(public dialogRef: MatDialogRef<RelationPickerDialogComponent>,
+              @Inject(MAT_DIALOG_DATA) public data: any) {
     data.lines = data.message.split('\n');
     data.selectedRelationType = RelationType.FollowUp;
   }

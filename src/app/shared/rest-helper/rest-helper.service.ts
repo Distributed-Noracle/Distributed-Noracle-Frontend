@@ -2,13 +2,14 @@ import {Injectable} from '@angular/core';
 import {Headers, Http, Response} from '@angular/http';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
 import {environment} from '../../../environments/environment';
+import {retry} from 'rxjs/operators';
 
 const HOST_URL = environment.hostUrl;
 
 @Injectable()
 export class RestHelperService {
   private CORE_BASE_URL = HOST_URL + '/las2peer';
-  private BASE_URL = HOST_URL + '/distributed-noracle/v0.5.0';
+  private BASE_URL = HOST_URL + '/distributed-noracle/v0.7.0';
   private isMock = false;
 
   constructor(private OidcSecurityService: OidcSecurityService, private http: Http) {
@@ -17,31 +18,29 @@ export class RestHelperService {
   public get(path: string): Promise<Response> {
     return this.http.get(this.BASE_URL + path,
       {headers: this.getHeaders()}
-    ).retry(3).toPromise();
+    ).pipe(retry(3)).toPromise();
   }
 
   public getAbsoulte(absolutePath: string): Promise<Response> {
-    return this.http.get(absolutePath,
-      {headers: this.getHeaders()}
-    ).retry(3).toPromise();
+    return this.http.get(absolutePath, {headers: this.getHeaders()}).pipe(retry(3)).toPromise();
   }
 
   public put(path: string, body: any): Promise<Response> {
     return this.http.put(this.BASE_URL + path,
       body,
       {headers: this.getHeaders()}
-    ).retry(3).toPromise();
+    ).pipe(retry(3)).toPromise();
   }
 
   public post(path: string, body: any): Promise<Response> {
     return this.http.post(this.BASE_URL + path,
       body,
       {headers: this.getHeaders()}
-    ).retry(3).toPromise();
+    ).pipe(retry(3)).toPromise();
   }
 
   public getCurrentAgent(): Promise<Response> {
-    return this.http.get(this.CORE_BASE_URL + '/currentagent', {headers: this.getHeaders()}).retry(3).toPromise();
+    return this.http.get(this.CORE_BASE_URL + '/currentagent', {headers: this.getHeaders()}).pipe(retry(3)).toPromise();
   }
 
   private getHeaders(): Headers {

@@ -4,8 +4,8 @@ import {GraphViewComponent} from './graph-view/graph-view.component';
 import {D3Service} from 'd3-ng2-service';
 import {GraphViewPageComponent} from './graph-view-page/graph-view-page.component';
 import {
-  MdButtonModule, MdDialogModule, MdFormFieldModule, MdInputModule, MdProgressSpinnerModule,
-  MdRadioModule, MdSnackBarModule
+  MatButtonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatProgressSpinnerModule,
+  MatRadioModule, MatSnackBarModule
 } from '@angular/material';
 import {FormsModule} from '@angular/forms';
 import {GraphViewService} from './graph-view/graph-view.service';
@@ -18,13 +18,13 @@ import {VoteDialogComponent} from './vote-dialog/vote-dialog.component';
 @NgModule({
   imports: [
     CommonModule,
-    MdButtonModule,
-    MdRadioModule,
-    MdDialogModule,
-    MdSnackBarModule,
-    MdProgressSpinnerModule,
-    MdFormFieldModule,
-    MdInputModule,
+    MatButtonModule,
+    MatRadioModule,
+    MatDialogModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule,
+    MatFormFieldModule,
+    MatInputModule,
     FormsModule,
     FlexLayoutModule,
     SharedModule

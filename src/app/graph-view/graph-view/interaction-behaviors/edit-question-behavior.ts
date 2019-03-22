@@ -1,15 +1,16 @@
 import {NodeInteractionBehavior} from './node-interaction-behavior';
 import {GraphNode} from '../graph-data-model/graph-node';
 import {GraphViewService} from '../graph-view.service';
-import {MdDialog} from '@angular/material';
+import {MatDialog} from '@angular/material';
 import {CreateQuestionDialogComponent} from '../../create-question-dialog/create-question-dialog.component';
 import {AgentService} from '../../../shared/agent/agent.service';
 import {VoteDialogComponent} from '../../vote-dialog/vote-dialog.component';
+import {Question} from '../../../shared/rest-data-model/question';
 
 export class EditQuestionBehavior extends NodeInteractionBehavior {
 
   constructor(private graphViewService: GraphViewService, private agentService: AgentService,
-              private dialog: MdDialog) {
+              private dialog: MatDialog) {
     super();
   }
 
@@ -24,9 +25,9 @@ export class EditQuestionBehavior extends NodeInteractionBehavior {
             text: node.question.text
           }
         });
-        return dialogRef.afterClosed().toPromise().then(result => {
+        return <Promise<any>>dialogRef.afterClosed().toPromise().then(result => {
           if (result !== undefined) {
-            return this.graphViewService.updateQuestion(node.id, result);
+            return this.graphViewService.updateQuestion(node.id, <string>result);
           }
         });
       } else {
@@ -42,9 +43,9 @@ export class EditQuestionBehavior extends NodeInteractionBehavior {
             vote: myVote !== undefined ? myVote.value : 0
           }
         });
-        return dialogRef.afterClosed().toPromise().then(result => {
+        return <Promise<any>>dialogRef.afterClosed().toPromise().then(result => {
           if (result !== undefined) {
-            this.graphViewService.updateQuestionVote(node.id, agent.agentid, result);
+            return this.graphViewService.updateQuestionVote(node.id, agent.agentid, <number>result);
           }
         });
       }
