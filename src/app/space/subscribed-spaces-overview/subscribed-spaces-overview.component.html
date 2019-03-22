@@ -10,10 +10,17 @@
       <md-icon svgIcon="img:bot"></md-icon>
     </button>
     <md-menu #menu [overlapTrigger]="false">
-      <a md-menu-item (click)="addBot(space)">
+      <button md-menu-item [matMenuTriggerFor]="menu2">
           <md-icon class="menuItem" svgIcon="img:add"></md-icon>
-          <span>Add Bot to Space</span>
-        </a>
+          <span>Add Bot</span>
+          <md-menu #menu2 [overlapTrigger]="false">
+            <md-list-item *ngFor="let bot of bots">
+              <a md-menu-item (click)="addBot(space,bot.name,bot.active)">
+              <md-icon class="menuItem" svgIcon="{{bot.icon}}"></md-icon>
+              <span>{{bot.name}}</span></a>
+            </md-list-item>
+          </md-menu>
+        </button>
       <a md-menu-item target="_blank" href="{{botWidgetUrl}}/widgets/train.html?unit={{space.space.spaceId}}">
         <md-icon class="menuItem" svgIcon="img:train"></md-icon>
         <span>Train Bot</span></a>
