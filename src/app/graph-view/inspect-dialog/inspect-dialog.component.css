@@ -1,0 +1,16 @@
+blockquote {
+    font-style: italic;
+    font-size: x-large;
+}
+
+.by {
+    text-align: right;
+    width: 95%;
+    font-size: small;
+}
+
+.votes {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}

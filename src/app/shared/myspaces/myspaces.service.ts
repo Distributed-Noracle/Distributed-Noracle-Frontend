@@ -3,17 +3,29 @@ import {AgentService} from '../agent/agent.service';
 import {SpaceService} from '../space/space.service';
 import {SpaceSubscription} from '../rest-data-model/spacesubscription';
 import {Space} from '../rest-data-model/space';
-import {Subject, Observable} from 'rxjs';
+import {Subject} from 'rxjs';
+import {SpaceSubscriber} from '../rest-data-model/spacesubscriber';
 
 @Injectable()
 export class MyspacesService {
   private myspacesSubject = new Subject<{ subscription: SpaceSubscription, space: Space }[]>();
+  private subscribers = new Map<string, Subject<SpaceSubscriber[]>>();
 
   constructor(private agentService: AgentService, private spaceService: SpaceService) {
   }
 
-  public getMySpacesObservable(): Observable<{ subscription: SpaceSubscription, space: Space }[]> {
+  public getMySpacesObservable(): Subject<{ subscription: SpaceSubscription, space: Space }[]> {
     return this.myspacesSubject;
+  }
+
+  public getSubscribersObservable(spaceId: string): Subject<SpaceSubscriber[]> {
+    const subs = this.subscribers.get(spaceId);
+    if (subs) {
+      return subs;
+    } else {
+      this.subscribers.set(spaceId, new Subject<SpaceSubscriber[]>());
+      return this.subscribers.get(spaceId);
+    }
   }
 
   public getMySpaces(): Promise<{ subscription: SpaceSubscription, space: Space }[]> {
@@ -50,4 +62,13 @@ export class MyspacesService {
     this.agentService.putSelectionOfSubscription(spaceId, selection).then(() => this.getMySpaces().then((s) => s));
   }
 
+
+  public getSpaceSubscribers(id): Promise<SpaceSubscriber[]> {
+    return new Promise(resolve => {
+      this.spaceService.getSpaceSubscribers(id).then(subs => {
+        this.getSubscribersObservable(id).next(subs);
+        resolve(subs);
+      });
+    });
+  }
 }

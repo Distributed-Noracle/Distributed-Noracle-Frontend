@@ -15,9 +15,11 @@ import {AddRelationBehavior} from './interaction-behaviors/add-relation-behavior
 import {Subscription} from 'rxjs';
 import {MatDialog} from '@angular/material';
 import {AgentService} from '../../shared/agent/agent.service';
+import {QuestionVoteService} from '../../shared/question-vote/question-vote.service';
 import {EdgeInteractionBehavior} from './interaction-behaviors/edge-interaction-behavior';
 import {EditRelationBehavior} from './interaction-behaviors/edit-relation-behavior';
 import {UpdateData} from './graph-data-model/update-data';
+import {Question} from '../../shared/rest-data-model/question';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -45,7 +47,8 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
 
 
   constructor(private graphViewService: GraphViewService, private agentService: AgentService,
-              private d3Service: D3Service, private dialog: MatDialog) {
+              private questionVoteService: QuestionVoteService, private d3Service: D3Service,
+              private dialog: MatDialog) {
     this.d3 = d3Service.getD3();
     this.transform = this.d3.zoomIdentity;
   }
@@ -60,11 +63,10 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     this.d3Sim.force('collide', this.d3.forceCollide((node) => (node as GraphNode).radius * 1.2));
 
     this.updateSubscription =
-      this.graphViewService.getUpdateObservable().subscribe((updateData) => this.processUpdate(updateData));
+      this.graphViewService.getUpdateObservable().subscribe(updateData => this.processUpdate(updateData));
     this.initData();
     this.initVisualization();
     this.updateInteractionMode();
-
   }
 
   ngOnDestroy() {
@@ -82,8 +84,6 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       this.network.getNodes().forEach((node) => {
         node.isSelected = (this.selectedQuestions.indexOf(node.id) !== -1);
       });
-      this.d3Sim.force('center', this.d3.forceCenter(this.width / 2, this.height / 2));
-      this.d3Sim.alpha(1).restart();
       this.updateInteractionMode();
     }
   }
@@ -95,8 +95,20 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     d3Sim.nodes(this.network.getNodes()).on('tick', () => {
       context.save();
       context.clearRect(0, 0, this.width, this.height);
+
+      const seedQuestion = this.graphViewService.getSeedQuestion();
+      if (seedQuestion !== null) {
+        context.fillStyle = '#bbb';
+        context.font = 'bold italic 25px sans-serif';
+        context.textAlign = 'center';
+        context.textBaseline = 'top';
+
+        context.fillText(seedQuestion.text, this.width / 2, 20);
+      }
+
       context.translate(this.transform.x, this.transform.y);
       context.scale(this.transform.k, this.transform.k);
+
       this.network.getEdges().forEach((e: Edge) => {
         // draw edge
         e.draw(context as CanvasRenderingContext2D);
@@ -117,6 +129,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       // no change
       return;
     }
+
     if (this.interactionMode === GraphInteractionMode.SelectAndNavigate) {
       // TODO: review: a new behavior every time? maybe use services?
       this.setSelectionBehaviors(new ChangeNodeSelectionBehavior(this.network, this.graphViewService), null);
@@ -124,7 +137,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       this.setSelectionBehaviors(new AddChildNodeBehavior(this.graphViewService, this.dialog), null);
     } else if (this.interactionMode === GraphInteractionMode.AddRelation) {
       this.setSelectionBehaviors(new AddRelationBehavior(this.graphViewService, this.dialog), null);
-    } else if (this.interactionMode === GraphInteractionMode.EditAndAssess) {
+    } else if (this.interactionMode === GraphInteractionMode.Inspect) {
       this.setSelectionBehaviors(
         new EditQuestionBehavior(this.graphViewService, this.agentService, this.dialog),
         new EditRelationBehavior(this.graphViewService, this.agentService, this.dialog)
@@ -132,9 +145,11 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     } else {
       this.setDragAndZoomBehavior();
     }
+
+    this.activatedInteractionMode = this.interactionMode;
   }
 
-  private  setDragAndZoomBehavior() {
+  private setDragAndZoomBehavior() {
     const canvas = this.canvas;
     const d3Sim = this.d3Sim;
 
@@ -200,6 +215,9 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     this.d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.network.getEdges())
       .distance((link, i, links) => (link as Edge).getDistance());
     this.d3Sim.alpha(1).restart();
+    this.network.getNodes().forEach(node => {
+      node.question.followUps = this.network.countInvisibleNeighbors(node);
+    });
   }
 
   private setSelectionBehaviors(nodeInteractionBehavior: NodeInteractionBehavior,
@@ -322,11 +340,14 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
   private processUpdate(updateData: UpdateData) {
     const context = this.d3Root.nativeElement.getContext('2d');
     const isSelected = this.selectedQuestions !== undefined &&
-      this.selectedQuestions.findIndex((id) => id === updateData.question.questionId) !== -1;
-    if (this.network.addOrUpdateNode(
-        new GraphNode(context, updateData.question.questionId,
+    this.selectedQuestions.findIndex((id) => id === updateData.question.questionId) !== -1;
+    const seedQuestion = this.graphViewService.getSeedQuestion();
+    const isSeed = (seedQuestion ? seedQuestion.questionId : null) === updateData.question.questionId;
+    const node = new GraphNode(context, updateData.question.questionId,
           updateData.question, updateData.questionAuthor, updateData.questionVotes,
-          updateData.relations, updateData.relationAuthors, updateData.relationVotes, isSelected))) {
+          updateData.relations, updateData.relationAuthors, updateData.relationVotes,
+          isSelected, isSeed);
+    if (this.network.addOrUpdateNode(node)) {
       this.updateSimulation();
     }
     if (isSelected) {

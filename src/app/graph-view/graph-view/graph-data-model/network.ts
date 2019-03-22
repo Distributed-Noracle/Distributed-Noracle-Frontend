@@ -1,5 +1,6 @@
 import {GraphNode} from './graph-node';
 import {Edge} from './edge';
+import { Relation } from '../../../shared/rest-data-model/relation';
 /**
  * Created by bgoeschlberger on 28.09.2017.
  */
@@ -39,7 +40,12 @@ export class Network {
       hasChanged = true;
     }
     nodeToAdd.relations.forEach((r, i) => {
-      if (this.edges.findIndex((e) => e.id === r.relationId) === -1) {
+      const index = this.edges.findIndex((e) => e.id === r.relationId);
+      const needsUpdate = index !== -1 && (!this.edges[index].relation.equals || !this.edges[index].relation.equals(r));
+      if (needsUpdate) {
+        this.edges.splice(index, 1);
+      }
+      if (index === -1 || needsUpdate) {
         // edge not yet in network
         const node1 = this.nodes.find((n) => r.firstQuestionId === n.id);
         const node2 = this.nodes.find((n) => n.id === r.secondQuestionId);
@@ -96,5 +102,16 @@ export class Network {
         }
       }
     });
+  }
+
+  public countInvisibleNeighbors(node: GraphNode) {
+    let sum = 0;
+    node.relations.forEach(relation => {
+      const other = relation.firstQuestionId === node.question.questionId ? relation.secondQuestionId : relation.firstQuestionId;
+      if (this.nodes.findIndex(n => n.question.questionId === other) === -1) {
+        sum++;
+      }
+    });
+    return sum;
   }
 }

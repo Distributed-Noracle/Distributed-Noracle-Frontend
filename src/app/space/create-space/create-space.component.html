@@ -3,9 +3,9 @@
 <form #creationForm="ngForm" (ngSubmit)="createSpace()">
   <p>
     <mat-form-field>
-      <input matInput id="name" name="space.name" placeholder="Space Name" [(ngModel)]="space.name" maxlength="20"
+      <input matInput id="name" name="space.name" placeholder="Space Name" [(ngModel)]="space.name" maxlength="40"
              required/>
-      <mat-hint align="end">{{space.name.length}} / 20</mat-hint>
+      <mat-hint align="end">{{space.name.length}} / 40</mat-hint>
     </mat-form-field>
   </p>
   <p>

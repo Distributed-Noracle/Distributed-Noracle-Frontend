@@ -1,0 +1,38 @@
+<div md-dialog-content>
+  <div>
+    <blockquote *ngIf="!editingQuestion">"{{data.text}}" 
+      <button md-icon-button (click)="editingQuestion=true;" *ngIf="data.isAuthor" color="secondary">
+        <md-icon>edit</md-icon>
+      </button>
+    </blockquote>
+    <md-form-field *ngIf="editingQuestion">
+      <textarea mdInput tabindex="1" [(ngModel)]="data.text"></textarea>
+    </md-form-field>
+    <button md-icon-button *ngIf="editingQuestion" (click)="editingQuestion=false;" color="secondary">
+      <md-icon>arrow_back</md-icon>
+    </button>
+  </div>
+  <div class="by">
+    {{data.authorName}} ({{data.lastModified}}) 
+  </div>
+  <br>
+  <div class="votes" style="width: 100px">
+    <dnor-vote-donut descriptor="vote">
+      <dnor-donut-item name="Good" color="#31ca31" [count]="data.votes.good"></dnor-donut-item>
+      <dnor-donut-item name="Bad" color="red" [count]="data.votes.bad"></dnor-donut-item>
+      <dnor-donut-item name="Neutral" color="grey" [count]="data.votes.neutral"></dnor-donut-item>
+    </dnor-vote-donut>
+  </div>
+
+  <md-radio-group *ngIf="!data.isAuthor" [(ngModel)]="data.vote">
+    <p><md-radio-button [value]="1">I like that question. It is particularly helpful for me.</md-radio-button></p>
+    <p><md-radio-button [value]="0">I am undecided whether this question is helpful for me.</md-radio-button></p>
+    <p><md-radio-button [value]="-1">This question did not help me.</md-radio-button></p>
+  </md-radio-group>
+
+</div>
+
+<div md-dialog-actions>
+  <button md-button [md-dialog-close]="data.text" tabindex="2">Save</button>
+  <button md-button (click)="onCancel()" tabindex="-1">Cancel</button>
+</div>
