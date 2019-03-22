@@ -73,6 +73,40 @@
                   "with": "src/environments/environment.las2peer.ts"
                 }
               ]
+            },
+            "contdep": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.contdep.ts"
+                }
+              ]
+            },
+            "multiplex": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.multiplex.ts"
+                }
+              ]
             }
           }
         },
@@ -90,6 +124,12 @@
             },
             "las2peer": {
               "browserTarget": "Distributed Noracle Frontend:build:las2peer"
+            },
+            "contdep": {
+              "browserTarget": "Distributed Noracle Frontend:build:contdep"
+            },
+            "multiplex": {
+              "browserTarget": "Distributed Noracle Frontend:build:multiplex"
             }
           }
         },
