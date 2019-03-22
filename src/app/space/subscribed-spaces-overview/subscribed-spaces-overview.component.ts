@@ -15,7 +15,7 @@ import {RestHelperService} from '../../shared/rest-helper/rest-helper.service';
 })
 export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
   public spaces: { space: Space, subscription: SpaceSubscription }[];
-  public bots: {name: string, active: boolean, icon: string}[] = [];
+  public bots: {name: string, active: {}}[] = [];
   public botWidgetUrl: string;
   private spaceSubscription: Subscription;
   private botUri: string;
@@ -49,16 +49,20 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
     xmlhttp.onreadystatechange = function(){
        if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
           const botj = JSON.parse(this.responseText);
-          for (const key of Object.keys(botj)) {
-            const bs = botj[key].active === 'true';
-            if (bs) {
-              const b = {'name': key, 'active': bs, 'icon': 'img:pause'};
-              bots.push(b);
-            }else {
-              const b = {'name': key, 'active': bs, 'icon': 'img:play'};
-              bots.push(b);
+          for (const bname of Object.keys(botj)) {
+            var b = {'name': bname, 'active': {}};
+            for (const uname of Object.keys(botj[bname]["active"])) {  
+                const bs = botj[bname]["active"][uname] === true;
+                var bstatus = {};
+                bstatus['active'] = bs;
+                if(bs){
+                   bstatus['icon'] = 'img:pause';
+                }else{
+                   bstatus['icon'] = 'img:play';
+                }
+                b["active"][uname] = bstatus;
             }
-
+            bots.push(b);
           }
        }
     };
@@ -106,9 +110,22 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
     document.body.removeChild(textArea);
   }
 
+  getIcon(bot:{}, spaceId: String){
+      if(bot['active'][spaceId]==null){
+        return 'img:play';
+      }
+      return bot['active'][spaceId]['icon'];
+  }
 
-
-  addBot(myspace: { space: Space, subscription: SpaceSubscription }, bot: String, active: boolean) {
+  addBot(myspace: { space: Space, subscription: SpaceSubscription }, botObject: {name: String, active: {}}) {
+    const bot = botObject.name;
+    var active = false;
+    if(botObject.active[myspace.space.spaceId]==null){
+        botObject['active'][myspace.space.spaceId] = {};
+    }else{
+        active = botObject['active'][myspace.space.spaceId]['active'];
+    }
+    
     if (active === false) {
       let url = window.location.href;
       url = url.substring(0, url.indexOf('/myspaces')) + `/spaces/${myspace.space.spaceId}?pw=${myspace.space.spaceSecret}`;
@@ -148,8 +165,8 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
             });
             bots.forEach(function(element) {
               if (element.name === bot) {
-                element.icon = 'img:pause';
-                element.active = true;
+                element.active[myspace.space.spaceId]['icon'] = 'img:pause';
+                element.active[myspace.space.spaceId]['active'] = true;
               }
             });
          }else if (xmlhttp.readyState === 4) {
@@ -167,15 +184,15 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
       this.bots.forEach(function(element) {
         if (element.name === bot) {
           const xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
-            xmlhttp.open('DELETE', botUri + '/' + bot);
+            xmlhttp.open('DELETE', botUri + '/' + bot + '/' + myspace.space.spaceId);
             xmlhttp.send();
             xmlhttp.onreadystatechange = function(){
                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
                   snackBar.open('Bot paused!', 'hide', {
                     duration: 2000,
                   });
-                  element.icon = 'img:play';
-                  element.active = false;
+                element.active[myspace.space.spaceId]['icon'] = 'img:play';
+                element.active[myspace.space.spaceId]['active'] = false;
                }else if (xmlhttp.readyState === 4) {
                   snackBar.open('Bot could not be paused!', 'hide', {
                     duration: 2000,

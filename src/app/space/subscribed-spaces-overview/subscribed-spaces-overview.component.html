@@ -15,15 +15,15 @@
           <span>Add Bot</span>
           <mat-menu #menu2 [overlapTrigger]="false">
             <mat-list-item *ngFor="let bot of bots">
-              <a mat-menu-item (click)="addBot(space,bot.name,bot.active)">
-              <mat-icon class="menuItem" svgIcon="{{bot.icon}}"></mat-icon>
+              <a mat-menu-item (click)="addBot(space,bot)">
+              <mat-icon class="menuItem" svgIcon="{{getIcon(bot,space.space.spaceId)}}"></mat-icon>
               <span>{{bot.name}}</span></a>
             </mat-list-item>
           </mat-menu>
         </button>
-      <a mat-menu-item target="_blank" href="{{botWidgetUrl}}/widgets/train.html?unit={{space.space.spaceId}}">
+      <!--<a mat-menu-item target="_blank" href="{{botWidgetUrl}}/widgets/train.html?unit={{space.space.spaceId}}">
         <mat-icon class="menuItem" svgIcon="img:train"></mat-icon>
-        <span>Train Bot</span></a>
+        <span>Train Bot</span></a>-->
     </mat-menu>
   </mat-list-item>
 </mat-list>
