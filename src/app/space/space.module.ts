@@ -4,7 +4,10 @@ import {CreateSpaceComponent} from './create-space/create-space.component';
 import {SubscribedSpacesOverviewComponent} from './subscribed-spaces-overview/subscribed-spaces-overview.component';
 import {SharedModule} from '../shared/shared.module';
 import {RouterModule} from '@angular/router';
-import {MatButtonModule, MatIconModule, MatInputModule, MatListModule, MatSnackBarModule, MatMenuModule} from '@angular/material';
+import {
+  MatButtonModule, MatIconModule, MatInputModule, MatListModule, MatSnackBarModule, MatMenuModule,
+  MatFormFieldModule, MatCardModule
+} from '@angular/material';
 import {FormsModule} from '@angular/forms';
 
 @NgModule({
@@ -18,6 +21,8 @@ import {FormsModule} from '@angular/forms';
     MatListModule,
     MatIconModule,
     MatSnackBarModule,
+    MatFormFieldModule,
+    MatCardModule,
     MatMenuModule
   ],
   declarations: [CreateSpaceComponent, SubscribedSpacesOverviewComponent],
