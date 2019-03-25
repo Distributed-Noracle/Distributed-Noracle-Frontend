@@ -1,7 +1,7 @@
 import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {GraphInteractionMode} from '../graph-view/graph-data-model/graph-interaction-mode.enum';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Subscription} from 'rxjs/Subscription';
+import {Subscription} from 'rxjs';
 import {MyspacesService} from '../../shared/myspaces/myspaces.service';
 import {SpaceSubscriber} from '../../shared/rest-data-model/spacesubscriber';
 

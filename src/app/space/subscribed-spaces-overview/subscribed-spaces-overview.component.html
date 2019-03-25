@@ -1,34 +1,34 @@
 <h1 class="mat-h1">My Spaces</h1>
-<md-list>
-  <md-list-item *ngFor="let space of spaces">
-    <a md-button color="primary" [routerLink]="['/spaces', space.space.spaceId]"
+<mat-list>
+  <mat-list-item *ngFor="let space of spaces">
+    <a mat-button color="primary" [routerLink]="['/spaces', space.space.spaceId]"
        [queryParams]="{sq: getStringifiedParamArray(space.subscription)}">{{space.space.name}}</a>
-    <button md-icon-button (click)="copyInviteUrl(space)" color="primary">
-      <md-icon>share</md-icon>
+    <button mat-icon-button (click)="copyInviteUrl(space)" color="primary">
+      <mat-icon>share</mat-icon>
     </button>
-    <button md-icon-button [mdMenuTriggerFor]="menu" color="primary">
-      <md-icon svgIcon="img:bot"></md-icon>
+    <button mat-icon-button [matMenuTriggerFor]="menu" color="primary">
+      <mat-icon svgIcon="img:bot"></mat-icon>
     </button>
-    <md-menu #menu [overlapTrigger]="false">
-      <button md-menu-item [matMenuTriggerFor]="menu2">
-          <md-icon class="menuItem" svgIcon="img:add"></md-icon>
+    <mat-menu #menu [overlapTrigger]="false">
+      <button mat-menu-item [matMenuTriggerFor]="menu2">
+          <mat-icon class="menuItem" svgIcon="img:add"></mat-icon>
           <span>Add Bot</span>
-          <md-menu #menu2 [overlapTrigger]="false">
-            <md-list-item *ngFor="let bot of bots">
-              <a md-menu-item (click)="addBot(space,bot.name,bot.active)">
-              <md-icon class="menuItem" svgIcon="{{bot.icon}}"></md-icon>
+          <mat-menu #menu2 [overlapTrigger]="false">
+            <mat-list-item *ngFor="let bot of bots">
+              <a mat-menu-item (click)="addBot(space,bot)">
+              <mat-icon class="menuItem" svgIcon="{{getIcon(bot,space.space.spaceId)}}"></mat-icon>
               <span>{{bot.name}}</span></a>
-            </md-list-item>
-          </md-menu>
+            </mat-list-item>
+          </mat-menu>
         </button>
-      <a md-menu-item target="_blank" href="{{botWidgetUrl}}/widgets/train.html?unit={{space.space.spaceId}}">
-        <md-icon class="menuItem" svgIcon="img:train"></md-icon>
-        <span>Train Bot</span></a>
-    </md-menu>
-  </md-list-item>
-</md-list>
+      <!--<a mat-menu-item target="_blank" href="{{botWidgetUrl}}/widgets/train.html?unit={{space.space.spaceId}}">
+        <mat-icon class="menuItem" svgIcon="img:train"></mat-icon>
+        <span>Train Bot</span></a>-->
+    </mat-menu>
+  </mat-list-item>
+</mat-list>
 
 
 
 <br>
-<button md-raised-button color="primary" routerLink="/spaces/create">Create new Space</button>
+<button mat-raised-button color="primary" routerLink="/spaces/create">Create new Space</button>

@@ -1,8 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {Observable} from 'rxjs/Observable';
+import {Observable, Subscription} from 'rxjs';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
-import {Subscription} from 'rxjs/Subscription';
 
 @Injectable()
 export class AuthGuardService implements CanActivate {

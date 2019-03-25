@@ -1,29 +1,24 @@
-import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
-import {OidcSecurityService, OidcSecurityValidation} from 'angular-auth-oidc-client';
+import {Component,  OnInit} from '@angular/core';
+import {OidcSecurityService, TokenHelperService} from 'angular-auth-oidc-client';
+import {take, filter} from 'rxjs/operators';
 
 @Component({
   selector: 'dnor-login',
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.css']
 })
-export class LoginPageComponent implements OnInit, OnDestroy {
+export class LoginPageComponent implements OnInit {
 
   constructor(public oidcSecurityService: OidcSecurityService) {
-    if (this.oidcSecurityService.moduleSetup) {
+    this.oidcSecurityService.getIsModuleSetup().pipe(
+      filter((isModuleSetup: boolean) => isModuleSetup),
+      take(1)
+    ).subscribe((isModuleSetup: boolean) => {
       this.doLogin();
-    } else {
-      this.oidcSecurityService.onModuleSetup.subscribe(() => {
-        this.doLogin();
-      });
-    }
+    });
   }
 
   ngOnInit() {
-  }
-
-
-  ngOnDestroy(): void {
-    this.oidcSecurityService.onModuleSetup.unsubscribe();
   }
 
   login() {
@@ -38,7 +33,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
       // }, 200);
     } else {
       // fixing messed up signature check in OidcSecurityValidation
-      OidcSecurityValidation.prototype.getHeaderFromToken = function (token, encode) {
+      TokenHelperService.prototype.getHeaderFromToken = function (token, encode) {
         let data = {};
         if (typeof token !== 'undefined') {
           const encoded = token.split('.')[0];
@@ -50,7 +45,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
         data['kid'] = 'rsa1';
         return data;
       };
-      this.oidcSecurityService.authorizedCallback();
+      this.oidcSecurityService.authorizedImplicitFlowCallback();
     }
   }
 }

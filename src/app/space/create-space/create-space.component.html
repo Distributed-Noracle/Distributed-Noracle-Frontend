@@ -1,18 +1,21 @@
-<h1>Create a new Space:</h1>
-
-<form #creationForm="ngForm" (ngSubmit)="createSpace()">
-  <p>
-    <md-form-field>
-      <input mdInput id="name" name="space.name" placeholder="Space Name" [(ngModel)]="space.name" maxlength="40"
-             required/>
-      <md-hint align="end">{{space.name.length}} / 40</md-hint>
-    </md-form-field>
-  </p>
-  <p>
-    <md-form-field>
-    <textarea mdInput id="question" name="question.text" placeholder="Seed Question" [(ngModel)]="question.text"
+<mat-card>
+  <mat-card-title>
+    Create a new Space:
+  </mat-card-title>
+  <form #creationForm="ngForm" (ngSubmit)="createSpace()">
+    <p>
+      <mat-form-field appearance="legacy">
+        <input matInput id="name" name="space.name" placeholder="Space Name" [(ngModel)]="space.name" maxlength="40"
+               required/>
+        <mat-hint align="end">{{space.name.length}} / 40</mat-hint>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field>
+    <textarea matInput id="question" name="question.text" placeholder="Seed Question" [(ngModel)]="question.text"
               maxlength="140" required></textarea>
-    </md-form-field>
-  </p>
-  <button type="submit" md-raised-button color="primary" [disabled]="!creationForm.form.valid">Create</button>
-</form>
+      </mat-form-field>
+    </p>
+    <button type="submit" mat-raised-button color="primary" [disabled]="!creationForm.form.valid">Create</button>
+  </form>
+</mat-card>

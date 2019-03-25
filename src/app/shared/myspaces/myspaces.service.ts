@@ -3,8 +3,7 @@ import {AgentService} from '../agent/agent.service';
 import {SpaceService} from '../space/space.service';
 import {SpaceSubscription} from '../rest-data-model/spacesubscription';
 import {Space} from '../rest-data-model/space';
-import {Subject} from 'rxjs/Subject';
-import {Observable} from 'rxjs/Observable';
+import {Subject} from 'rxjs';
 import {SpaceSubscriber} from '../rest-data-model/spacesubscriber';
 
 @Injectable()

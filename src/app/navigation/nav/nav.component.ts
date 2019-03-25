@@ -24,7 +24,8 @@ export class NavComponent implements OnInit {
       this.oidcSecurityService.logoff();
       this.authGuardService.logoff();
       // XXX: hack because we don't support end session
-      const windowref = window.open('https://api.learning-layers.eu/o/oauth2/logout', '', '_blank').close();
+      const windowref = window.open('https://api.learning-layers.eu/o/oauth2/logout', '', '_blank');
+      setTimeout(() => { windowref.close(); }, 500);
       this.router.navigate(['login']);
     }
   }

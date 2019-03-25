@@ -1,5 +1,5 @@
 import {GraphViewService} from '../graph-view.service';
-import {MdDialog} from '@angular/material';
+import {MatDialog} from '@angular/material';
 import {AgentService} from '../../../shared/agent/agent.service';
 import {EdgeInteractionBehavior} from './edge-interaction-behavior';
 import {Edge} from '../graph-data-model/edge';
@@ -12,7 +12,7 @@ import { RelationType } from '../graph-data-model/relation-type.enum';
 export class EditRelationBehavior extends EdgeInteractionBehavior {
 
   constructor(private graphViewService: GraphViewService, private agentService: AgentService,
-              private dialog: MdDialog) {
+              private dialog: MatDialog) {
     super();
   }
 

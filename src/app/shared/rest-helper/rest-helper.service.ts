@@ -3,6 +3,7 @@ import {Headers, Http, Response} from '@angular/http';
 import {Router} from '@angular/router';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
 import {environment} from '../../../environments/environment';
+import {retry} from 'rxjs/operators';
 
 const HOST_URLS = environment.hostUrls;
 
@@ -13,18 +14,18 @@ export class RestHelperService {
   private isMock = false;
   private oidcName = '';
 
-  constructor(private OidcSecurityService: OidcSecurityService, private http: Http, 
+  constructor(private OidcSecurityService: OidcSecurityService, private http: Http,
     private router: Router) {
     OidcSecurityService.getUserData().subscribe((userData: any) => {
       this.oidcName = userData.email;
     });
   }
 
-  public async get(path: string): Promise<Response> {
+  public async get(path: string): Promise<any> {
     try {
       const res = await this.http.get(this.getBaseURL() + path,
         { headers: this.getHeaders() }
-      ).retry(3).toPromise();
+      ).pipe(retry(3)).toPromise();
       return res;
     } catch (error) {
       if (error.status === 401) {
@@ -35,27 +36,25 @@ export class RestHelperService {
   }
 
   public getAbsoulte(absolutePath: string): Promise<Response> {
-    return this.http.get(absolutePath,
-      {headers: this.getHeaders()}
-    ).retry(3).toPromise();
+    return this.http.get(absolutePath, {headers: this.getHeaders()}).pipe(retry(3)).toPromise();
   }
 
   public put(path: string, body: any): Promise<Response> {
     return this.http.put(this.getBaseURL() + path,
       body,
       {headers: this.getHeaders()}
-    ).retry(3).toPromise();
+    ).pipe(retry(3)).toPromise();
   }
 
   public post(path: string, body: any): Promise<Response> {
     return this.http.post(this.getBaseURL() + path,
       body,
       {headers: this.getHeaders()}
-    ).retry(3).toPromise();
+    ).pipe(retry(3)).toPromise();
   }
 
   public getCurrentAgent(): Promise<Response> {
-    return this.http.get(this.getCoreBaseURL() + '/currentagent', {headers: this.getHeaders()}).retry(3).toPromise();
+    return this.http.get(this.getCoreBaseURL() + '/currentagent', {headers: this.getHeaders()}).pipe(retry(3)).toPromise();
   }
 
   private getHeaders(): Headers {

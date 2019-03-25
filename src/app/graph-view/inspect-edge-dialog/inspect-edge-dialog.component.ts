@@ -1,6 +1,5 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MD_DIALOG_DATA, MdDialogRef} from '@angular/material';
-import {VoteDonutComponent, ItemDirective} from './../vote-donut/vote-donut.component';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 @Component({
   selector: 'dnor-inspect-edge-dialog',
@@ -11,8 +10,8 @@ export class InspectEdgeDialogComponent implements OnInit {
 
   public editingRelation = false;
 
-  constructor(public dialogRef: MdDialogRef<InspectEdgeDialogComponent>,
-              @Inject(MD_DIALOG_DATA) public data: any) {
+  constructor(public dialogRef: MatDialogRef<InspectEdgeDialogComponent>,
+              @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   ngOnInit() {

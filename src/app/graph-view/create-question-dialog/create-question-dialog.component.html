@@ -1,11 +1,11 @@
-<h1 md-dialog-title>{{data.title}}</h1>
-<div md-dialog-content>
+<h1 mat-dialog-title>{{data.title}}</h1>
+<div mat-dialog-content>
   <p>{{data.message}}</p>
-  <md-form-field>
-    <textarea mdInput tabindex="1" [(ngModel)]="data.text"></textarea>
-  </md-form-field>
+  <mat-form-field>
+    <textarea matInput tabindex="1" [(ngModel)]="data.text"></textarea>
+  </mat-form-field>
 </div>
-<div md-dialog-actions>
-  <button md-button [md-dialog-close]="data.text" tabindex="2">Ok</button>
-  <button md-button (click)="onCancel()" tabindex="-1">Cancel</button>
+<div mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="data.text" tabindex="2">Ok</button>
+  <button mat-button (click)="onCancel()" tabindex="-1">Cancel</button>
 </div>

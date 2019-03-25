@@ -1,15 +1,12 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import { NgModule }       from '@angular/core';
 import {SpaceSubscription} from '../../shared/rest-data-model/spacesubscription';
-import {Subscription} from 'rxjs/Subscription';
+import {Subscription} from 'rxjs';
 import {Space} from '../../shared/rest-data-model/space';
 import {MyspacesService} from '../../shared/myspaces/myspaces.service';
-import {MdSnackBar} from '@angular/material';
-import { MdIconRegistry } from '@angular/material';
-import { DomSanitizer } from '@angular/platform-browser';
+import {MatIconRegistry, MatSnackBar} from '@angular/material';
+import {DomSanitizer} from '@angular/platform-browser';
 import {environment} from '../../../environments/environment';
 import {RestHelperService} from '../../shared/rest-helper/rest-helper.service';
-
 
 @Component({
   selector: 'dnor-subscribed-spaces-overview',
@@ -18,52 +15,57 @@ import {RestHelperService} from '../../shared/rest-helper/rest-helper.service';
 })
 export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
   public spaces: { space: Space, subscription: SpaceSubscription }[];
-  public bots: {name: string, active: boolean, icon: string}[] = [];
+  public bots: {name: string, active: {}}[] = [];
   public botWidgetUrl: string;
   private spaceSubscription: Subscription;
   private botUri: string;
 
-  constructor(private myspacesService: MyspacesService, private snackBar: MdSnackBar,private mdIconRegistry: MdIconRegistry, private sanitizer: DomSanitizer, private rh: RestHelperService) {
+  constructor(private myspacesService: MyspacesService, private snackBar: MatSnackBar,
+              private matIconRegistry: MatIconRegistry, private sanitizer: DomSanitizer, private rh: RestHelperService) {
   }
 
   ngOnInit() {
     this.spaceSubscription =
       this.myspacesService.getMySpacesObservable().subscribe((myspaces) => this.spaces = myspaces);
     this.myspacesService.getMySpaces().then((s) => s);
-    this.mdIconRegistry.addSvgIconInNamespace('img', 'bot',
+    this.matIconRegistry.addSvgIconInNamespace('img', 'bot',
         this.sanitizer.bypassSecurityTrustResourceUrl('assets/bot.svg'));
-    this.mdIconRegistry.addSvgIconInNamespace('img', 'add',
+    this.matIconRegistry.addSvgIconInNamespace('img', 'add',
         this.sanitizer.bypassSecurityTrustResourceUrl('assets/add.svg'));
-    this.mdIconRegistry.addSvgIconInNamespace('img', 'train',
+    this.matIconRegistry.addSvgIconInNamespace('img', 'train',
         this.sanitizer.bypassSecurityTrustResourceUrl('assets/train.svg'));
-    this.mdIconRegistry.addSvgIconInNamespace('img', 'play',
+    this.matIconRegistry.addSvgIconInNamespace('img', 'play',
         this.sanitizer.bypassSecurityTrustResourceUrl('assets/play.svg'));
-    this.mdIconRegistry.addSvgIconInNamespace('img', 'pause',
+    this.matIconRegistry.addSvgIconInNamespace('img', 'pause',
         this.sanitizer.bypassSecurityTrustResourceUrl('assets/pause.svg'));
     this.botWidgetUrl = this.rh.getHostURL() + '/fileservice/v2.2.5/files/sbf';
-    this.botUri = this.rh.getHostURL() + "/SBFManager/bots/distributed-noracle";
+    this.botUri = this.rh.getHostURL() + '/SBFManager/bots/distributed-noracle';
 
-    var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
-    xmlhttp.open("GET", this.botUri);
-    xmlhttp.setRequestHeader("Accept", "application/json");
+    const xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+    xmlhttp.open('GET', this.botUri);
+    xmlhttp.setRequestHeader('Accept', 'application/json');
     xmlhttp.send();
-    var bots = this.bots;
-    xmlhttp.onreadystatechange=function(){
-       if (xmlhttp.readyState==4 && xmlhttp.status==200){
-          var botj = JSON.parse(this.responseText);
-          for (var key in botj){
-            let bs = botj[key].active==='true';
-            if(bs){
-              let b = {"name":key,"active":bs, "icon":"img:pause"};
-              bots.push(b);
-            }else{
-              let b = {"name":key,"active":bs, "icon":"img:play"};
-              bots.push(b);
+    const bots = this.bots;
+    xmlhttp.onreadystatechange = function(){
+       if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+          const botj = JSON.parse(this.responseText);
+          for (const bname of Object.keys(botj)) {
+            var b = {'name': bname, 'active': {}};
+            for (const uname of Object.keys(botj[bname]["active"])) {  
+                const bs = botj[bname]["active"][uname] === true;
+                var bstatus = {};
+                bstatus['active'] = bs;
+                if(bs){
+                   bstatus['icon'] = 'img:pause';
+                }else{
+                   bstatus['icon'] = 'img:play';
+                }
+                b["active"][uname] = bstatus;
             }
-            
+            bots.push(b);
           }
        }
-    }
+    };
   }
 
   ngOnDestroy() {
@@ -108,10 +110,23 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
     document.body.removeChild(textArea);
   }
 
-  
+  getIcon(bot:{}, spaceId: String){
+      if(bot['active'][spaceId]==null){
+        return 'img:play';
+      }
+      return bot['active'][spaceId]['icon'];
+  }
 
-  addBot(myspace: { space: Space, subscription: SpaceSubscription }, bot: String, active: boolean){
-    if(active==false){
+  addBot(myspace: { space: Space, subscription: SpaceSubscription }, botObject: {name: String, active: {}}) {
+    const bot = botObject.name;
+    var active = false;
+    if(botObject.active[myspace.space.spaceId]==null){
+        botObject['active'][myspace.space.spaceId] = {};
+    }else{
+        active = botObject['active'][myspace.space.spaceId]['active'];
+    }
+    
+    if (active === false) {
       let url = window.location.href;
       url = url.substring(0, url.indexOf('/myspaces')) + `/spaces/${myspace.space.spaceId}?pw=${myspace.space.spaceSecret}`;
       const textArea = document.createElement('textarea');
@@ -135,53 +150,55 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
       document.body.appendChild(textArea);
       textArea.select();
 
-      var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
-      xmlhttp.open("POST", this.rh.getHostURL() + "/SBFManager/join/"+bot);
-      xmlhttp.setRequestHeader("Content-Type", "application/json");
-      xmlhttp.send(JSON.stringify({basePath: environment.hostUrls[0]+ "/distributed-noracle", joinPath:"agents/$botId/spacesubscriptions",spaceId: myspace.space.spaceId, spaceSecret: myspace.space.spaceSecret}));
-      var snackBar = this.snackBar;
-      var bots = this.bots;
-      xmlhttp.onreadystatechange=function(){
-         if (xmlhttp.readyState==4 && xmlhttp.status==200){
+      const xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+      xmlhttp.open('POST', this.rh.getHostURL() + '/SBFManager/join/' + bot);
+      xmlhttp.setRequestHeader('Content-Type', 'application/json');
+      xmlhttp.send(JSON.stringify({basePath: environment.hostUrls[0] + '/distributed-noracle',
+        joinPath: 'agents/$botId/spacesubscriptions',
+        spaceId: myspace.space.spaceId, spaceSecret: myspace.space.spaceSecret}));
+      const snackBar = this.snackBar;
+      const bots = this.bots;
+      xmlhttp.onreadystatechange = function(){
+         if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
             snackBar.open('Bot added!', 'hide', {
               duration: 2000,
             });
             bots.forEach(function(element) {
-              if(element.name==bot){
-                element.icon = "img:pause";
-                element.active = true;
+              if (element.name === bot) {
+                element.active[myspace.space.spaceId]['icon'] = 'img:pause';
+                element.active[myspace.space.spaceId]['active'] = true;
               }
             });
-         }else if(xmlhttp.readyState==4){
+         }else if (xmlhttp.readyState === 4) {
             snackBar.open('Bot could not be added!', 'hide', {
               duration: 2000,
             });
          }
-      }
+      };
 
       document.body.removeChild(textArea);
-    }else{
-      let botUri = this.botUri;
+    }else {
+      const botUri = this.botUri;
 
-      var snackBar = this.snackBar;
+      const snackBar = this.snackBar;
       this.bots.forEach(function(element) {
-        if(element.name==bot){
-          var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
-            xmlhttp.open("DELETE", botUri+"/"+bot);
+        if (element.name === bot) {
+          const xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+            xmlhttp.open('DELETE', botUri + '/' + bot + '/' + myspace.space.spaceId);
             xmlhttp.send();
-            xmlhttp.onreadystatechange=function(){
-               if (xmlhttp.readyState==4 && xmlhttp.status==200){
+            xmlhttp.onreadystatechange = function(){
+               if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
                   snackBar.open('Bot paused!', 'hide', {
                     duration: 2000,
                   });
-                  element.icon = "img:play";
-                  element.active = false;
-               }else if(xmlhttp.readyState==4){
+                element.active[myspace.space.spaceId]['icon'] = 'img:play';
+                element.active[myspace.space.spaceId]['active'] = false;
+               }else if (xmlhttp.readyState === 4) {
                   snackBar.open('Bot could not be paused!', 'hide', {
                     duration: 2000,
                   });
                }
-            }
+            };
         }
       });
     }

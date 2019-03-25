@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {MD_DIALOG_DATA, MdDialogRef} from '@angular/material';
+import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
 
 @Component({
   selector: 'dnor-create-question-dialog',
@@ -8,8 +8,8 @@ import {MD_DIALOG_DATA, MdDialogRef} from '@angular/material';
 })
 export class CreateQuestionDialogComponent implements OnInit {
 
-  constructor(public dialogRef: MdDialogRef<CreateQuestionDialogComponent>,
-              @Inject(MD_DIALOG_DATA) public data: any) {
+  constructor(public dialogRef: MatDialogRef<CreateQuestionDialogComponent>,
+              @Inject(MAT_DIALOG_DATA) public data: any) {
   }
 
   ngOnInit() {

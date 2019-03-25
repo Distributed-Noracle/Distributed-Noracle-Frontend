@@ -9,37 +9,42 @@
         <li *ngFor="let m of spaceMembers"><span class="bw">{{m}}</span></li>
       </ul>
     </mat-expansion-panel>
-  
+
     <mat-expansion-panel>
       <mat-expansion-panel-header expandedHeight="30px" collapsedHeight="30px">
         <span class="bw">Help</span>
       </mat-expansion-panel-header>
       <ul>
-        <li><span class="bw"><md-icon style="font-weight: bold">chat_bubble_outline</md-icon> selected / <md-icon>chat_bubble_outline</md-icon> deselected</span></li>
-        <li><span class="bw"><md-icon style="color: green">chat_bubble_outline</md-icon> rated positively / <md-icon style="color: rgb(255, 0, 0)">chat_bubble_outline</md-icon> rated negatively</span></li>
+        <li><span class="bw"><mat-icon style="font-weight: bold">chat_bubble_outline</mat-icon> selected / <mat-icon>chat_bubble_outline</mat-icon> deselected</span>
+        </li>
+        <li><span class="bw"><mat-icon style="color: green">chat_bubble_outline</mat-icon> rated positively / <mat-icon
+          style="color: rgb(255, 0, 0)">chat_bubble_outline</mat-icon> rated negatively</span></li>
         <li><span class="bw"><span style="font-weight: bold">>>></span> follow-up question</span></li>
         <li><span class="bw"><span style="font-weight: bold">――</span> related question</span></li>
         <li><span class="bw">―――――――――――――――――――――</span></li>
-        <li><span class="bw">More questions? <a href="mailto:noracle@dbis.rwth-aachen.de">noracle@dbis.rwth-aachen.de</a></span></li>
+        <li><span class="bw">More questions? <a
+          href="mailto:noracle@dbis.rwth-aachen.de">noracle@dbis.rwth-aachen.de</a></span></li>
       </ul>
-    </mat-expansion-panel>    
-  </mat-accordion>       
+    </mat-expansion-panel>
+  </mat-accordion>
 </div>
 <div #graphContainer>
   <div *ngIf="subscriptionInProgress" fxLayout="column" fxLayoutAlign="space-around center">
     <p>Subscribing to space&hellip;</p>
-    <md-spinner></md-spinner>
+    <mat-spinner></mat-spinner>
   </div>
   <dnor-graph-view *ngIf="!subscriptionInProgress"
-    [spaceId]="spaceId"
-    [selectedQuestions]="selectedQuestions" [height]="height" [width]="width"
-    [interactionMode]="interactionMode"></dnor-graph-view>
+                   [spaceId]="spaceId"
+                   [selectedQuestions]="selectedQuestions" [height]="height" [width]="width"
+                   [interactionMode]="interactionMode"></dnor-graph-view>
 </div>
 <div #below>
-  <md-radio-group *ngIf="!subscriptionInProgress"
-    fxLayout="row" fxLayoutGap="20px" fxLayoutWrap [(ngModel)]="interactionMode">
-    <md-radio-button color="primary" *ngFor="let m of getInteractionModes()" [value]="m">
-      {{getInteractionModeLabel(m)}}
-    </md-radio-button>
-  </md-radio-group>
+  <mat-card style="display: inline-block">
+    <mat-radio-group *ngIf="!subscriptionInProgress"
+                     fxLayout="row" fxLayoutGap="20px" fxLayoutWrap [(ngModel)]="interactionMode">
+      <mat-radio-button color="primary" *ngFor="let m of getInteractionModes()" [value]="m">
+        {{getInteractionModeLabel(m)}}
+      </mat-radio-button>
+    </mat-radio-group>
+  </mat-card>
 </div>

@@ -1,17 +1,16 @@
 import {NodeInteractionBehavior} from './node-interaction-behavior';
 import {GraphNode} from '../graph-data-model/graph-node';
 import {GraphViewService} from '../graph-view.service';
-import {MdDialog} from '@angular/material';
+import {MatDialog} from '@angular/material';
 import {InspectDialogComponent} from '../../inspect-dialog/inspect-dialog.component';
 import {AgentService} from '../../../shared/agent/agent.service';
 import {QuestionVoteService} from '../../../shared/question-vote/question-vote.service'
-import {timestamp} from 'rxjs/operator/timestamp';
 import {VoteUtil} from '../utils/vote-util';
 
 export class EditQuestionBehavior extends NodeInteractionBehavior {
 
   constructor(private graphViewService: GraphViewService, private agentService: AgentService,
-              private dialog: MdDialog) {
+              private dialog: MatDialog) {
     super();
   }
 

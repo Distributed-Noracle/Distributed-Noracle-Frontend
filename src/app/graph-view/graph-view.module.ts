@@ -5,8 +5,8 @@ import {GraphViewComponent} from './graph-view/graph-view.component';
 import {D3Service} from 'd3-ng2-service';
 import {GraphViewPageComponent} from './graph-view-page/graph-view-page.component';
 import {
-  MdButtonModule, MdDialogModule, MdFormFieldModule, MdInputModule, MdProgressSpinnerModule,
-  MdRadioModule, MdSnackBarModule, MdIconModule
+  MatButtonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatProgressSpinnerModule,
+  MatRadioModule, MatSnackBarModule, MatIconModule, MatCardModule
 } from '@angular/material';
 import {FormsModule} from '@angular/forms';
 import {GraphViewService} from './graph-view/graph-view.service';
@@ -21,18 +21,19 @@ import {InspectEdgeDialogComponent} from './inspect-edge-dialog/inspect-edge-dia
 @NgModule({
   imports: [
     CommonModule,
-    MdButtonModule,
-    MdRadioModule,
-    MdDialogModule,
-    MdSnackBarModule,
-    MdProgressSpinnerModule,
-    MdFormFieldModule,
-    MdInputModule,
+    MatButtonModule,
+    MatRadioModule,
+    MatDialogModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule,
+    MatFormFieldModule,
+    MatInputModule,
     FormsModule,
     FlexLayoutModule,
     SharedModule,
-    MdIconModule,
-    MatExpansionModule
+    MatIconModule,
+    MatExpansionModule,
+    MatCardModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [GraphViewComponent, GraphViewPageComponent, RelationPickerDialogComponent,

@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {SpaceSubscription} from '../../shared/rest-data-model/spacesubscription';
-import {Subscription} from 'rxjs/Subscription';
+import {Subscription} from 'rxjs';
 import {MyspacesService} from '../../shared/myspaces/myspaces.service';
 import {Space} from '../../shared/rest-data-model/space';
 
