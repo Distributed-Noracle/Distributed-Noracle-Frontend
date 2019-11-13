@@ -5,7 +5,7 @@ import {GraphViewService} from '../graph-view.service';
 
 export class ChangeNodeSelectionBehavior extends NodeInteractionBehavior {
 
-  constructor(private network: Network, private graphViewService: GraphViewService) {
+  constructor(protected network: Network, protected graphViewService: GraphViewService) {
     super();
   }
 
@@ -37,7 +37,7 @@ export class ChangeNodeSelectionBehavior extends NodeInteractionBehavior {
     });
   }
 
-  private selectNode(n: GraphNode) {
+  protected selectNode(n: GraphNode) {
     n.isSelected = true;
     this.graphViewService.updateSelectionRouteParams(n.id, n.isSelected);
     let requiresUpdate = false;

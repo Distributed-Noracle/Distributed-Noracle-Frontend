@@ -4,5 +4,6 @@ export enum GraphInteractionMode {
   AddQuestion,
   AddRelation,
   Inspect,
-  Check_Questions
+  Check_Questions,
+  ExpandWholeGraph
 }

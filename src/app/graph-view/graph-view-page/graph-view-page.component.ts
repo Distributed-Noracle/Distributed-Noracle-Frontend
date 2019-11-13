@@ -102,6 +102,8 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
         return 'Vote/Edit';
       case 'Check_Questions':
           return 'Check';
+      case 'ExpandWholeGraph':
+          return 'Display all';
     }
   }
 }

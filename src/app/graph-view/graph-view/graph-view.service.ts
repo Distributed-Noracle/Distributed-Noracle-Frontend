@@ -178,6 +178,13 @@ export class GraphViewService {
     return this.questions.length > 0 ? this.questions[0] : null;
   }
 
+  public selectAllNodes(){
+    this.questions.forEach(question => {
+      this.registerQuestionForUpdate(question.questionId);      
+    });
+    this.requestUpdate();
+  }
+
   private getQuestion(questionId: string): Question {
     return this.questions.find((q) => q.questionId === questionId);
   }
@@ -202,7 +209,11 @@ export class GraphViewService {
     return this.relationAuthors.get(relationId);
   }
 
-  private fetchAll(spaceId: string) {
+  public getAllQuestions(): Question[]{
+    return this.questions;
+  }
+
+  private async fetchAll(spaceId: string) {
     // load all questions and all relations of the space
     const questionsAndRelationsPromise = Promise.all([
       this.questionService.getQuestionsOfSpace(spaceId).then((res) => {

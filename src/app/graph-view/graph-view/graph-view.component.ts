@@ -21,6 +21,7 @@ import {EditRelationBehavior} from './interaction-behaviors/edit-relation-behavi
 import {UpdateData} from './graph-data-model/update-data';
 import {Question} from '../../shared/rest-data-model/question';
 import { CheckQuestionsBehaviour } from './interaction-behaviors/check-question-behavior';
+import { ExpandWholeGraphBehaviour } from './interaction-behaviors/expand-graph-behavior';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -148,6 +149,11 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
         new CheckQuestionsBehaviour(this.network, this.agentService),
         null
       );
+    } else if (this.interactionMode === GraphInteractionMode.ExpandWholeGraph) {
+      this.setSelectionBehaviors(
+        new ExpandWholeGraphBehaviour(this.network, this.graphViewService), 
+        null
+      )
     } else {
       this.setDragAndZoomBehavior();
     }
