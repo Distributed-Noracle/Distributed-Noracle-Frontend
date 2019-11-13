@@ -19,11 +19,11 @@ export class CheckQuestionsBehaviour extends NodeInteractionBehavior {
         });
 
         var code_part = 'CODE_PART_1'; // Enter code from MTurk here!
-        var numberOfNeccesaryQuestions = 10; // Enter number of questions the Turkers have to ask here
+        var numberOfNeccesaryQuestions = 2; // Enter number of questions the Turkers have to ask here
 
         var appendix = numberOfSuitableQuestions < numberOfNeccesaryQuestions? //
             "Please ask " +(numberOfNeccesaryQuestions- numberOfSuitableQuestions)+ ' more questions.' : //
-            "You have reached the min. number of asked questions.\nThank you!";
+            "You have reached the min. number of asked questions.\nThank you!\nHere is the first code part: "+code_part;
 
         window.alert('The current User (' + agentName +")\n"+ 'asked ' + numberOfSuitableQuestions+ ' suitable questions.\n' + appendix);
         return null;
