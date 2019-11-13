@@ -3,5 +3,6 @@ export enum GraphInteractionMode {
   DragAndZoom,
   AddQuestion,
   AddRelation,
-  Inspect
+  Inspect,
+  Check_Questions
 }

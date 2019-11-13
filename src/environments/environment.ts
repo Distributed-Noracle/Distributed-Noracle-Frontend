@@ -7,5 +7,6 @@ export const environment = {
   production: false,
   redirectUrl: 'http://localhost:4200/login',
   mobsosUrl: 'http://las2peer.dbis.rwth-aachen.de:9079',
+  //hostUrls: ['http://steen.informatik.rwth-aachen.de:9082']
   hostUrls: ['http://las2peer.dbis.rwth-aachen.de:9078']
 };

@@ -20,6 +20,7 @@ import {EdgeInteractionBehavior} from './interaction-behaviors/edge-interaction-
 import {EditRelationBehavior} from './interaction-behaviors/edit-relation-behavior';
 import {UpdateData} from './graph-data-model/update-data';
 import {Question} from '../../shared/rest-data-model/question';
+import { CheckQuestionsBehaviour } from './interaction-behaviors/check-question-behavior';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -141,6 +142,11 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       this.setSelectionBehaviors(
         new EditQuestionBehavior(this.graphViewService, this.agentService, this.dialog),
         new EditRelationBehavior(this.graphViewService, this.agentService, this.dialog)
+      );
+    } else if (this.interactionMode === GraphInteractionMode.Check_Questions) {
+      this.setSelectionBehaviors(
+        new CheckQuestionsBehaviour(this.network, this.agentService),
+        null
       );
     } else {
       this.setDragAndZoomBehavior();
