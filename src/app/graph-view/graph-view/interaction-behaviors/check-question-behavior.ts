@@ -14,12 +14,12 @@ export class CheckQuestionsBehaviour extends NodeInteractionBehavior {
         var nodes = this.network.getNodes();
         var numberOfSuitableQuestions = 0;
         nodes.forEach(node => {
-            if(this.isSuitable(node))
+            if(node.questionAuthor == agentName && this.isSuitable(node))
                 numberOfSuitableQuestions++;
         });
 
         var code_part = 'CODE_PART_1'; // Enter code from MTurk here!
-        var numberOfNeccesaryQuestions = 2; // Enter number of questions the Turkers have to ask here
+        var numberOfNeccesaryQuestions = 10; // Enter number of questions the Turkers have to ask here
 
         var appendix = numberOfSuitableQuestions < numberOfNeccesaryQuestions? //
             "Please ask " +(numberOfNeccesaryQuestions- numberOfSuitableQuestions)+ ' more questions.' : //
