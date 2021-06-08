@@ -36,14 +36,14 @@ import {OidcCookieStorage} from "./shared/oidc-cookie-storage/oidc-cookie-storag
     SpaceModule,
     GraphViewModule,
     RouterModule.forRoot([
-      {path: 'welcome', component: WelcomePageComponent},
-      {path: 'login', component: LoginPageComponent},
-      {path: 'afterlogin', component: AfterLoginComponent},
-      {path: 'myspaces', component: SubscribedSpacesOverviewComponent, canActivate: [AuthGuardService]},
-      {path: 'spaces/create', component: CreateSpaceComponent, canActivate: [AuthGuardService]},
-      {path: 'spaces/:spaceId', component: GraphViewPageComponent, canActivate: [AuthGuardService]},
-      {path: '**', redirectTo: 'welcome'}
-    ]),
+    { path: 'welcome', component: WelcomePageComponent },
+    { path: 'login', component: LoginPageComponent },
+    { path: 'afterlogin', component: AfterLoginComponent },
+    { path: 'myspaces', component: SubscribedSpacesOverviewComponent, canActivate: [AuthGuardService] },
+    { path: 'spaces/create', component: CreateSpaceComponent, canActivate: [AuthGuardService] },
+    { path: 'spaces/:spaceId', component: GraphViewPageComponent, canActivate: [AuthGuardService] },
+    { path: '**', redirectTo: 'welcome' }
+], { relativeLinkResolution: 'legacy' }),
     HttpClientModule,
     AuthModule.forRoot({storage: OidcCookieStorage})
   ],
