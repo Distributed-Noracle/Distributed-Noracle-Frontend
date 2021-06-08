@@ -2,7 +2,7 @@ import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {GraphViewComponent} from './graph-view/graph-view.component';
-import {D3Service} from 'd3-ng2-service';
+// import {D3Service} from 'd3-ng2-service';
 import {GraphViewPageComponent} from './graph-view-page/graph-view-page.component';
 import {
   MatButtonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatProgressSpinnerModule,
@@ -43,7 +43,7 @@ import {InspectEdgeDialogComponent} from './inspect-edge-dialog/inspect-edge-dia
   bootstrap: [RelationPickerDialogComponent, CreateQuestionDialogComponent,
     InspectDialogComponent, VoteDonutComponent, InspectEdgeDialogComponent],
   exports: [GraphViewPageComponent],
-  providers: [D3Service, GraphViewService]
+  providers: [/*D3Service,*/ GraphViewService]
 })
 export class GraphViewModule {
 }

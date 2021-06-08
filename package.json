@@ -32,7 +32,7 @@
     "classlist.js": "^1.1.20150312",
     "codelyzer": "^5.0.0-beta.1",
     "core-js": "^3.0.0",
-    "d3-ng2-service": "2.2.0",
+    "d3": "^6.7.0",
     "rxjs": "6.4.0",
     "tslib": "^1.9.3",
     "zone.js": "^0.9.0"
@@ -41,6 +41,7 @@
     "@angular-devkit/build-angular": "~0.13.0",
     "@angular-devkit/schematics": "0.0.34",
     "@angular/compiler-cli": "7.2.10",
+    "@types/d3": "^6.7.0",
     "@types/jasmine": "2.5.38",
     "@types/node": "~6.0.60",
     "jasmine-core": "~2.5.2",
