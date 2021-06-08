@@ -29,7 +29,7 @@ import * as d3 from 'd3';
   styleUrls: ['./graph-view.component.css']
 })
 export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
-  @ViewChild('d3root') private d3Root;
+  @ViewChild('d3root', {static: false}) private d3Root;
   @Input('height') public height = 400;
   @Input('width') public width = 400;
   @Input('interactionMode') private interactionMode: GraphInteractionMode;
