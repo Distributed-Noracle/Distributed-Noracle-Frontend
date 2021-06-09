@@ -74,8 +74,8 @@ export class GraphViewService {
         // there cannot be votes on the newly created question and relation yet
         this.questionVotes.set(q.questionId, []);
         this.relationVotes.set(r.relationId, []);
-        this.questionAuthors.set(q.questionId, this.authGuardService.getUserData().preferred_username);
-        this.relationAuthors.set(r.relationId, this.authGuardService.getUserData().preferred_username);
+        this.questionAuthors.set(q.questionId, this.authGuardService.getUserName());
+        this.relationAuthors.set(r.relationId, this.authGuardService.getUserName());
         this.updateSelectionRouteParams(q.questionId, true);
         this.registerQuestionForUpdate(q.questionId);
         this.notifyObservers();
@@ -141,7 +141,7 @@ export class GraphViewService {
     this.relationService.postRelation(this.spaceId, relation).then((r) => {
       this.relations.push(r);
       this.relationVotes.set(r.relationId, []);
-      this.relationAuthors.set(r.relationId, this.authGuardService.getUserData().preferred_username);
+      this.relationAuthors.set(r.relationId, this.authGuardService.getUserName());
       this.notifyObservers();
     });
   }

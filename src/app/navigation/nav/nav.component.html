@@ -4,8 +4,7 @@
     <span fxFlex="grow"></span>
     <dnor-space-dropdown *ngIf="authGuardService.isAuthorized()"></dnor-space-dropdown>
     <a fxFlex mat-button (click)="logout()" *ngIf="authGuardService.isAuthorized()"><span>Logout</span></a>
-    <a fxFlex mat-button [routerLink]="['login']" routerLinkActive="router-link-active"
-       *ngIf="!authGuardService.isAuthorized()">
+    <a fxFlex mat-button [routerLink]="['login']" routerLinkActive="router-link-active" *ngIf="!authGuardService.isAuthorized()">
       <span>Login</span>
     </a>
   </div>

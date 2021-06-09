@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {Router} from '@angular/router';
-import {OidcSecurityService} from 'angular-auth-oidc-client';
+// import {OidcSecurityService} from 'angular-auth-oidc-client';
 import {environment} from '../../../environments/environment';
 import {retry} from 'rxjs/operators';
+import { KeycloakService } from 'keycloak-angular';
 
 const HOST_URLS = environment.hostUrls;
 
@@ -14,11 +15,14 @@ export class RestHelperService {
   private isMock = false;
   private oidcName = '';
 
-  constructor(private OidcSecurityService: OidcSecurityService, private http: HttpClient,
+  constructor(/*private OidcSecurityService: OidcSecurityService,*/ private http: HttpClient,
+    protected readonly keycloak: KeycloakService,
     private router: Router) {
-    OidcSecurityService.getUserData().subscribe((userData: any) => {
+
+    this.oidcName = this.keycloak.getUsername();
+    /*OidcSecurityService.getUserData().subscribe((userData: any) => {
       this.oidcName = userData.email;
-    });
+    });*/
   }
 
   public async get(path: string): Promise<any> {
@@ -64,11 +68,16 @@ export class RestHelperService {
     const headers = new HttpHeaders();
     headers.append('Accept', 'application/json;q=0.9,text/plain;q=0.8,*/*;q=0.5');
     headers.append('Content-Type', 'application/json');
-    const token = this.OidcSecurityService.getToken();
-    if (token !== '') {
-      const tokenValue = 'Bearer ' + token;
-      headers.append('Authorization', tokenValue);
-    }
+    this.keycloak.getToken().then(token => {
+      if (token !== '') {
+        const tokenValue = 'Bearer ' + token;
+        headers.append('Authorization', tokenValue);
+      }
+    }); //this.OidcSecurityService.getToken();
+    // if (token !== '') {
+    //   const tokenValue = 'Bearer ' + token;
+    //   headers.append('Authorization', tokenValue);
+    // }
     return headers;
   }
 
