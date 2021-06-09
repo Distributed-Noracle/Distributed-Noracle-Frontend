@@ -33,7 +33,7 @@ export class ChangeNodeSelectionBehavior extends NodeInteractionBehavior {
           this.graphViewService.unregisterQuestionForUpdate(node.id);
         }
       }
-      resolve();
+      resolve(null);
     });
   }
 

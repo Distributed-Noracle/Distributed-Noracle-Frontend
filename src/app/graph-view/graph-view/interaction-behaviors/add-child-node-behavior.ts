@@ -3,7 +3,7 @@ import {GraphNode} from '../graph-data-model/graph-node';
 import {GraphViewService} from '../graph-view.service';
 import {Question} from '../../../shared/rest-data-model/question';
 import {CreateQuestionDialogComponent} from '../../create-question-dialog/create-question-dialog.component';
-import {MatDialog} from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 
 export class AddChildNodeBehavior extends NodeInteractionBehavior {
 

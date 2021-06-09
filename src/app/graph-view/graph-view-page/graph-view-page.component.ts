@@ -3,7 +3,6 @@ import {GraphInteractionMode} from '../graph-view/graph-data-model/graph-interac
 import {ActivatedRoute, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
 import {MyspacesService} from '../../shared/myspaces/myspaces.service';
-import {SpaceSubscriber} from '../../shared/rest-data-model/spacesubscriber';
 
 @Component({
   selector: 'dnor-graph-view-page',
@@ -18,14 +17,14 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
   private elementRef: ElementRef;
 
   public subscriptionInProgress = false;
-  private interactionMode = GraphInteractionMode.SelectAndNavigate;
-  private height = 600;
-  private width = 800;
+  public interactionMode = GraphInteractionMode.SelectAndNavigate;
+  public height = 600;
+  public width = 800;
   private paramSubscription: Subscription;
   private queryParamSubscription: Subscription;
-  private spaceId = '1';
-  private selectedQuestions;
-  protected spaceMembers = [];
+  public spaceId = '1';
+  public selectedQuestions;
+  public spaceMembers = [];
 
   private adjustSize() {
     this.height = (window.innerHeight
@@ -78,7 +77,7 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
     this.adjustSize();
   }
 
-  private getInteractionModes() {
+  public getInteractionModes() {
     const modes = [];
     for (const mode in GraphInteractionMode) {
       if (typeof GraphInteractionMode[mode] === 'number') {
@@ -88,7 +87,7 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
     return modes;
   }
 
-  private getInteractionModeLabel(mode: number) {
+  public getInteractionModeLabel(mode: number) {
     switch (GraphInteractionMode[mode]) {
       case 'SelectAndNavigate':
         return 'Select/Navigate';

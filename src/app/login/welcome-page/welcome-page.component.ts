@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {Headers, Http, Response} from '@angular/http';
+import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../environments/environment';
 
 const MOBSOS_URL = environment.mobsosUrl;
@@ -12,7 +12,7 @@ const REGEX = /<h3>Use<\/h3>\n<h4>No Factors or Measures yet<\/h4>([\s\S]*)<\/di
 })
 export class WelcomePageComponent implements OnInit {
 
-  constructor(private http: Http) { }
+  constructor(private http: HttpClient) { }
 
   ngOnInit() {
     this.loadStats();
@@ -33,7 +33,7 @@ export class WelcomePageComponent implements OnInit {
       updateModels: 'true'
     }).toPromise();
 
-    const filtered = REGEX.exec(response.text());
+    const filtered = REGEX.exec(response.toString());
     if (!filtered || !filtered[1]) {
       console.log(filtered);
       throw new Error('malformatted response');

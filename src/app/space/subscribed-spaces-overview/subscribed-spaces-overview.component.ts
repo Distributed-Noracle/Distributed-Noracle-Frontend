@@ -3,7 +3,8 @@ import {SpaceSubscription} from '../../shared/rest-data-model/spacesubscription'
 import {Subscription} from 'rxjs';
 import {Space} from '../../shared/rest-data-model/space';
 import {MyspacesService} from '../../shared/myspaces/myspaces.service';
-import {MatIconRegistry, MatSnackBar} from '@angular/material';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatIconRegistry } from '@angular/material/icon';
 import {DomSanitizer} from '@angular/platform-browser';
 import {environment} from '../../../environments/environment';
 import {RestHelperService} from '../../shared/rest-helper/rest-helper.service';
@@ -51,7 +52,7 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
           const botj = JSON.parse(this.responseText);
           for (const bname of Object.keys(botj)) {
             var b = {'name': bname, 'active': {}};
-            for (const uname of Object.keys(botj[bname]["active"])) {  
+            for (const uname of Object.keys(botj[bname]["active"])) {
                 const bs = botj[bname]["active"][uname] === true;
                 var bstatus = {};
                 bstatus['active'] = bs;
@@ -125,7 +126,7 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
     }else{
         active = botObject['active'][myspace.space.spaceId]['active'];
     }
-    
+
     if (active === false) {
       let url = window.location.href;
       url = url.substring(0, url.indexOf('/myspaces')) + `/spaces/${myspace.space.spaceId}?pw=${myspace.space.spaceSecret}`;
@@ -181,7 +182,7 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
       const botUri = this.botUri;
 
       const snackBar = this.snackBar;
-      this.bots.forEach(function(element) {
+      this.bots.forEach(element => {
         if (element.name === bot) {
           const xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
             xmlhttp.open('DELETE', botUri + '/' + bot + '/' + myspace.space.spaceId);

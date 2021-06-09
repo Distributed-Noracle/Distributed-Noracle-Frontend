@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Headers, Http, Response} from '@angular/http';
+import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {OidcSecurityService} from 'angular-auth-oidc-client';
 import {environment} from '../../../environments/environment';
@@ -14,7 +14,7 @@ export class RestHelperService {
   private isMock = false;
   private oidcName = '';
 
-  constructor(private OidcSecurityService: OidcSecurityService, private http: Http,
+  constructor(private OidcSecurityService: OidcSecurityService, private http: HttpClient,
     private router: Router) {
     OidcSecurityService.getUserData().subscribe((userData: any) => {
       this.oidcName = userData.email;
@@ -35,33 +35,33 @@ export class RestHelperService {
     }
   }
 
-  public getAbsoulte(absolutePath: string): Promise<Response> {
+  public getAbsoulte(absolutePath: string): any /*Promise<HttpResponse>*/ {
     return this.http.get(absolutePath, {headers: this.getHeaders()}).pipe(retry(3)).toPromise();
   }
 
-  public put(path: string, body: any): Promise<Response> {
+  public put(path: string, body: any): any /*Promise<HttpResponse>*/ {
     return this.http.put(this.getBaseURL() + path,
       body,
       {headers: this.getHeaders()}
     ).pipe(retry(3)).toPromise();
   }
 
-  public post(path: string, body: any): Promise<Response> {
+  public post(path: string, body: any): any /*Promise<HttpResponse>*/ {
     return this.http.post(this.getBaseURL() + path,
       body,
       {headers: this.getHeaders()}
     ).pipe(retry(3)).toPromise();
   }
 
-  public getCurrentAgent(): Promise<Response> {
+  public getCurrentAgent(): any /*Promise<HttpResponse>*/ {
     return this.http.get(this.getCoreBaseURL() + '/currentagent', {headers: this.getHeaders()}).pipe(retry(3)).toPromise();
   }
 
-  private getHeaders(): Headers {
+  private getHeaders(): HttpHeaders {
     if (this.isMock) {
       return this.getMockHeaders();
     }
-    const headers = new Headers();
+    const headers = new HttpHeaders();
     headers.append('Accept', 'application/json;q=0.9,text/plain;q=0.8,*/*;q=0.5');
     headers.append('Content-Type', 'application/json');
     const token = this.OidcSecurityService.getToken();
@@ -72,8 +72,8 @@ export class RestHelperService {
     return headers;
   }
 
-  private getMockHeaders(): Headers {
-    const headers = new Headers();
+  private getMockHeaders(): HttpHeaders {
+    const headers = new HttpHeaders();
     headers.append('Accept', 'application/json;q=0.9,text/plain;q=0.8,*/*;q=0.5');
     headers.append('Content-Type', 'application/json');
     const user = 'noracle-example-smith';
