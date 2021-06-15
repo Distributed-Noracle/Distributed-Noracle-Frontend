@@ -1,5 +1,4 @@
 import {GraphViewService} from '../graph-view.service';
-import {MatDialog} from '@angular/material';
 import {AgentService} from '../../../shared/agent/agent.service';
 import {EdgeInteractionBehavior} from './edge-interaction-behavior';
 import {Edge} from '../graph-data-model/edge';
@@ -8,6 +7,7 @@ import {RelationVote} from '../../../shared/rest-data-model/relation-vote';
 import {VoteUtil} from '../utils/vote-util';
 import {InspectEdgeDialogComponent} from '../../inspect-edge-dialog/inspect-edge-dialog.component';
 import { RelationType } from '../graph-data-model/relation-type.enum';
+import { MatDialog } from '@angular/material/dialog';
 
 export class EditRelationBehavior extends EdgeInteractionBehavior {
 

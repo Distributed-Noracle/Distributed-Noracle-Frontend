@@ -1,6 +1,6 @@
 import {Component, Inject, Input, OnInit} from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {RelationType} from '../graph-view/graph-data-model/relation-type.enum';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 
 @Component({
   selector: 'dnor-relation-picker-dialog',

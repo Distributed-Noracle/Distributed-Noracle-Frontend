@@ -1,9 +1,9 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {LoginPageComponent} from './login-page/login-page.component';
-import {MatButtonModule} from '@angular/material';
 import {WelcomePageComponent} from './welcome-page/welcome-page.component';
 import { AfterLoginComponent } from './after-login/after-login.component';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   imports: [

@@ -4,11 +4,16 @@ import {CreateSpaceComponent} from './create-space/create-space.component';
 import {SubscribedSpacesOverviewComponent} from './subscribed-spaces-overview/subscribed-spaces-overview.component';
 import {SharedModule} from '../shared/shared.module';
 import {RouterModule} from '@angular/router';
-import {
-  MatButtonModule, MatIconModule, MatInputModule, MatListModule, MatSnackBarModule, MatMenuModule,
-  MatFormFieldModule, MatCardModule
-} from '@angular/material';
 import {FormsModule} from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatCardModule } from '@angular/material/card';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+
 
 @NgModule({
   imports: [
@@ -18,11 +23,13 @@ import {FormsModule} from '@angular/forms';
     FormsModule,
     MatInputModule,
     MatButtonModule,
-    MatListModule,
+    MatInputModule,
     MatIconModule,
     MatSnackBarModule,
     MatFormFieldModule,
     MatCardModule,
+    MatInputModule,
+    MatListModule,
     MatMenuModule
   ],
   declarations: [CreateSpaceComponent, SubscribedSpacesOverviewComponent],

@@ -1,15 +1,14 @@
 import {BrowserModule} from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
+import {APP_INITIALIZER, NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {HttpModule} from '@angular/http';
 import {AppComponent} from './app.component';
 import {GraphViewModule} from './graph-view/graph-view.module';
-import {
-  AuthModule, AuthWellKnownEndpoints, OidcConfigService, OidcSecurityService,
-  OpenIDImplicitFlowConfiguration
-} from 'angular-auth-oidc-client';
+// import {
+//   AuthModule, AuthWellKnownEndpoints, OidcConfigService, OidcSecurityService,
+//   OpenIDImplicitFlowConfiguration
+// } from 'angular-auth-oidc-client';
 import {RouterModule} from '@angular/router';
-import {environment} from '../environments/environment';
+// import {environment} from '../environments/environment';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AuthGuardService} from './shared/auth-guard/auth-guard.service';
 import {NavigationModule} from './navigation/navigation.module';
@@ -23,7 +22,26 @@ import {SubscribedSpacesOverviewComponent} from './space/subscribed-spaces-overv
 import {CreateSpaceComponent} from './space/create-space/create-space.component';
 import {AfterLoginComponent} from './login/after-login/after-login.component';
 import {HttpClientModule} from '@angular/common/http';
-import {OidcCookieStorage} from "./shared/oidc-cookie-storage/oidc-cookie-storage";
+// import {OidcCookieStorage} from "./shared/oidc-cookie-storage/oidc-cookie-storage";
+
+import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
+
+function initializeKeycloak(keycloak: KeycloakService): () => Promise<boolean> {
+  return () =>
+      keycloak.init({
+          config: {
+              url: 'https://api.learning-layers.eu/auth',
+              realm: 'main',
+              clientId: '8b7837a0-0b49-4443-9a56-591f50531d0a',
+          },
+          initOptions: {
+              checkLoginIframe: true,
+              checkLoginIframeInterval: 25
+          },
+          loadUserProfileAtStartUp: true
+      });
+}
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -31,29 +49,36 @@ import {OidcCookieStorage} from "./shared/oidc-cookie-storage/oidc-cookie-storag
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
-    HttpModule,
     SharedModule,
     NavigationModule,
     LoginModule,
     SpaceModule,
     GraphViewModule,
     RouterModule.forRoot([
-      {path: 'welcome', component: WelcomePageComponent},
-      {path: 'login', component: LoginPageComponent},
-      {path: 'afterlogin', component: AfterLoginComponent},
-      {path: 'myspaces', component: SubscribedSpacesOverviewComponent, canActivate: [AuthGuardService]},
-      {path: 'spaces/create', component: CreateSpaceComponent, canActivate: [AuthGuardService]},
-      {path: 'spaces/:spaceId', component: GraphViewPageComponent, canActivate: [AuthGuardService]},
-      {path: '**', redirectTo: 'welcome'}
-    ]),
+    { path: 'welcome', component: WelcomePageComponent },
+    { path: 'login', component: LoginPageComponent },
+    { path: 'afterlogin', component: AfterLoginComponent },
+    { path: 'myspaces', component: SubscribedSpacesOverviewComponent, canActivate: [AuthGuardService] },
+    { path: 'spaces/create', component: CreateSpaceComponent, canActivate: [AuthGuardService] },
+    { path: 'spaces/:spaceId', component: GraphViewPageComponent, canActivate: [AuthGuardService] },
+    { path: '**', redirectTo: 'welcome' }
+], { relativeLinkResolution: 'legacy' }),
     HttpClientModule,
-    AuthModule.forRoot({storage: OidcCookieStorage})
+    KeycloakAngularModule
+    // AuthModule.forRoot({storage: OidcCookieStorage})
   ],
-  providers: [OidcConfigService],
+  providers: [/*OidcConfigService*/
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeKeycloak,
+      multi: true,
+      deps: [KeycloakService],
+    },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor(public oidcSecurityService: OidcSecurityService) {
+  /* constructor(public oidcSecurityService: OidcSecurityService) {
     const openIDImplicitFlowConfiguration = new OpenIDImplicitFlowConfiguration();
     openIDImplicitFlowConfiguration.stsServer = 'https://api.learning-layers.eu/o/oauth2';
     openIDImplicitFlowConfiguration.redirect_url = environment.redirectUrl;
@@ -96,5 +121,5 @@ export class AppModule {
       openIDImplicitFlowConfiguration,
       authWellKnownEndpoints
     );
-  }
+  } */
 }

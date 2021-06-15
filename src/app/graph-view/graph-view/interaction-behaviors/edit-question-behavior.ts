@@ -1,11 +1,10 @@
 import {NodeInteractionBehavior} from './node-interaction-behavior';
 import {GraphNode} from '../graph-data-model/graph-node';
 import {GraphViewService} from '../graph-view.service';
-import {MatDialog} from '@angular/material';
 import {InspectDialogComponent} from '../../inspect-dialog/inspect-dialog.component';
 import {AgentService} from '../../../shared/agent/agent.service';
-import {QuestionVoteService} from '../../../shared/question-vote/question-vote.service'
 import {VoteUtil} from '../utils/vote-util';
+import { MatDialog } from '@angular/material/dialog';
 
 export class EditQuestionBehavior extends NodeInteractionBehavior {
 

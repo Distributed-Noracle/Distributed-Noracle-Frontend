@@ -2,12 +2,9 @@ import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {GraphViewComponent} from './graph-view/graph-view.component';
-import {D3Service} from 'd3-ng2-service';
+// import {D3Service} from 'd3-ng2-service';
 import {GraphViewPageComponent} from './graph-view-page/graph-view-page.component';
-import {
-  MatButtonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatProgressSpinnerModule,
-  MatRadioModule, MatSnackBarModule, MatIconModule, MatCardModule
-} from '@angular/material';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {FormsModule} from '@angular/forms';
 import {GraphViewService} from './graph-view/graph-view.service';
 import {FlexLayoutModule} from '@angular/flex-layout';
@@ -17,6 +14,14 @@ import {CreateQuestionDialogComponent} from './create-question-dialog/create-que
 import {InspectDialogComponent} from './inspect-dialog/inspect-dialog.component';
 import {VoteDonutComponent, ItemDirective} from './vote-donut/vote-donut.component';
 import {InspectEdgeDialogComponent} from './inspect-edge-dialog/inspect-edge-dialog.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   imports: [
@@ -36,14 +41,23 @@ import {InspectEdgeDialogComponent} from './inspect-edge-dialog/inspect-edge-dia
     MatCardModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  declarations: [GraphViewComponent, GraphViewPageComponent, RelationPickerDialogComponent,
-    CreateQuestionDialogComponent, InspectDialogComponent, VoteDonutComponent,
+  declarations: [
+    GraphViewComponent,
+    GraphViewPageComponent,
+    RelationPickerDialogComponent,
+    CreateQuestionDialogComponent,
+    InspectDialogComponent,
+    VoteDonutComponent,
     ItemDirective,
     InspectEdgeDialogComponent],
-  bootstrap: [RelationPickerDialogComponent, CreateQuestionDialogComponent,
-    InspectDialogComponent, VoteDonutComponent, InspectEdgeDialogComponent],
+  bootstrap: [
+    RelationPickerDialogComponent,
+    CreateQuestionDialogComponent,
+    InspectDialogComponent,
+    VoteDonutComponent,
+    InspectEdgeDialogComponent],
   exports: [GraphViewPageComponent],
-  providers: [D3Service, GraphViewService]
+  providers: [/*D3Service,*/ GraphViewService]
 })
 export class GraphViewModule {
 }

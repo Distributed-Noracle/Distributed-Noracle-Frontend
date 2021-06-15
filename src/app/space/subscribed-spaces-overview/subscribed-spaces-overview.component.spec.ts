@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { SubscribedSpacesOverviewComponent } from './subscribed-spaces-overview.component';
 
@@ -6,7 +6,7 @@ describe('SubscribedSpacesOverviewComponent', () => {
   let component: SubscribedSpacesOverviewComponent;
   let fixture: ComponentFixture<SubscribedSpacesOverviewComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ SubscribedSpacesOverviewComponent ]
     })

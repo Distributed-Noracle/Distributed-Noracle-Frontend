@@ -3,10 +3,10 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Distributed Noracle Frontend": {
+    "distributed-noracle-frontend": {
+      "projectType": "application",
       "root": "",
       "sourceRoot": "src",
-      "projectType": "application",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
@@ -14,8 +14,9 @@
             "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
+            "tsConfig": "tsconfig.app.json",
+            "aot": true,
             "assets": [
               "src/assets",
               "src/favicon.ico",
@@ -28,6 +29,12 @@
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -45,6 +52,12 @@
               ]
             },
             "productionTest": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -58,6 +71,12 @@
               ]
             },
             "las2peer": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -75,6 +94,12 @@
               ]
             },
             "contdep": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -92,6 +117,12 @@
               ]
             },
             "multiplex": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -107,36 +138,45 @@
                   "with": "src/environments/environment.multiplex.ts"
                 }
               ]
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
             }
           }
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "browserTarget": "Distributed Noracle Frontend:build"
-          },
+          "defaultConfiguration": "development",
           "configurations": {
+            "development": {
+              "browserTarget": "distributed-noracle-frontend:build:development"
+            },
             "production": {
-              "browserTarget": "Distributed Noracle Frontend:build:production"
+              "browserTarget": "distributed-noracle-frontend:build:production"
             },
             "productionTest": {
-              "browserTarget": "Distributed Noracle Frontend:build:productionTest"
+              "browserTarget": "distributed-noracle-frontend:build:productionTest"
             },
             "las2peer": {
-              "browserTarget": "Distributed Noracle Frontend:build:las2peer"
+              "browserTarget": "distributed-noracle-frontend:build:las2peer"
             },
             "contdep": {
-              "browserTarget": "Distributed Noracle Frontend:build:contdep"
+              "browserTarget": "distributed-noracle-frontend:build:contdep"
             },
             "multiplex": {
-              "browserTarget": "Distributed Noracle Frontend:build:multiplex"
+              "browserTarget": "distributed-noracle-frontend:build:multiplex"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "Distributed Noracle Frontend:build"
+            "browserTarget": "distributed-noracle-frontend:build"
           }
         },
         "test": {
@@ -169,7 +209,7 @@
         }
       }
     },
-    "Distributed Noracle Frontend-e2e": {
+    "distributed-noracle-frontend-e2e": {
       "root": "e2e",
       "sourceRoot": "e2e",
       "projectType": "application",
@@ -178,7 +218,7 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "Distributed Noracle Frontend:serve"
+            "devServerTarget": "distributed-noracle-frontend:serve"
           }
         },
         "lint": {
@@ -193,11 +233,11 @@
       }
     }
   },
-  "defaultProject": "Distributed Noracle Frontend",
+  "defaultProject": "distributed-noracle-frontend",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "dnor",
-      "styleext": "css"
+      "style": "css"
     },
     "@schematics/angular:directive": {
       "prefix": "dnor"
