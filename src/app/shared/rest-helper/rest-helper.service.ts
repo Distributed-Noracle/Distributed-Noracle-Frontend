@@ -54,7 +54,6 @@ export class RestHelperService {
   }
 
   public getCurrentAgent(): Promise<any> {
-    console.log("getCurrentAgent");
     return this.http.get(this.getCoreBaseURL() + '/currentagent', {headers: this.getHeaders()}).pipe(retry(3)).toPromise();
   }
 
@@ -65,12 +64,7 @@ export class RestHelperService {
     const headers = new HttpHeaders();
     headers.append('Accept', 'application/json;q=0.9,text/plain;q=0.8,*/*;q=0.5');
     headers.append('Content-Type', 'application/json');
-    console.log(this.keycloak.isTokenExpired());
-    console.log(this.keycloak.getUsername());
-    this.keycloak.isLoggedIn().then(li => console.log(li));
     this.keycloak.getToken().then(token => {
-      console.log("this.keycloak.getToken()");
-      console.log(`Token = ${token}`)
       if (token !== '') {
         const tokenValue = 'Bearer ' + token;
         headers.append('Authorization', tokenValue);
@@ -107,7 +101,6 @@ export class RestHelperService {
    * host a node themselves.
    */
   public getHostURL(): string {
-    console.log("getHostURL()")
     return HOST_URLS[Math.abs(this.hash(this.userName) % HOST_URLS.length)];
   }
 

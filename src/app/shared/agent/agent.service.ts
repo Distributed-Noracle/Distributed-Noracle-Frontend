@@ -44,10 +44,8 @@ export class AgentService {
   public getSpaceSubscriptions(): Promise<SpaceSubscription[]> {
     return this.getAgent()
       .then((agent) => {
-        if (agent) {
           return this.restHelperService.get(`/agents/${agent.agentid}/spacesubscriptions`)
             .then(res2 => res2.json() as SpaceSubscription[]);
-        }
       }).catch(() => {
         return Promise.reject(null)
       });

@@ -1,5 +1,4 @@
 import {Component, Input, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
-// import {D3, D3Service} from 'd3-ng2-service';
 import {ForceLink, Simulation} from 'd3-force';
 import {GraphNode} from './graph-data-model/graph-node';
 import {Edge} from './graph-data-model/edge';
@@ -18,11 +17,10 @@ import {QuestionVoteService} from '../../shared/question-vote/question-vote.serv
 import {EdgeInteractionBehavior} from './interaction-behaviors/edge-interaction-behavior';
 import {EditRelationBehavior} from './interaction-behaviors/edit-relation-behavior';
 import {UpdateData} from './graph-data-model/update-data';
-
 import {MatDialog} from '@angular/material/dialog';
 
 import * as d3 from "d3";
-
+import { D3DragEvent, D3ZoomEvent } from 'd3';
 
 @Component({
   selector: 'dnor-graph-view',
@@ -37,7 +35,6 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
   @Input('spaceId') private spaceId = 'dummy';
   @Input('selectedQuestions') private selectedQuestions: string[];
 
-  // private d3: D3;
   private loadedSpaceId;
   private network: Network;
   private transform: ZoomTransform;
@@ -158,56 +155,56 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     d3.select(canvas)
       .call(d3.drag()
         .container(canvas)
-        .subject(() => {
-          // console.log('subject: (' + this.d3.event.x + '/' + this.d3.event.y + ')')
+        .subject((event: D3DragEvent<any, any, any>) => {
+          console.log('subject: (' + event.x + '/' + event.y + ')')
           this.hasDragSubject = false;
           const nodes = this.network.getNodes();
           for (let i = nodes.length - 1; i >= 0; i--) {
             const n = nodes[i];
-            // const dx = this.transform.invertX(d3.event.x) - n.x;
-            // const dy = this.transform.invertY(d3.event.y) - n.y;
-            // if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
-            //   n.x = this.transform.applyX(n.x);
-            //   n.y = this.transform.applyY(n.y);
-            //   this.hasDragSubject = true;
-            //   return n;
-            // }
+            const dx = this.transform.invertX(event.x) - n.x;
+            const dy = this.transform.invertY(event.y) - n.y;
+            if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
+              n.x = this.transform.applyX(n.x);
+              n.y = this.transform.applyY(n.y);
+              this.hasDragSubject = true;
+              return n;
+            }
           }
         })
-        .on('start', () => {
-          // if (!d3.event.active) {
-          //   d3Sim.alphaTarget(0.3).restart();
-          // }
-          // d3.event.subject.fx = this.transform.invertX(d3.event.x);
-          // d3.event.subject.fy = this.transform.invertY(d3.event.y);
+        .on('start', (event: D3DragEvent<any, any, any>) => {
+          if (!event.active) {
+            d3Sim.alphaTarget(0.3).restart();
+          }
+          event.subject.fx = this.transform.invertX(event.x);
+          event.subject.fy = this.transform.invertY(event.y);
         })
-        .on('drag', () => {
-          // console.log(this.transform.invertX(this.d3.event.x) + '/' + this.transform.invertY(this.d3.event.y));
-          // d3.event.subject.fx = this.transform.invertX(d3.event.x);
-          // d3.event.subject.fy = this.transform.invertY(d3.event.y);
+        .on('drag', (event: D3DragEvent<any, any, any>) => {
+          console.log(this.transform.invertX(event.x) + '/' + this.transform.invertY(event.y));
+          event.subject.fx = this.transform.invertX(event.x);
+          event.subject.fy = this.transform.invertY(event.y);
         })
-        .on('end', () => {
-          // if (!d3.event.active) {
-          //   d3Sim.alphaTarget(0);
-          // }
-          // d3.event.subject.fx = null;
-          // d3.event.subject.fy = null;
+        .on('end', (event: D3DragEvent<any, any, any>) => {
+          if (!event.active) {
+            d3Sim.alphaTarget(0);
+          }
+          event.subject.fx = null;
+          event.subject.fy = null;
         })
       )
       .call(d3.zoom()
         .scaleExtent([1 / 4, 4])
-        .filter(() => {
-          // if (d3.event.type === 'mousedown' || d3.event.type === 'touchstart') {
-          //   if (this.hasDragSubject) {
-          //     return false;
-          //   }
-          // }
+        .filter((event: D3ZoomEvent<any, any>) => {
+          if (event.type === 'mousedown' || event.type === 'touchstart') {
+            if (this.hasDragSubject) {
+              return false;
+            }
+          }
           return true;
-        }).on('zoom', () => {
-          // if (!d3.event.active) {
+        }).on('zoom', (event: D3ZoomEvent<any, any>) => {
+          // if (!event.active) {
           //   d3Sim.restart();
           // }
-          // this.transform = d3.event.transform;
+          this.transform = event.transform;
         }));
   }
 
@@ -231,21 +228,21 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     d3.select(canvas)
       .call(d3.drag()
         .container(canvas)
-        .subject(() => {
-          // console.log('subject: (' + this.d3.event.x + '/' + this.d3.event.y + ')')
+        .subject((event: D3DragEvent<any, any, any>) => {
+          console.log('subject: (' + event.x + '/' + event.y + ')')
           this.hasDragSubject = false;
           if (nodeInteractionBehavior !== undefined && nodeInteractionBehavior !== null) {
             const nodes = this.network.getNodes();
             for (let i = nodes.length - 1; i >= 0; i--) {
               const n = nodes[i];
-              // const dx = this.transform.invertX(d3.event.x) - n.x;
-              // const dy = this.transform.invertY(d3.event.y) - n.y;
-              // if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
-              //   n.x = this.transform.applyX(n.x);
-              //   n.y = this.transform.applyY(n.y);
-              //   this.hasDragSubject = true;
-              //   return n;
-              // }
+              const dx = this.transform.invertX(event.x) - n.x;
+              const dy = this.transform.invertY(event.y) - n.y;
+              if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
+                n.x = this.transform.applyX(n.x);
+                n.y = this.transform.applyY(n.y);
+                this.hasDragSubject = true;
+                return n;
+              }
             }
           }
           if (edgeInteractionBehavior !== undefined && edgeInteractionBehavior !== null) {
@@ -254,77 +251,82 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
             let d_sqr_min = squaredDistanceThreshold;
             for (let i = edges.length - 1; i >= 0; i--) {
               const edge = edges[i];
-              // const d_sqr = this.getPointToLineSegmentSquaredDistance(
-              //   (edge.source as GraphNode).x, (edge.source as GraphNode).y,
-              //   (edge.target as GraphNode).x, (edge.target as GraphNode).y,
-              //   this.transform.invertX(d3.event.x), this.transform.invertY(d3.event.y)
-              // );
-              // if (d_sqr < d_sqr_min) {
-              //   d_sqr_min = d_sqr;
-              //   index = i;
-              // }
+              const d_sqr = this.getPointToLineSegmentSquaredDistance(
+                (edge.source as GraphNode).x, (edge.source as GraphNode).y,
+                (edge.target as GraphNode).x, (edge.target as GraphNode).y,
+                this.transform.invertX(event.x), this.transform.invertY(event.y)
+              );
+              if (d_sqr < d_sqr_min) {
+                d_sqr_min = d_sqr;
+                index = i;
+              }
             }
             if (index !== -1) {
               return edges[index];
             }
           }
         })
-        .on('start', () => false)
-        .on('drag', () => false)
-        // .on('end', () => {
-        //   if (d3.event.subject !== undefined && d3.event.subject.question !== undefined) {
-        //     const n = d3.event.subject as GraphNode;
-        //     const dx = this.transform.invertX(d3.event.x) - n.x;
-        //     const dy = this.transform.invertY(d3.event.y) - n.y;
-        //     if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
-        //       nodeInteractionBehavior.interactWith(n).then(() => {
-        //         this.updateSimulation();
-        //       });
-        //     }
-        //   } else if (d3.event.subject !== undefined && d3.event.subject.relation !== undefined) {
-        //     const edge = d3.event.subject as Edge;
-        //     // const d_sqr = this.getPointToLineSegmentSquaredDistance(
-        //     //   (edge.source as GraphNode).x, (edge.source as GraphNode).y,
-        //     //   (edge.target as GraphNode).x, (edge.target as GraphNode).y,
-        //     //   this.transform.invertX(d3.event.x), this.transform.invertY(d3.event.y)
-        //     // );
-        //     // if (d_sqr <= squaredDistanceThreshold) {
-        //     //   edgeInteractionBehavior.interactWith(edge).then(() => {
-        //     //     this.updateSimulation();
-        //     //   });
-        //     // }
-        //   }
-        // }))
-      ).call(d3.zoom().filter(() => false));
+        .on('start', (event: D3DragEvent<any, any, any>) => {
+          console.log(event);
+        })
+        .on('drag', (event: D3DragEvent<any, any, any>) => {
+          console.log(event);
+        })
+        .on('end', (event: D3DragEvent<any, any, any>) => {
+          console.log(event);
+          if (event.subject !== undefined && event.subject.question !== undefined) {
+            const n = event.subject as GraphNode;
+            const dx = this.transform.invertX(event.x) - n.x;
+            const dy = this.transform.invertY(event.y) - n.y;
+            if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
+              nodeInteractionBehavior.interactWith(n).then(() => {
+                this.updateSimulation();
+              });
+            }
+          } else if (event.subject !== undefined && event.subject.relation !== undefined) {
+            const edge = event.subject as Edge;
+            const d_sqr = this.getPointToLineSegmentSquaredDistance(
+              (edge.source as GraphNode).x, (edge.source as GraphNode).y,
+              (edge.target as GraphNode).x, (edge.target as GraphNode).y,
+              this.transform.invertX(event.x), this.transform.invertY(event.y)
+            );
+            if (d_sqr <= squaredDistanceThreshold) {
+              edgeInteractionBehavior.interactWith(edge).then(() => {
+                this.updateSimulation();
+              });
+            }
+          }
+        }))
+      .call(d3.zoom().filter(() => false));
   }
 
-  // private getPointToLineSegmentSquaredDistance(ax: number, ay: number, bx: number, by: number, px: number, py: number) {
-  //   // calculate unit vector of AB
-  //   const ab_len = Math.sqrt(Math.pow(bx - ax, 2) + Math.pow(by - ay, 2));
-  //   const abx_0 = (bx - ax) / ab_len;
-  //   const aby_0 = (by - ay) / ab_len;
+  private getPointToLineSegmentSquaredDistance(ax: number, ay: number, bx: number, by: number, px: number, py: number) {
+    // calculate unit vector of AB
+    const ab_len = Math.sqrt(Math.pow(bx - ax, 2) + Math.pow(by - ay, 2));
+    const abx_0 = (bx - ax) / ab_len;
+    const aby_0 = (by - ay) / ab_len;
 
-  //   // calculate projection point C, projecting AP on AB
-  //   const dot = abx_0 * (px - ax) + aby_0 * (py - ay);
-  //   const cx = ax + dot * abx_0;
-  //   const cy = ay + dot * aby_0;
+    // calculate projection point C, projecting AP on AB
+    const dot = abx_0 * (px - ax) + aby_0 * (py - ay);
+    const cx = ax + dot * abx_0;
+    const cy = ay + dot * aby_0;
 
-  //   // calculate multiplier for unit vector to reach point C from point A
-  //   const ac_mul = (cx - ax) / abx_0;
+    // calculate multiplier for unit vector to reach point C from point A
+    const ac_mul = (cx - ax) / abx_0;
 
-  //   let d_sqr;
-  //   if (ac_mul < 0) {
-  //     // not above the line segment, closer to A
-  //     d_sqr = Math.pow(ax - px, 2) + Math.pow(ay - py, 2);
-  //   } else if (ac_mul > ab_len) {
-  //     // not above the line segment, closer to B
-  //     d_sqr = Math.pow(bx - px, 2) + Math.pow(by - py, 2);
-  //   } else {
-  //     // above the line segment, distance to C === distance to AB
-  //     d_sqr = Math.pow(cx - px, 2) + Math.pow(cy - py, 2);
-  //   }
-  //   return d_sqr;
-  // }
+    let d_sqr;
+    if (ac_mul < 0) {
+      // not above the line segment, closer to A
+      d_sqr = Math.pow(ax - px, 2) + Math.pow(ay - py, 2);
+    } else if (ac_mul > ab_len) {
+      // not above the line segment, closer to B
+      d_sqr = Math.pow(bx - px, 2) + Math.pow(by - py, 2);
+    } else {
+      // above the line segment, distance to C === distance to AB
+      d_sqr = Math.pow(cx - px, 2) + Math.pow(cy - py, 2);
+    }
+    return d_sqr;
+  }
 
   private initData() {
     this.network = new Network();
