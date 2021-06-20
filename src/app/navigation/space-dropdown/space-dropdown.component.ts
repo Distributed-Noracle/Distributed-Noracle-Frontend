@@ -17,13 +17,17 @@ export class SpaceDropdownComponent implements OnInit, OnDestroy {
   constructor(private myspacesService: MyspacesService) {
   }
 
-  ngOnInit() {
-    this.spaceSubscription =
-      this.myspacesService.getMySpacesObservable().subscribe((myspaces) => this.spaces = myspaces);
-    this.myspacesService.getMySpaces().then((s) => s);
+  ngOnInit(): void {
+    this.spaceSubscription = this.myspacesService.getMySpacesObservable().subscribe((myspaces) => this.spaces = myspaces);
+    this.myspacesService.getMySpaces()
+      .then((s) => s)
+      .catch(() => {
+        // TODO: Error Dialog to user
+        console.error('Error while trying to get the spaces.');
+      });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.spaceSubscription.unsubscribe();
   }
 

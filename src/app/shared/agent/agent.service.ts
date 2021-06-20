@@ -18,7 +18,9 @@ export class AgentService {
       return this.restHelperService.getCurrentAgent().then((res) => {
         this.cachedAgent = res.json();
         return this.cachedAgent;
-      });
+      }).catch((res) => {
+        return Promise.reject(res);
+      })
     }
   }
 
@@ -42,8 +44,12 @@ export class AgentService {
   public getSpaceSubscriptions(): Promise<SpaceSubscription[]> {
     return this.getAgent()
       .then((agent) => {
-        return this.restHelperService.get(`/agents/${agent.agentid}/spacesubscriptions`)
-          .then(res2 => res2.json() as SpaceSubscription[]);
+        if (agent) {
+          return this.restHelperService.get(`/agents/${agent.agentid}/spacesubscriptions`)
+            .then(res2 => res2.json() as SpaceSubscription[]);
+        }
+      }).catch(() => {
+        return Promise.reject(null)
       });
   }
 
