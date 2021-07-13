@@ -40,7 +40,11 @@ export class MyspacesService {
             });
             this.myspacesSubject.next(result);
             return result;
-          });
+          })
+          .catch(() => Promise.reject(null));
+      })
+      .catch(() => {
+        return Promise.reject(null)
       });
   }
 

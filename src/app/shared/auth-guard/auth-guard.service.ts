@@ -12,7 +12,7 @@ export class AuthGuardService implements CanActivate {
   private userName: string;
   // private userData: any;
 
-  constructor(/*private oidcSecurityService: OidcSecurityService,*/ private router: Router,
+  constructor(private router: Router,
     protected readonly keycloak: KeycloakService) {
 
     this.keycloak.isLoggedIn().then(loggedIn => {
@@ -31,7 +31,7 @@ export class AuthGuardService implements CanActivate {
     // this.userDataSubscription = this.oidcSecurityService.getUserData().subscribe(userData => this.userData = userData);
   }
 
-  isAuthorized() {
+  isAuthorized() : boolean {
     return this._isAuthorized;
   }
 
