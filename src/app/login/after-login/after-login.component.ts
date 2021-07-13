@@ -12,7 +12,7 @@ export class AfterLoginComponent implements OnInit {
   constructor(authGuardService: AuthGuardService, agentService: AgentService, router: Router) {
     if (authGuardService.isAuthorized()) {
       agentService.getAgent().then((agent) =>
-        agentService.putAgentName(agent.agentid, authGuardService.getUserData().preferred_username));
+        agentService.putAgentName(agent.agentid, authGuardService.getUserName()));
       const lastRouteRequested = authGuardService.getLastRouteRequested();
       if (lastRouteRequested !== undefined) {
         router.navigate([lastRouteRequested.url], {

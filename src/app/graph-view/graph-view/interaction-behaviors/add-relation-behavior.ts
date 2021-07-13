@@ -2,9 +2,9 @@ import {NodeInteractionBehavior} from './node-interaction-behavior';
 import {GraphNode} from '../graph-data-model/graph-node';
 import {Relation} from '../../../shared/rest-data-model/relation';
 import {RelationPickerDialogComponent} from '../../relation-picker-dialog/relation-picker-dialog.component';
-import {MatDialog} from '@angular/material';
 import {GraphViewService} from '../graph-view.service';
 import {RelationType} from '../graph-data-model/relation-type.enum';
+import {MatDialog} from '@angular/material/dialog';
 
 export class AddRelationBehavior extends NodeInteractionBehavior {
 

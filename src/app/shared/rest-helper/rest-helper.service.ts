@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Headers, Http, Response} from '@angular/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Router} from '@angular/router';
-import {OidcSecurityService} from 'angular-auth-oidc-client';
 import {environment} from '../../../environments/environment';
 import {retry} from 'rxjs/operators';
+import {KeycloakService } from 'keycloak-angular';
 
 const HOST_URLS = environment.hostUrls;
 
@@ -12,13 +12,13 @@ export class RestHelperService {
   private CORE_BASE_URL = '/las2peer';
   private BASE_URL = '/distributed-noracle/v0.7.0';
   private isMock = false;
-  private oidcName = '';
+  private userName = '';
 
-  constructor(private OidcSecurityService: OidcSecurityService, private http: Http,
+  constructor(private http: HttpClient,
+    protected readonly keycloak: KeycloakService,
     private router: Router) {
-    OidcSecurityService.getUserData().subscribe((userData: any) => {
-      this.oidcName = userData.email;
-    });
+
+    this.userName = this.keycloak.getUsername();
   }
 
   public async get(path: string): Promise<any> {
@@ -35,45 +35,47 @@ export class RestHelperService {
     }
   }
 
-  public getAbsoulte(absolutePath: string): Promise<Response> {
+  public getAbsoulte(absolutePath: string): Promise<any> {
     return this.http.get(absolutePath, {headers: this.getHeaders()}).pipe(retry(3)).toPromise();
   }
 
-  public put(path: string, body: any): Promise<Response> {
+  public put(path: string, body: any): Promise<any> {
     return this.http.put(this.getBaseURL() + path,
       body,
       {headers: this.getHeaders()}
     ).pipe(retry(3)).toPromise();
   }
 
-  public post(path: string, body: any): Promise<Response> {
+  public post(path: string, body: any): Promise<any> {
     return this.http.post(this.getBaseURL() + path,
       body,
       {headers: this.getHeaders()}
     ).pipe(retry(3)).toPromise();
   }
 
-  public getCurrentAgent(): Promise<Response> {
+  public getCurrentAgent(): Promise<any> {
     return this.http.get(this.getCoreBaseURL() + '/currentagent', {headers: this.getHeaders()}).pipe(retry(3)).toPromise();
   }
 
-  private getHeaders(): Headers {
+  private getHeaders(): HttpHeaders {
     if (this.isMock) {
       return this.getMockHeaders();
     }
-    const headers = new Headers();
+    const headers = new HttpHeaders();
     headers.append('Accept', 'application/json;q=0.9,text/plain;q=0.8,*/*;q=0.5');
     headers.append('Content-Type', 'application/json');
-    const token = this.OidcSecurityService.getToken();
-    if (token !== '') {
-      const tokenValue = 'Bearer ' + token;
-      headers.append('Authorization', tokenValue);
-    }
+    this.keycloak.getToken().then(token => {
+      if (token !== '') {
+        const tokenValue = 'Bearer ' + token;
+        headers.append('Authorization', tokenValue);
+      }
+    });
+
     return headers;
   }
 
-  private getMockHeaders(): Headers {
-    const headers = new Headers();
+  private getMockHeaders(): HttpHeaders {
+    const headers = new HttpHeaders();
     headers.append('Accept', 'application/json;q=0.9,text/plain;q=0.8,*/*;q=0.5');
     headers.append('Content-Type', 'application/json');
     const user = 'noracle-example-smith';
@@ -93,20 +95,20 @@ export class RestHelperService {
   }
 
   /**
-   * Determines the API URL to be used by mapping the oidc email address of the
+   * Determines the API URL to be used by mapping the username of the
    * logged in user to one of the provided URLs using a hash function.
    * This was introduced to simulate a distributed setting with users who can't
    * host a node themselves.
    */
   public getHostURL(): string {
-    return HOST_URLS[Math.abs(this.hash(this.oidcName) % HOST_URLS.length)];
+    return HOST_URLS[Math.abs(this.hash(this.userName) % HOST_URLS.length)];
   }
 
   /**
    * Maps the input string to a 32bit signed integer
    * @param str The string to be hashed
    */
-  private hash(str): number {
+  private hash(str: string): number {
     let hash = 0, i, chr;
     if (!str || str.length === 0) {
       return hash;

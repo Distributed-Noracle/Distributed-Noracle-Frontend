@@ -1,29 +1,42 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
+import { KeycloakService } from 'keycloak-angular';
 import {Observable, Subscription} from 'rxjs';
-import {OidcSecurityService} from 'angular-auth-oidc-client';
+// import {OidcSecurityService} from 'angular-auth-oidc-client';
 
 @Injectable()
 export class AuthGuardService implements CanActivate {
   private isAuthorizedSubscription: Subscription;
   private _isAuthorized = false;
   private userDataSubscription: Subscription;
-  private userData: any;
+  private userName: string;
+  // private userData: any;
 
-  constructor(private oidcSecurityService: OidcSecurityService, private router: Router) {
-    this.isAuthorizedSubscription = this.oidcSecurityService.getIsAuthorized().subscribe(
-      (isAuthorized: boolean) => {
-        this._isAuthorized = isAuthorized;
-      });
-    this.userDataSubscription = this.oidcSecurityService.getUserData().subscribe(userData => this.userData = userData);
+  constructor(private router: Router,
+    protected readonly keycloak: KeycloakService) {
+
+    this.keycloak.isLoggedIn().then(loggedIn => {
+      this._isAuthorized = loggedIn;
+      if (this._isAuthorized) {
+        this.keycloak.loadUserProfile().then(profile => {
+          this.userName = profile.username;
+        })
+      }
+    });
+
+    // this.isAuthorizedSubscription = this.oidcSecurityService.getIsAuthorized().subscribe(
+    //   (isAuthorized: boolean) => {
+    //     this._isAuthorized = isAuthorized;
+    //   });
+    // this.userDataSubscription = this.oidcSecurityService.getUserData().subscribe(userData => this.userData = userData);
   }
 
-  isAuthorized() {
+  isAuthorized() : boolean {
     return this._isAuthorized;
   }
 
-  getUserData(): { preferred_username} {
-    return this.userData;
+  getUserName(): string {
+    return this.userName;
   }
 
   getLastRouteRequested() {
