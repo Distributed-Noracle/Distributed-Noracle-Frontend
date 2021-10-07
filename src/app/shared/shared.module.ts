@@ -6,7 +6,6 @@ import {RelationService} from './relation/relation.service';
 import {AgentService} from './agent/agent.service';
 import {RestHelperService} from './rest-helper/rest-helper.service';
 import {AuthGuardService} from './auth-guard/auth-guard.service';
-// import {OidcSecurityService} from 'angular-auth-oidc-client';
 import {MyspacesService} from './myspaces/myspaces.service';
 import { RelationVoteService } from './relation-vote/relation-vote.service';
 import {QuestionVoteService} from './question-vote/question-vote.service';

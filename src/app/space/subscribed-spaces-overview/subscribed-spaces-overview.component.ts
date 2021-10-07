@@ -16,10 +16,10 @@ import {RestHelperService} from '../../shared/rest-helper/rest-helper.service';
 })
 export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
   public spaces: { space: Space, subscription: SpaceSubscription }[];
-  public bots: {name: string, active: {}}[] = [];
-  public botWidgetUrl: string;
+  //public bots: {name: string, active: {}}[] = [];
+  //public botWidgetUrl: string;
   private spaceSubscription: Subscription;
-  private botUri: string;
+  // private botUri: string;
 
   constructor(private myspacesService: MyspacesService, private snackBar: MatSnackBar,
               private matIconRegistry: MatIconRegistry, private sanitizer: DomSanitizer, private rh: RestHelperService) {
@@ -39,10 +39,10 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
         this.sanitizer.bypassSecurityTrustResourceUrl('assets/play.svg'));
     this.matIconRegistry.addSvgIconInNamespace('img', 'pause',
         this.sanitizer.bypassSecurityTrustResourceUrl('assets/pause.svg'));
-    this.botWidgetUrl = this.rh.getHostURL() + '/fileservice/v2.2.5/files/sbf';
-    this.botUri = this.rh.getHostURL() + '/SBFManager/bots/distributed-noracle';
+    //this.botWidgetUrl = this.rh.getHostURL() + '/fileservice/v2.2.5/files/sbf';
+    //this.botUri = this.rh.getHostURL() + '/SBFManager/bots/distributed-noracle';
 
-    const xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+    /*const xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
     xmlhttp.open('GET', this.botUri);
     xmlhttp.setRequestHeader('Accept', 'application/json');
     xmlhttp.send();
@@ -66,7 +66,7 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
             bots.push(b);
           }
        }
-    };
+    }; */
   }
 
   ngOnDestroy() {
@@ -118,7 +118,7 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
       return bot['active'][spaceId]['icon'];
   }
 
-  addBot(myspace: { space: Space, subscription: SpaceSubscription }, botObject: {name: String, active: {}}) {
+  /*addBot(myspace: { space: Space, subscription: SpaceSubscription }, botObject: {name: String, active: {}}) {
     const bot = botObject.name;
     var active = false;
     if(botObject.active[myspace.space.spaceId]==null){
@@ -203,7 +203,7 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
         }
       });
     }
-  }
+  }*/
 
   private copyFallback(url: string) {
     window.prompt('Could not copy to clipboard automatically. Please copy the following invitation link manually:', url);

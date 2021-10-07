@@ -9,7 +9,7 @@ export class GraphNode implements SimulationNodeDatum {
   private lines: string[];
   private textSize = 10;
   private bubbleScaleFactor = 1.25;
-  public radius;
+  public radius: number;
   public relationVotes: Map<string, RelationVote[]> = new Map<string, RelationVote[]>();
   public relations: Relation[];
 

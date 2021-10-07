@@ -10,8 +10,8 @@ export class QuestionVoteService {
   }
 
   public getQuestionVotes(spaceId: string, questionId: string) {
-    return this.restHelperService.get(`/spaces/${spaceId}/questions/${questionId}/votes`).then((res) => {
-      return res.json() as QuestionVote[];
+    return this.restHelperService.get(`/spaces/${spaceId}/questions/${questionId}/votes`).then((res: QuestionVote[]) => {
+      return res;
     });
   }
 

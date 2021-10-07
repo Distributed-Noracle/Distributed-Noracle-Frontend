@@ -15,12 +15,12 @@ export class WelcomePageComponent implements OnInit, OnDestroy {
 
   public statsLoaded: boolean = false;
 
-  private successModelSubscription: Subscription;
+  private successModelSubscription: Subscription = new Subscription();
 
   constructor(private http: HttpClient) { }
 
   ngOnInit() {
-    this.loadStats();
+    // this.loadStats()
   }
 
   ngOnDestroy() {
@@ -33,7 +33,6 @@ export class WelcomePageComponent implements OnInit, OnDestroy {
    * a MobSOS API for non pre-formatted data is available
    */
   loadStats() {
-
     let body: Object = {
       catalog: 'measure_catalogs/measure_catalog-mysql.xml',
       modelName: 'Noracle Service Success Model',
@@ -50,7 +49,6 @@ export class WelcomePageComponent implements OnInit, OnDestroy {
       .subscribe(response => {
         const filtered = REGEX.exec(response);
         if (!filtered || !filtered[1]) {
-          console.log(filtered);
           throw new Error('malformatted response');
         }
 
@@ -60,7 +58,6 @@ export class WelcomePageComponent implements OnInit, OnDestroy {
         for (let ix = 0; ix < scripts.length; ix++) {
           eval.call(window, scripts[ix].text);
         }
-        this.statsLoaded = true;
       });
   }
 

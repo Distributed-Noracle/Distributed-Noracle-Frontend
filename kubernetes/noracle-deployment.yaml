@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: noracle-frontent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: noracle-frontent
+  template:
+    metadata:
+      labels:
+        app: noracle-frontent
+    spec:
+      containers:
+        - name: noracle-frontent
+          image: registry.tech4comp.dbis.rwth-aachen.de/rwthacis/noracle-frontend:latest
