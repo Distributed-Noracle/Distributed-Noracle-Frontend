@@ -10,15 +10,13 @@ const HOST_URLS = environment.hostUrls;
 @Injectable()
 export class RestHelperService {
   private CORE_BASE_URL = '/las2peer';
-  private BASE_URL = '/distributed-noracle/v0.7.0';
+  private BASE_URL = '/distributed-noracle';
   private isMock = false;
   private userName = '';
 
   constructor(private http: HttpClient,
     protected readonly keycloak: KeycloakService,
     private router: Router) {
-
-    this.userName = this.keycloak.getUsername();
   }
 
   public async get(path: string): Promise<any> {
@@ -47,10 +45,7 @@ export class RestHelperService {
   }
 
   public post(path: string, body: any): Promise<any> {
-    return this.http.post(this.getBaseURL() + path,
-      body,
-      {headers: this.getHeaders()}
-    ).pipe(retry(3)).toPromise();
+    return this.http.post(this.getBaseURL() + path, body, { headers: this.getHeaders(), observe: 'response' }).pipe(retry(3)).toPromise();
   }
 
   public getCurrentAgent(): Promise<any> {
@@ -61,17 +56,6 @@ export class RestHelperService {
     if (this.isMock) {
       return this.getMockHeaders();
     }
-    const headers = new HttpHeaders();
-    headers.append('Accept', 'application/json;q=0.9,text/plain;q=0.8,*/*;q=0.5');
-    headers.append('Content-Type', 'application/json');
-    this.keycloak.getToken().then(token => {
-      if (token !== '') {
-        const tokenValue = 'Bearer ' + token;
-        headers.append('Authorization', tokenValue);
-      }
-    });
-
-    return headers;
   }
 
   private getMockHeaders(): HttpHeaders {

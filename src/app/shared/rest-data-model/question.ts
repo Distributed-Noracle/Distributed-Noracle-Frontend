@@ -10,6 +10,7 @@ export class Question {
   authorId: string;
   timestampCreated: string;
   timestampLastModified: string;
+  depth: number;
 
   followUps: number;
 

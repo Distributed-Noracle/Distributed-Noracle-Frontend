@@ -10,15 +10,20 @@ export class QuestionService {
 
   public getQuestionsOfSpace(spaceId: string): Promise<Question[]> {
     // TODO: proper pagination
-    return this.restHelperService.get(`/spaces/${spaceId}/questions?limit=1000`).then((res) => {
-      return res.json() as Question[];
+    return this.restHelperService.get(`/spaces/${spaceId}/questions?limit=1000`).then((res: Question[]) => {
+      return res;
     });
   }
 
   public postQuestion(spaceId: string, question: Question): Promise<Question> {
     return this.restHelperService.post(`/spaces/${spaceId}/questions`, question).then((res) => {
-      return this.restHelperService.getAbsoulte(res.headers.get('location'))
-        .then((r) => r.json() as Question);
+      // TODO: Hacky hack, needs to be fixed by the backend!
+      let location: string = res.headers.get('location');
+      location = location.replace("http", "https");
+      return this.restHelperService.getAbsoulte(location)
+        .then((r: Question) => {
+          return r;
+        });
     });
   }
 

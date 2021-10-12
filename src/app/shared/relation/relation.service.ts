@@ -10,8 +10,8 @@ export class RelationService {
 
   public getRelationsOfSpace(id): Promise<Relation[]> {
     // TODO: proper pagination
-    return this.restHelperService.get(`/spaces/${id}/relations?limit=1000`).then((res) => {
-      return res.json() as Relation[];
+    return this.restHelperService.get(`/spaces/${id}/relations?limit=1000`).then((res: Relation[]) => {
+      return res;
     });
   }
 

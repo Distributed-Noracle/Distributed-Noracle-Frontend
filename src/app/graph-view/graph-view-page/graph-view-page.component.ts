@@ -1,4 +1,4 @@
-import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {GraphInteractionMode} from '../graph-view/graph-data-model/graph-interaction-mode.enum';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
@@ -10,33 +10,24 @@ import {MyspacesService} from '../../shared/myspaces/myspaces.service';
   styleUrls: ['./graph-view-page.component.css']
 })
 export class GraphViewPageComponent implements OnInit, OnDestroy {
-  @ViewChild('graphContainer')
-  private graphContainer;
-  @ViewChild('below')
-  private below;
-  private elementRef: ElementRef;
-
   public subscriptionInProgress = false;
   public interactionMode = GraphInteractionMode.SelectAndNavigate;
-  public height = 600;
-  public width = 800;
+  public height = 800;
+  public width = 1100;
   private paramSubscription: Subscription;
   private queryParamSubscription: Subscription;
   public spaceId = '1';
   public selectedQuestions;
   public spaceMembers = [];
 
-  private adjustSize() {
-    this.height = (window.innerHeight
-      - this.graphContainer.nativeElement.getBoundingClientRect().top
-      - this.below.nativeElement.getBoundingClientRect().height) * 0.9;
-    this.width = window.innerWidth * 0.95;
-  }
+  // private adjustSize() {
+  //   this.height = (window.innerHeight
+  //     - this.graphContainer.nativeElement.getBoundingClientRect().top
+  //     - this.below.nativeElement.getBoundingClientRect().height) * 0.9;
+  //   this.width = window.innerWidth * 0.95;
+  // }
 
-  constructor(elementRef: ElementRef, private activatedRoute: ActivatedRoute,
-              private router: Router, private myspacesService: MyspacesService) {
-    this.elementRef = elementRef;
-  }
+  constructor(private activatedRoute: ActivatedRoute, private router: Router, private myspacesService: MyspacesService) {}
 
   ngOnInit() {
     this.paramSubscription = this.activatedRoute.params.subscribe((params) => {
@@ -64,7 +55,6 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
         this.selectedQuestions = JSON.parse(q);
       }
     });
-    this.adjustSize();
   }
 
   ngOnDestroy() {
@@ -72,11 +62,10 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
     this.queryParamSubscription.unsubscribe();
   }
 
-  @HostListener('window:resize', ['$event'])
-  onWindowResize(event) {
-    this.adjustSize();
-  }
-
+  // @HostListener('window:resize', ['$event'])
+  // onWindowResize(event) {
+  //   this.adjustSize();
+  // }
   public getInteractionModes() {
     const modes = [];
     for (const mode in GraphInteractionMode) {

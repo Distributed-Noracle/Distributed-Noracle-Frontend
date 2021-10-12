@@ -205,7 +205,7 @@ export class GraphViewService {
   private fetchAll(spaceId: string) {
     // load all questions and all relations of the space
     const questionsAndRelationsPromise = Promise.all([
-      this.questionService.getQuestionsOfSpace(spaceId).then((res) => {
+      this.questionService.getQuestionsOfSpace(spaceId).then((res: Question[]) => {
         this.questions = res;
         this.questions.forEach(q => this.questionVotes.set(q.questionId, q.votes));
         const seedIndex = this.observedQuestionIds.indexOf('seed');

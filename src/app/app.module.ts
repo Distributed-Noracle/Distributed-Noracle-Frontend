@@ -16,10 +16,11 @@ import {SpaceModule} from './space/space.module';
 import {SubscribedSpacesOverviewComponent} from './space/subscribed-spaces-overview/subscribed-spaces-overview.component';
 import {CreateSpaceComponent} from './space/create-space/create-space.component';
 import {AfterLoginComponent} from './login/after-login/after-login.component';
-import {HttpClientModule} from '@angular/common/http';
+import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 import { environment } from 'src/environments/environment';
+import { HttpRequestInterceptor } from './shared/http-request-interceptor/http-request-interceptor';
 
 function initializeKeycloak(keycloak: KeycloakService): () => Promise<boolean> {
   return () =>
@@ -32,9 +33,11 @@ function initializeKeycloak(keycloak: KeycloakService): () => Promise<boolean> {
           initOptions: {
               checkLoginIframe: true,
               checkLoginIframeInterval: 25,
+              enableLogging: false
           },
+          enableBearerInterceptor: true,
           loadUserProfileAtStartUp: true,
-          bearerExcludedUrls: [environment.mobsosUrl]
+          bearerExcludedUrls: environment.hostUrls
       });
 }
 
@@ -69,6 +72,10 @@ function initializeKeycloak(keycloak: KeycloakService): () => Promise<boolean> {
       multi: true,
       deps: [KeycloakService],
     },
+    { provide: HTTP_INTERCEPTORS,
+      useClass: HttpRequestInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

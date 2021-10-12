@@ -33,3 +33,16 @@
 mat-icon {
     font-size: 15px;
 }
+
+.container {
+    width: 1500px;
+    margin: 0 auto;
+}
+
+.spaceContent {
+    width: 1150px;
+}
+
+.spaceInfo {
+    width: 400px;
+}

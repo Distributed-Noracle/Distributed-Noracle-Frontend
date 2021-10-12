@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: noracle-ingress
+  namespace: ma-breuer
+spec:
+  tls:
+  - hosts:
+    - noracle.tech4comp.dbis.rwth-aachen.de
+    secretName: 'nginx-tls'
+  rules:
+  - host: noracle.tech4comp.dbis.rwth-aachen.de
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: noracle-frontend-service
+            port:
+              number: 1234

@@ -16,10 +16,10 @@ export class AgentService {
       return Promise.resolve(this.cachedAgent);
     } else {
       return this.restHelperService.getCurrentAgent().then((res) => {
-        this.cachedAgent = res.json();
+        this.cachedAgent = res;
         return this.cachedAgent;
-      }).catch((res) => {
-        return Promise.reject(res);
+      }).catch(error => {
+        console.error(error);
       })
     }
   }
@@ -27,7 +27,7 @@ export class AgentService {
   public putAgentName(agentId: string, name: string): Promise<string> {
     this.cachedAgentNames.set(agentId, name);
     return this.restHelperService.put(`/agents/${agentId}`, {agentName: name})
-      .then((res) => res.json().name as string);
+      .then((res) => res.name as string);
   }
 
   public getAgentName(agentId: string): Promise<string> {
@@ -35,8 +35,8 @@ export class AgentService {
       return Promise.resolve(this.cachedAgentNames.get(agentId));
     } else {
       return this.restHelperService.get(`/agents/${agentId}`).then(res => {
-        this.cachedAgentNames.set(agentId, res.json().name);
-        return res.json().name as string;
+        this.cachedAgentNames.set(agentId, res.name);
+        return res.name as string;
       }, reason => 'unknown');
     }
   }
@@ -45,7 +45,9 @@ export class AgentService {
     return this.getAgent()
       .then((agent) => {
           return this.restHelperService.get(`/agents/${agent.agentid}/spacesubscriptions`)
-            .then(res2 => res2.json() as SpaceSubscription[]);
+            .then((res2: SpaceSubscription[]) => {
+              return res2;
+            });
       }).catch(() => {
         return Promise.reject(null)
       });

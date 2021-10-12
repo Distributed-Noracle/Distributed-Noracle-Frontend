@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ForceLink, Simulation} from 'd3-force';
 import {GraphNode} from './graph-data-model/graph-node';
 import {Edge} from './graph-data-model/edge';
@@ -27,10 +27,10 @@ import { D3DragEvent, D3ZoomEvent } from 'd3';
   templateUrl: './graph-view.component.html',
   styleUrls: ['./graph-view.component.css']
 })
-export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
-  @ViewChild('d3root') private d3Root;
-  @Input('height') public height = 400;
-  @Input('width') public width = 400;
+export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
+  @ViewChild('d3root') private d3Root: ElementRef;
+  @Input('height') public height = 800;
+  @Input('width') public width = 1100;
   @Input('interactionMode') private interactionMode: GraphInteractionMode;
   @Input('spaceId') private spaceId = 'dummy';
   @Input('selectedQuestions') private selectedQuestions: string[];
@@ -46,22 +46,23 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
   private updateSubscription: Subscription;
 
 
-  constructor(private graphViewService: GraphViewService, private agentService: AgentService,
-              private questionVoteService: QuestionVoteService, private dialog: MatDialog) {
+  constructor(private graphViewService: GraphViewService, private agentService: AgentService, private dialog: MatDialog) {
     this.transform = d3.zoomIdentity;
   }
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ngAfterViewInit(): void {
     this.canvas = this.d3Root.nativeElement;
     this.context = this.canvas.getContext('2d');
+
     this.d3Sim = d3.forceSimulation() as Simulation<GraphNode, Edge>;
-    this.d3Sim.force('link', d3.forceLink<GraphNode, Edge>().id((n, i, d) => n.id.toString()));
+    this.d3Sim.force('link', d3.forceLink<GraphNode, Edge>().id((n, i, d) => n.id));
     this.d3Sim.force('charge', d3.forceManyBody());
     this.d3Sim.force('center', d3.forceCenter(this.width / 2, this.height / 2));
-    this.d3Sim.force('collide', d3.forceCollide((node) => (node as GraphNode).radius * 1.2));
+    this.d3Sim.force('collide', d3.forceCollide((node: GraphNode) => (node as GraphNode).radius * 1.2));
 
-    this.updateSubscription =
-      this.graphViewService.getUpdateObservable().subscribe(updateData => this.processUpdate(updateData));
+    this.updateSubscription = this.graphViewService.getUpdateObservable().subscribe(updateData => this.processUpdate(updateData));
     this.initData();
     this.initVisualization();
     this.updateInteractionMode();
@@ -86,37 +87,37 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  initVisualization() {
+  initVisualization(): void {
     const context = this.context;
     const d3Sim = this.d3Sim;
 
     d3Sim.nodes(this.network.getNodes()).on('tick', () => {
-      context.save();
-      context.clearRect(0, 0, this.width, this.height);
+        context.save();
+        context.clearRect(0, 0, this.width, this.height);
 
-      const seedQuestion = this.graphViewService.getSeedQuestion();
-      if (seedQuestion !== null) {
-        context.fillStyle = '#bbb';
-        context.font = 'bold italic 25px sans-serif';
-        context.textAlign = 'center';
-        context.textBaseline = 'top';
+        const seedQuestion = this.graphViewService.getSeedQuestion();
+        if (seedQuestion !== null) {
+          context.fillStyle = '#bbb';
+          context.font = 'bold italic 25px sans-serif';
+          context.textAlign = 'center';
+          context.textBaseline = 'top';
 
-        context.fillText(seedQuestion.text, this.width / 2, 20);
-      }
+          context.fillText(seedQuestion.text, this.width / 2, 20);
+        }
 
-      context.translate(this.transform.x, this.transform.y);
-      context.scale(this.transform.k, this.transform.k);
+        context.translate(this.transform.x, this.transform.y);
+        context.scale(this.transform.k, this.transform.k);
 
-      this.network.getEdges().forEach((e: Edge) => {
-        // draw edge
-        e.draw(context as CanvasRenderingContext2D);
+        this.network.getEdges().forEach((e: Edge) => {
+          // draw edge
+          e.draw(context as CanvasRenderingContext2D);
+        });
+        this.network.getNodes().forEach((n) => {
+          // draw node
+          n.draw(context as CanvasRenderingContext2D);
+        });
+        context.restore();
       });
-      this.network.getNodes().forEach((n) => {
-        // draw node
-        n.draw(context as CanvasRenderingContext2D);
-      });
-      context.restore();
-    });
     d3Sim.force<ForceLink<GraphNode, Edge>>('link').links(this.network.getEdges())
       .distance((link, i, links) => (link as Edge).getDistance());
     d3Sim.restart();
@@ -156,7 +157,6 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       .call(d3.drag()
         .container(canvas)
         .subject((event: D3DragEvent<any, any, any>) => {
-          console.log('subject: (' + event.x + '/' + event.y + ')')
           this.hasDragSubject = false;
           const nodes = this.network.getNodes();
           for (let i = nodes.length - 1; i >= 0; i--) {
@@ -179,7 +179,6 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
           event.subject.fy = this.transform.invertY(event.y);
         })
         .on('drag', (event: D3DragEvent<any, any, any>) => {
-          console.log(this.transform.invertX(event.x) + '/' + this.transform.invertY(event.y));
           event.subject.fx = this.transform.invertX(event.x);
           event.subject.fy = this.transform.invertY(event.y);
         })
@@ -201,10 +200,8 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
           }
           return true;
         }).on('zoom', (event: D3ZoomEvent<any, any>) => {
-          // if (!event.active) {
-          //   d3Sim.restart();
-          // }
           this.transform = event.transform;
+          this.d3Sim.restart();
         }));
   }
 
@@ -221,7 +218,6 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
   private setSelectionBehaviors(nodeInteractionBehavior: NodeInteractionBehavior,
                                 edgeInteractionBehavior: EdgeInteractionBehavior) {
     const canvas = this.canvas;
-    const d3Sim = this.d3Sim;
     const squaredDistanceThreshold = 100;
 
     // drag behavior
@@ -229,7 +225,6 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
       .call(d3.drag()
         .container(canvas)
         .subject((event: D3DragEvent<any, any, any>) => {
-          console.log('subject: (' + event.x + '/' + event.y + ')')
           this.hasDragSubject = false;
           if (nodeInteractionBehavior !== undefined && nodeInteractionBehavior !== null) {
             const nodes = this.network.getNodes();
@@ -266,14 +261,9 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy {
             }
           }
         })
-        .on('start', (event: D3DragEvent<any, any, any>) => {
-          console.log(event);
-        })
-        .on('drag', (event: D3DragEvent<any, any, any>) => {
-          console.log(event);
-        })
+        //.on('start', (event: D3DragEvent<any, any, any>) => {})
+        //.on('drag', (event: D3DragEvent<any, any, any>) => {})
         .on('end', (event: D3DragEvent<any, any, any>) => {
-          console.log(event);
           if (event.subject !== undefined && event.subject.question !== undefined) {
             const n = event.subject as GraphNode;
             const dx = this.transform.invertX(event.x) - n.x;
