@@ -138,7 +138,7 @@ export class GraphViewService {
   }
 
   public addRelation(relation: Relation) {
-    this.relationService.postRelation(this.spaceId, relation).then((r) => {
+    this.relationService.postRelation(this.spaceId, relation).then((r: Relation) => {
       this.relations.push(r);
       this.relationVotes.set(r.relationId, []);
       this.relationAuthors.set(r.relationId, this.authGuardService.getUserName());

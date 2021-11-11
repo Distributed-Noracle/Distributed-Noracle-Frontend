@@ -17,13 +17,16 @@ export class RelationService {
 
   public putRelation(spaceId: string, relationId: string, relation: Relation): Promise<Relation> {
     return this.restHelperService.put(`/spaces/${spaceId}/relations/${relationId}`, relation)
-      .then((r) => r.json() as Relation);
+      .then((r: Relation) => r);
   }
 
   public postRelation(spaceId: string, relation: Relation): Promise<Relation> {
     return this.restHelperService.post(`/spaces/${spaceId}/relations`, relation).then((res) => {
-      return this.restHelperService.getAbsoulte(res.headers.get('location'))
-        .then((r) => r.json() as Relation);
+      // TODO: Hacky hack, needs to be fixed by the backend!
+      let location: string = res.headers.get('location');
+      location = location.replace("http", "https");
+      return this.restHelperService.getAbsoulte(location)
+        .then((r: Relation) => r);
     });
   }
 

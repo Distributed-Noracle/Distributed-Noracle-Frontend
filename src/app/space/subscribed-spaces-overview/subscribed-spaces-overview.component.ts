@@ -6,8 +6,10 @@ import {MyspacesService} from '../../shared/myspaces/myspaces.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatIconRegistry } from '@angular/material/icon';
 import {DomSanitizer} from '@angular/platform-browser';
-import {environment} from '../../../environments/environment';
-import {RestHelperService} from '../../shared/rest-helper/rest-helper.service';
+import { RecommenderQuestion } from 'src/app/shared/rest-data-model/recommender-question';
+import { NavigationExtras, Router } from '@angular/router';
+import { RecommendationService } from 'src/app/shared/recommendation/recommendation.service';
+import { AgentService } from 'src/app/shared/agent/agent.service';
 
 @Component({
   selector: 'dnor-subscribed-spaces-overview',
@@ -16,18 +18,25 @@ import {RestHelperService} from '../../shared/rest-helper/rest-helper.service';
 })
 export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
   public spaces: { space: Space, subscription: SpaceSubscription }[];
+  public spacesLoaded = false;
+  public recommendationsLoaded = false;
+  public recommenderQuestions: RecommenderQuestion[] = [];
   //public bots: {name: string, active: {}}[] = [];
   //public botWidgetUrl: string;
+
   private spaceSubscription: Subscription;
   // private botUri: string;
 
-  constructor(private myspacesService: MyspacesService, private snackBar: MatSnackBar,
-              private matIconRegistry: MatIconRegistry, private sanitizer: DomSanitizer, private rh: RestHelperService) {
+  constructor(private myspacesService: MyspacesService, private snackBar: MatSnackBar, private router: Router,
+              private matIconRegistry: MatIconRegistry, private sanitizer: DomSanitizer, private recommendationService: RecommendationService,
+              private agentService: AgentService) {
   }
 
   ngOnInit() {
-    this.spaceSubscription =
-      this.myspacesService.getMySpacesObservable().subscribe((myspaces) => this.spaces = myspaces);
+    this.spaceSubscription = this.myspacesService.getMySpacesObservable().subscribe((myspaces) => {
+      this.spacesLoaded = true;
+      this.spaces = myspaces
+    });
     this.myspacesService.getMySpaces().then((s) => s);
     this.matIconRegistry.addSvgIconInNamespace('img', 'bot',
         this.sanitizer.bypassSecurityTrustResourceUrl('assets/bot.svg'));
@@ -39,6 +48,41 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
         this.sanitizer.bypassSecurityTrustResourceUrl('assets/play.svg'));
     this.matIconRegistry.addSvgIconInNamespace('img', 'pause',
         this.sanitizer.bypassSecurityTrustResourceUrl('assets/pause.svg'));
+
+    // TestData for rendering
+    // let q1 = new Question();
+    // q1.text = "What is a question?";
+    // q1.timestampCreated = "2021-11-08T15:27:21.198688Z";
+    // this.recommenderQuestions = [
+    //   {
+    //     questionNeighbourIds: ["1", "2", "3"],
+    //     question: q1,
+    //     authorName: "david"
+    //   },
+    //   {
+    //     questionNeighbourIds: ["1", "2", "3"],
+    //     question: q1,
+    //     authorName: "alice"
+    //   },
+    //   {
+    //     questionNeighbourIds: ["1", "2", "3"],
+    //     question: q1,
+    //     authorName: "carol"
+    //   }
+    // ];
+    // this.recommendationsLoaded = true;
+
+    this.agentService.getAgent().then((agent) => {
+      this.recommendationService.getRecommendedQuestions(agent.agentid).then((res: RecommenderQuestion[]) => {
+        this.recommenderQuestions = res;
+      }).catch(() => {
+        console.error("error while getting recommendations...");
+      }).finally(() => {
+        this.recommendationsLoaded = true;
+      })
+    })
+
+
     //this.botWidgetUrl = this.rh.getHostURL() + '/fileservice/v2.2.5/files/sbf';
     //this.botUri = this.rh.getHostURL() + '/SBFManager/bots/distributed-noracle';
 
@@ -71,6 +115,19 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.spaceSubscription.unsubscribe();
+  }
+
+  linkClicked(r: RecommenderQuestion): void {
+    let questionIds = r.questionNeighbourIds;
+    questionIds.push(r.question.questionId);
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        sq: JSON.stringify(questionIds)
+      }
+    }
+    this.router.navigate(['/spaces', r.question.spaceId], navigationExtras).then(() => {
+      window.location.reload();
+    });
   }
 
   copyInviteUrl(myspace: { space: Space, subscription: SpaceSubscription }) {

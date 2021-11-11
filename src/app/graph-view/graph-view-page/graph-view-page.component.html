@@ -1,53 +1,106 @@
-<div class="container" fxLayout="row">
-  <div class="spaceContent" fxLayout="column" fxLayoutAlign="space-around center">
-    <div *ngIf="subscriptionInProgress">
-      <p>Subscribing to space&hellip;</p>
-      <mat-spinner></mat-spinner>
-    </div>
-    <dnor-graph-view *ngIf="!subscriptionInProgress"
-                      [spaceId]="spaceId"
-                      [width]="width"
-                      [height]="height"
-                      [selectedQuestions]="selectedQuestions"
-                      [interactionMode]="interactionMode"></dnor-graph-view>
-    <mat-card style="display: inline-block">
-      <mat-radio-group *ngIf="!subscriptionInProgress"
-                        fxLayout="row" fxLayoutGap="20px" fxLayoutWrap [(ngModel)]="interactionMode">
-        <mat-radio-button color="primary" *ngFor="let m of getInteractionModes()" [value]="m">
-          {{getInteractionModeLabel(m)}}
-        </mat-radio-button>
-      </mat-radio-group>
-    </mat-card>
+<div class="graph-view">
+  <div *ngIf="subscriptionInProgress">
+    <p>Subscribing to space&hellip;</p>
+    <mat-spinner></mat-spinner>
   </div>
-  <div class="spaceInfo">
-    <div class="memberList" *ngIf="!subscriptionInProgress">
-      <mat-accordion displayMode="flat" multi="true">
-        <mat-expansion-panel expanded="true">
-          <mat-expansion-panel-header expandedHeight="30px" collapsedHeight="30px">
-            <span class="bw">Participants</span>
-          </mat-expansion-panel-header>
-          <ul>
-            <li *ngFor="let m of this.spaceMembers"><span class="bw">{{m}}</span></li>
-          </ul>
-        </mat-expansion-panel>
-
-        <mat-expansion-panel>
-          <mat-expansion-panel-header expandedHeight="30px" collapsedHeight="30px">
-            <span class="bw">Help</span>
-          </mat-expansion-panel-header>
-          <ul>
-            <li><span class="bw"><mat-icon style="font-weight: bold">chat_bubble_outline</mat-icon> selected / <mat-icon>chat_bubble_outline</mat-icon> deselected</span>
-            </li>
-            <li><span class="bw"><mat-icon style="color: green">chat_bubble_outline</mat-icon> rated positively / <mat-icon
-              style="color: rgb(255, 0, 0)">chat_bubble_outline</mat-icon> rated negatively</span></li>
-            <li><span class="bw"><span style="font-weight: bold">>>></span> follow-up question</span></li>
-            <li><span class="bw"><span style="font-weight: bold">――</span> related question</span></li>
-            <li><span class="bw">―――――――――――――――――――――</span></li>
-            <li><span class="bw">More questions? <a
-              href="mailto:noracle@dbis.rwth-aachen.de">noracle@dbis.rwth-aachen.de</a></span></li>
-          </ul>
-        </mat-expansion-panel>
-      </mat-accordion>
-    </div>
-  </div>
+  <dnor-graph-view *ngIf="!subscriptionInProgress"
+                    [spaceId]="spaceId"
+                    [width]="width"
+                    [height]="height"
+                    [selectedQuestions]="selectedQuestions"
+                    [interactionMode]="interactionMode">
+  </dnor-graph-view>
 </div>
+<mat-card class="interaction_modes">
+  <mat-radio-group
+    *ngIf="!subscriptionInProgress"
+    fxLayout="row wrap"
+    fxLayoutGap="15px"
+    [(ngModel)]="interactionMode">
+    <mat-radio-button color="accent" *ngFor="let m of getInteractionModes()" [value]="m">
+      {{getInteractionModeLabel(m)}}
+    </mat-radio-button>
+  </mat-radio-group>
+</mat-card>
+<div fxHide.xs class="memberList" *ngIf="!subscriptionInProgress">
+  <mat-accordion displayMode="flat" multi="true">
+    <mat-expansion-panel expanded="true" hideToggle>
+      <mat-expansion-panel-header expandedHeight="30px" collapsedHeight="30px">
+        <span class="bw">Participants</span>
+      </mat-expansion-panel-header>
+      <ul>
+        <li *ngFor="let m of this.spaceMembers"><span class="bw">{{m}}</span></li>
+      </ul>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel hideToggle>
+      <mat-expansion-panel-header expandedHeight="30px" collapsedHeight="30px">
+        <span class="bw">Help</span>
+      </mat-expansion-panel-header>
+      <ul>
+        <li><span class="bw"><mat-icon style="font-weight: bold">chat_bubble_outline</mat-icon> selected / <mat-icon>chat_bubble_outline</mat-icon> deselected</span>
+        </li>
+        <li><span class="bw"><mat-icon style="color: green">chat_bubble_outline</mat-icon> rated positively / <mat-icon
+          style="color: rgb(255, 0, 0)">chat_bubble_outline</mat-icon> rated negatively</span></li>
+        <li><span class="bw"><span style="font-weight: bold">>>></span> follow-up question</span></li>
+        <li><span class="bw"><span style="font-weight: bold">――</span> related question</span></li>
+        <li><span class="bw">―――――――――――――――――――――</span></li>
+        <li><span class="bw">More questions? <a
+          href="mailto:noracle@dbis.rwth-aachen.de">noracle@dbis.rwth-aachen.de</a></span></li>
+      </ul>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>
+<!--<div class="container" fxLayout="row">-->
+  <!-- <div class="spaceContent" fxLayout="column" fxLayoutAlign="space-around center"> -->
+<!-- <div *ngIf="subscriptionInProgress">
+  <p>Subscribing to space&hellip;</p>
+  <mat-spinner></mat-spinner>
+</div>
+<dnor-graph-view *ngIf="!subscriptionInProgress"
+                  [spaceId]="spaceId"
+                  [width]="width"
+                  [height]="height"
+                  [selectedQuestions]="selectedQuestions"
+                  [interactionMode]="interactionMode"></dnor-graph-view>
+<mat-card style="display: inline-block">
+  <mat-radio-group *ngIf="!subscriptionInProgress"
+                    fxLayout="row" fxLayoutGap="20px" fxLayoutWrap [(ngModel)]="interactionMode">
+    <mat-radio-button color="primary" *ngFor="let m of getInteractionModes()" [value]="m">
+      {{getInteractionModeLabel(m)}}
+    </mat-radio-button>
+  </mat-radio-group>
+</mat-card> -->
+  <!-- </div> -->
+  <!-- <div class="spaceInfo"> -->
+<!-- <div class="memberList" *ngIf="!subscriptionInProgress">
+  <mat-accordion displayMode="flat" multi="true">
+    <mat-expansion-panel expanded="true">
+      <mat-expansion-panel-header expandedHeight="30px" collapsedHeight="30px">
+        <span class="bw">Participants</span>
+      </mat-expansion-panel-header>
+      <ul>
+        <li *ngFor="let m of this.spaceMembers"><span class="bw">{{m}}</span></li>
+      </ul>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+      <mat-expansion-panel-header expandedHeight="30px" collapsedHeight="30px">
+        <span class="bw">Help</span>
+      </mat-expansion-panel-header>
+      <ul>
+        <li><span class="bw"><mat-icon style="font-weight: bold">chat_bubble_outline</mat-icon> selected / <mat-icon>chat_bubble_outline</mat-icon> deselected</span>
+        </li>
+        <li><span class="bw"><mat-icon style="color: green">chat_bubble_outline</mat-icon> rated positively / <mat-icon
+          style="color: rgb(255, 0, 0)">chat_bubble_outline</mat-icon> rated negatively</span></li>
+        <li><span class="bw"><span style="font-weight: bold">>>></span> follow-up question</span></li>
+        <li><span class="bw"><span style="font-weight: bold">――</span> related question</span></li>
+        <li><span class="bw">―――――――――――――――――――――</span></li>
+        <li><span class="bw">More questions? <a
+          href="mailto:noracle@dbis.rwth-aachen.de">noracle@dbis.rwth-aachen.de</a></span></li>
+      </ul>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div> -->
+  <!-- </div> -->
+<!-- </div> -->

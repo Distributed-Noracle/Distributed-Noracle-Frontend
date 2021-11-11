@@ -9,14 +9,25 @@ import {AuthGuardService} from './auth-guard/auth-guard.service';
 import {MyspacesService} from './myspaces/myspaces.service';
 import { RelationVoteService } from './relation-vote/relation-vote.service';
 import {QuestionVoteService} from './question-vote/question-vote.service';
+import {RecommendationService} from './recommendation/recommendation.service';
 
 @NgModule({
   imports: [
     CommonModule
   ],
   declarations: [],
-  providers: [SpaceService, QuestionService, RelationService, AgentService,
-    RestHelperService, /*OidcSecurityService,*/ AuthGuardService, MyspacesService, QuestionVoteService, RelationVoteService]
+  providers: [
+    SpaceService,
+    QuestionService,
+    RelationService,
+    AgentService,
+    RestHelperService,
+    AuthGuardService,
+    MyspacesService,
+    QuestionVoteService,
+    RelationVoteService,
+    RecommendationService
+  ]
 })
 export class SharedModule {
 }

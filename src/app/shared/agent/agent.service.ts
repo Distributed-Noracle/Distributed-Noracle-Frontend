@@ -58,8 +58,11 @@ export class AgentService {
       .then((agent) => {
         return this.restHelperService.post(`/agents/${agent.agentid}/spacesubscriptions`, postData)
           .then(res => {
-            return this.restHelperService.getAbsoulte(res.headers.get('location'))
-              .then((res2) => res2.json() as SpaceSubscription);
+            // TODO: Hacky hack, needs to be fixed by the backend!
+            let location: string = res.headers.get('location');
+            location = location.replace("http", "https");
+            return this.restHelperService.getAbsoulte(location)
+              .then((res2: SpaceSubscription) => res2);
           });
       });
   }

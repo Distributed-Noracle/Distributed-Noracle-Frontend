@@ -50,7 +50,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterVi
     this.transform = d3.zoomIdentity;
   }
 
-  ngOnInit() {}
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     this.canvas = this.d3Root.nativeElement;
@@ -68,12 +68,12 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterVi
     this.updateInteractionMode();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.updateSubscription.unsubscribe();
     this.graphViewService.initServiceForSpace(null);
   }
 
-  ngOnChanges() {
+  ngOnChanges(): void {
     if (this.d3Sim) {
       if (this.spaceId !== this.loadedSpaceId) {
         this.initData();
@@ -123,7 +123,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterVi
     d3Sim.restart();
   }
 
-  private updateInteractionMode() {
+  private updateInteractionMode(): void {
     if (this.activatedInteractionMode === this.interactionMode) {
       // no change
       return;
@@ -188,6 +188,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterVi
           }
           event.subject.fx = null;
           event.subject.fy = null;
+          this.updateSimulation();
         })
       )
       .call(d3.zoom()
@@ -266,8 +267,8 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterVi
         .on('end', (event: D3DragEvent<any, any, any>) => {
           if (event.subject !== undefined && event.subject.question !== undefined) {
             const n = event.subject as GraphNode;
-            const dx = this.transform.invertX(event.x) - n.x;
-            const dy = this.transform.invertY(event.y) - n.y;
+            const dx = event.dx;
+            const dy = event.dy;
             if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
               nodeInteractionBehavior.interactWith(n).then(() => {
                 this.updateSimulation();
@@ -333,13 +334,13 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterVi
   private processUpdate(updateData: UpdateData) {
     const context = this.d3Root.nativeElement.getContext('2d');
     const isSelected = this.selectedQuestions !== undefined &&
-    this.selectedQuestions.findIndex((id) => id === updateData.question.questionId) !== -1;
+      this.selectedQuestions.findIndex((id) => id === updateData.question.questionId) !== -1;
     const seedQuestion = this.graphViewService.getSeedQuestion();
     const isSeed = (seedQuestion ? seedQuestion.questionId : null) === updateData.question.questionId;
     const node = new GraphNode(context, updateData.question.questionId,
-          updateData.question, updateData.questionAuthor, updateData.questionVotes,
-          updateData.relations, updateData.relationAuthors, updateData.relationVotes,
-          isSelected, isSeed);
+      updateData.question, updateData.questionAuthor, updateData.questionVotes,
+      updateData.relations, updateData.relationAuthors, updateData.relationVotes,
+      isSelected, isSeed);
     if (this.network.addOrUpdateNode(node)) {
       this.updateSimulation();
     }

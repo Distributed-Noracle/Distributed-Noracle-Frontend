@@ -17,6 +17,7 @@ import {SubscribedSpacesOverviewComponent} from './space/subscribed-spaces-overv
 import {CreateSpaceComponent} from './space/create-space/create-space.component';
 import {AfterLoginComponent} from './login/after-login/after-login.component';
 import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
+import {MatSidenavModule} from '@angular/material/sidenav';
 
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 import { environment } from 'src/environments/environment';
@@ -63,7 +64,8 @@ function initializeKeycloak(keycloak: KeycloakService): () => Promise<boolean> {
     { path: '**', redirectTo: 'welcome' }
 ], { relativeLinkResolution: 'legacy' }),
     HttpClientModule,
-    KeycloakAngularModule
+    KeycloakAngularModule,
+    MatSidenavModule,
   ],
   providers: [
     {

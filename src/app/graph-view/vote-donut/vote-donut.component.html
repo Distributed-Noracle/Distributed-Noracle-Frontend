@@ -1,6 +1,6 @@
 <svg height="150px" width="100px" viewBox="0 0 120 120">
   <circle *ngFor="let item of items;let i=index" cx="60" cy="60" r="50" fill="transparent" stroke-width="3  " [attr.stroke-dasharray]="getPerimeter(50)"
     [attr.stroke-dashoffset]="getOffset(50,i)" [attr.stroke]="item.color" />
-  <text x="50%" y="46%" alignment-baseline="middle" text-anchor="middle" fill="white" font-size="40px" font-weight="italic">{{total}}</text>
-  <text x="50%" y="68%" alignment-baseline="middle" text-anchor="middle" fill="white" font-size="15px">{{total === 1 ? descriptor : descriptorPlural}}</text>
+  <text x="50%" y="46%" alignment-baseline="middle" text-anchor="middle" font-size="40px" font-weight="italic">{{total}}</text>
+  <text x="50%" y="68%" alignment-baseline="middle" text-anchor="middle" font-size="15px">{{total === 1 ? descriptor : descriptorPlural}}</text>
 </svg>

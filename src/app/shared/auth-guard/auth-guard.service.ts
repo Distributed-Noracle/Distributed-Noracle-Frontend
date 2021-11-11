@@ -37,14 +37,20 @@ export class AuthGuardService implements CanActivate {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | Observable<boolean> | Promise<boolean> {
-    if (!this.isAuthorized) {
-      document.cookie = 'rejectedPath=' + encodeURIComponent(JSON.stringify({
+    return this.keycloak.isLoggedIn().then((loggedIn: boolean) => {
+      if (loggedIn) {
+        this.isAuthorized = true;
+        return this.isAuthorized;
+      } else {
+        document.cookie = 'rejectedPath=' + encodeURIComponent(JSON.stringify({
           url: route.url.map((v) => v.path).reduce((prev, cur) => prev + '/' + cur, ''),
           queryParams: route.queryParams
         })) + '; path=/; expires=' + new Date(Date.now() + ((3 * 60 * 1000))).toUTCString();
-      this.router.navigate(['/login'], {replaceUrl: true});
-    }
-    return this.isAuthorized;
+        this.router.navigate(['/login'], {replaceUrl: true});
+        this.isAuthorized = false;
+        return this.isAuthorized;
+      }
+    });
   }
 
   logoff(): void {

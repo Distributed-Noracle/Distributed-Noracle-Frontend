@@ -29,7 +29,7 @@ export class QuestionService {
 
   public putQuestion(spaceId: string, questionId: string, question: Question): Promise<Question> {
     return this.restHelperService.put(`/spaces/${spaceId}/questions/${questionId}`, question)
-      .then((r) => r.json() as Question);
+      .then((r: Question) => r);
   }
 
 }

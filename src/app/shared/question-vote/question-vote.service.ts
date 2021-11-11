@@ -18,6 +18,6 @@ export class QuestionVoteService {
   public putQuestionVote(spaceId: string, questionId: string, agentId: string,
                          questionVote: QuestionVote): Promise<QuestionVote> {
     return this.restHelperService.put(`/spaces/${spaceId}/questions/${questionId}/votes/${agentId}`, questionVote)
-      .then((r) => r.json() as QuestionVote);
+      .then((r: QuestionVote) => r);
   }
 }

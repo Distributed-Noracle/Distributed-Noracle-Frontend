@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {GraphInteractionMode} from '../graph-view/graph-data-model/graph-interaction-mode.enum';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
@@ -19,13 +19,6 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
   public spaceId = '1';
   public selectedQuestions;
   public spaceMembers = [];
-
-  // private adjustSize() {
-  //   this.height = (window.innerHeight
-  //     - this.graphContainer.nativeElement.getBoundingClientRect().top
-  //     - this.below.nativeElement.getBoundingClientRect().height) * 0.9;
-  //   this.width = window.innerWidth * 0.95;
-  // }
 
   constructor(private activatedRoute: ActivatedRoute, private router: Router, private myspacesService: MyspacesService) {}
 
@@ -55,6 +48,8 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
         this.selectedQuestions = JSON.parse(q);
       }
     });
+    this.width = window.innerWidth * 0.99;
+    this.height = window.innerHeight * 0.91;
   }
 
   ngOnDestroy() {
@@ -62,10 +57,6 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
     this.queryParamSubscription.unsubscribe();
   }
 
-  // @HostListener('window:resize', ['$event'])
-  // onWindowResize(event) {
-  //   this.adjustSize();
-  // }
   public getInteractionModes() {
     const modes = [];
     for (const mode in GraphInteractionMode) {

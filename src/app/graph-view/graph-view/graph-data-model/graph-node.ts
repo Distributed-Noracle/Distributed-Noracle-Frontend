@@ -24,9 +24,9 @@ export class GraphNode implements SimulationNodeDatum {
 
 
   constructor(context: CanvasRenderingContext2D, public id: string,
-    public question: Question, public questionAuthor: string, public questionVotes: QuestionVote[],
-    relations: Relation[], public relationAuthors: string[], relationVotes: RelationVote[][],
-    public isSelected = false, public isSeed = false) {
+              public question: Question, public questionAuthor: string, public questionVotes: QuestionVote[],
+              relations: Relation[], public relationAuthors: string[], relationVotes: RelationVote[][],
+              public isSelected = false, public isSeed = false) {
     this.relations = relations.slice(0);
     this.lines = this.wrapText((s) => context.measureText(s).width);
     for (let i = 0; i < relations.length; i++) {
@@ -156,6 +156,7 @@ export class GraphNode implements SimulationNodeDatum {
     this.bubbleScaleFactor = n.bubbleScaleFactor;
     this.questionVotes = n.questionVotes;
     this.relationVotes = n.relationVotes;
+    this.relationAuthors = n.relationAuthors;
     return true;
   }
 
@@ -171,6 +172,7 @@ export class GraphNode implements SimulationNodeDatum {
       this.bubbleScaleFactor === n.bubbleScaleFactor &&
       this.questionVotes.length === n.questionVotes.length &&
       this.questionVotes.map((v, i) => v.value === n.questionVotes[i].value).reduce((p, c) => p && c, true) &&
+      this.relationVotes.size === n.relationVotes.size &&
       this.relations.map(r =>
         this.relationVotes.get(r.relationId).length === n.relationVotes.get(r.relationId).length &&
         this.relationVotes.get(r.relationId).map((v, i) => v.value === n.relationVotes.get(r.relationId)[i].value &&
