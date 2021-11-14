@@ -62,7 +62,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterVi
     this.d3Sim.force('center', d3.forceCenter(this.width / 2, this.height / 2));
     this.d3Sim.force('collide', d3.forceCollide((node: GraphNode) => (node as GraphNode).radius * 1.2));
 
-    this.updateSubscription = this.graphViewService.getUpdateObservable().subscribe(updateData => this.processUpdate(updateData));
+    this.updateSubscription = this.graphViewService.update.subscribe(updateData => this.processUpdate(updateData));
     this.initData();
     this.initVisualization();
     this.updateInteractionMode();

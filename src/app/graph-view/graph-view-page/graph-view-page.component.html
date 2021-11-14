@@ -1,3 +1,9 @@
+<mat-progress-bar 
+  color="accent"
+  style="width: 100%; position: fixed;"
+  mode="indeterminate"
+  *ngIf="this.loading">
+</mat-progress-bar>
 <div class="graph-view">
   <div *ngIf="subscriptionInProgress">
     <p>Subscribing to space&hellip;</p>
@@ -14,7 +20,6 @@
 <mat-card class="interaction_modes">
   <mat-radio-group
     *ngIf="!subscriptionInProgress"
-    fxLayout="row wrap"
     fxLayoutGap="15px"
     [(ngModel)]="interactionMode">
     <mat-radio-button color="accent" *ngFor="let m of getInteractionModes()" [value]="m">

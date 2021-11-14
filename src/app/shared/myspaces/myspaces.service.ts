@@ -62,8 +62,8 @@ export class MyspacesService {
     });
   }
 
-  public updateSelectionOfSubscription(spaceId: string, selection: string[]) {
-    this.agentService.putSelectionOfSubscription(spaceId, selection).then(() => this.getMySpaces().then((s) => s));
+  public updateSelectionOfSubscription(spaceId: string, selection: string[]): Promise<any> {
+    return this.agentService.putSelectionOfSubscription(spaceId, selection).then(() => this.getMySpaces().then((s) => s));
   }
 
 
