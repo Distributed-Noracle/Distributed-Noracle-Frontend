@@ -15,6 +15,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 @NgModule({
@@ -34,7 +35,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     MatListModule,
     MatMenuModule,
     MatProgressSpinnerModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    MatTooltipModule
   ],
   declarations: [CreateSpaceComponent, SubscribedSpacesOverviewComponent],
   exports: [CreateSpaceComponent, SubscribedSpacesOverviewComponent]

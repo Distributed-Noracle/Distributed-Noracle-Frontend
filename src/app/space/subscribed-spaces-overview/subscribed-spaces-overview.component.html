@@ -15,7 +15,12 @@
   <button mat-raised-button color="primary" routerLink="/spaces/create">Create new Space</button>
   <br>
 
-  <h1 class="mat-h1 title">Recommended For You</h1>
+  <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
+    <h1 class="mat-h1 title">Recommended For You</h1>
+    <button mat-icon-button (click)="reloadRecommendations()">
+      <mat-icon matTooltip="Refresh Recommendations">refresh</mat-icon>
+    </button>
+  </div>
   <mat-spinner *ngIf="!this.recommendationsLoaded"></mat-spinner>
   <div *ngIf="this.recommendationsLoaded && this.recommenderQuestions.length == 0">
     There are no recommendations for you at the moment :(

@@ -32,22 +32,35 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
               private agentService: AgentService) {
   }
 
+  reloadRecommendations(): void {
+    this.recommendationsLoaded = false;
+    this.agentService.getAgent().then((agent) => {
+      this.recommendationService.getRecommendedQuestions(agent.agentid, true).then((res: RecommenderQuestion[]) => {
+        this.recommenderQuestions = res;
+      }).catch(() => {
+        console.error("error while getting recommendations...");
+      }).finally(() => {
+        this.recommendationsLoaded = true;
+      })
+    });
+  }
+
   ngOnInit() {
     this.spaceSubscription = this.myspacesService.getMySpacesObservable().subscribe((myspaces) => {
       this.spacesLoaded = true;
       this.spaces = myspaces
     });
     this.myspacesService.getMySpaces().then((s) => s);
-    this.matIconRegistry.addSvgIconInNamespace('img', 'bot',
-        this.sanitizer.bypassSecurityTrustResourceUrl('assets/bot.svg'));
-    this.matIconRegistry.addSvgIconInNamespace('img', 'add',
-        this.sanitizer.bypassSecurityTrustResourceUrl('assets/add.svg'));
-    this.matIconRegistry.addSvgIconInNamespace('img', 'train',
-        this.sanitizer.bypassSecurityTrustResourceUrl('assets/train.svg'));
-    this.matIconRegistry.addSvgIconInNamespace('img', 'play',
-        this.sanitizer.bypassSecurityTrustResourceUrl('assets/play.svg'));
-    this.matIconRegistry.addSvgIconInNamespace('img', 'pause',
-        this.sanitizer.bypassSecurityTrustResourceUrl('assets/pause.svg'));
+    // this.matIconRegistry.addSvgIconInNamespace('img', 'bot',
+    //     this.sanitizer.bypassSecurityTrustResourceUrl('assets/bot.svg'));
+    // this.matIconRegistry.addSvgIconInNamespace('img', 'add',
+    //     this.sanitizer.bypassSecurityTrustResourceUrl('assets/add.svg'));
+    // this.matIconRegistry.addSvgIconInNamespace('img', 'train',
+    //     this.sanitizer.bypassSecurityTrustResourceUrl('assets/train.svg'));
+    // this.matIconRegistry.addSvgIconInNamespace('img', 'play',
+    //     this.sanitizer.bypassSecurityTrustResourceUrl('assets/play.svg'));
+    // this.matIconRegistry.addSvgIconInNamespace('img', 'pause',
+    //     this.sanitizer.bypassSecurityTrustResourceUrl('assets/pause.svg'));
 
     // TestData for rendering
     // let q1 = new Question();
@@ -80,7 +93,7 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
       }).finally(() => {
         this.recommendationsLoaded = true;
       })
-    })
+    });
 
 
     //this.botWidgetUrl = this.rh.getHostURL() + '/fileservice/v2.2.5/files/sbf';
@@ -118,8 +131,9 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
   }
 
   linkClicked(r: RecommenderQuestion): void {
-    let questionIds = r.questionNeighbourIds;
-    questionIds.push(r.question.questionId);
+    let questionIds = [r.question.questionId];
+    //let questionIds = r.questionNeighbourIds;
+    //questionIds.push(r.question.questionId);
     let navigationExtras: NavigationExtras = {
       queryParams: {
         sq: JSON.stringify(questionIds)
