@@ -38,7 +38,7 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
   reloadRecommendations(): void {
     this.recommendationsLoaded = false;
     this.agentService.getAgent().then((agent) => {
-      this.recommendationService.getRecommendedQuestions(agent.agentid, true).then((res: RecommenderQuestion[]) => {
+      this.recommendationService.getRecommendedQuestions(agent.agentid).then((res: RecommenderQuestion[]) => {
         this.recommenderQuestions = res;
       }).catch(() => {
         console.error("error while getting recommendations...");

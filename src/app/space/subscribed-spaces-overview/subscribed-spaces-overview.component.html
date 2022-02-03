@@ -36,6 +36,7 @@
   </div>
   <div class="side-container">
     <h4>Public Spaces</h4>
+    <div *ngIf="this.publicSpaces.length === 0">There are no public spaces in your network yet.</div>
     <div class="public-spaces" fxLayout="column" fxLayoutGap="12px">
       <div class="public-space" *ngFor="let s of publicSpaces">
         <!--TODO: Show vote count for each space -->

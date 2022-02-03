@@ -8,7 +8,7 @@
 }
 
 .main-container {
-  width: calc(100% - 300px - 24px);
+  width: calc(100% - 340px - 20px);
 }
 
 .public-space {
@@ -16,8 +16,8 @@
 }
 
 .side-container {
-  width: 300px;
-  margin-left: 24px;
+  width: 340px;
+  margin-left: 20px;
 }
 
 .public-space-relation-count {
@@ -44,7 +44,7 @@
   color: #0074CC;
 }
 
-@media (max-width: 740px) {
+@media (max-width: 780px) {
   .main-container {
     width: 100%;
   }
