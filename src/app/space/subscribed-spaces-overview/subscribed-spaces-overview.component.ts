@@ -35,6 +35,19 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
     return `${month}, ${date.getDay()}, ${date.getFullYear()}, ${date.getHours()}:${date.getMinutes()}`;
   }
 
+  reloadRecommendations(): void {
+    this.recommendationsLoaded = false;
+    this.agentService.getAgent().then((agent) => {
+      this.recommendationService.getRecommendedQuestions(agent.agentid, true).then((res: RecommenderQuestion[]) => {
+        this.recommenderQuestions = res;
+      }).catch(() => {
+        console.error("error while getting recommendations...");
+      }).finally(() => {
+        this.recommendationsLoaded = true;
+      })
+    });
+  }
+
   ngOnInit() {
     this.spaceSubscription = this.myspacesService.getMySpacesObservable().subscribe((myspaces) => {
       this.spacesLoaded = true;
