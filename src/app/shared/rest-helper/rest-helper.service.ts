@@ -4,6 +4,7 @@ import {Router} from '@angular/router';
 import {environment} from '../../../environments/environment';
 import {retry} from 'rxjs/operators';
 import {KeycloakService } from 'keycloak-angular';
+import { Observable } from 'rxjs';
 
 const HOST_URLS = environment.hostUrls;
 
@@ -23,7 +24,9 @@ export class RestHelperService {
     try {
       const res = await this.http.get(this.getBaseURL() + path,
         { headers: this.getHeaders() }
-      ).pipe(retry(3)).toPromise();
+      )
+      //.pipe(retry(3))
+      .toPromise();
       return res;
     } catch (error) {
       if (error.status === 401) {
@@ -34,22 +37,31 @@ export class RestHelperService {
   }
 
   public getAbsoulte(absolutePath: string): Promise<any> {
-    return this.http.get(absolutePath, {headers: this.getHeaders()}).pipe(retry(3)).toPromise();
+    return this.http.get(absolutePath, {headers: this.getHeaders()})
+      //.pipe(retry(3))
+      .toPromise();
   }
 
   public put(path: string, body: any): Promise<any> {
     return this.http.put(this.getBaseURL() + path,
       body,
       {headers: this.getHeaders()}
-    ).pipe(retry(3)).toPromise();
+    )
+    .toPromise();
   }
 
   public post(path: string, body: any): Promise<any> {
-    return this.http.post(this.getBaseURL() + path, body, { headers: this.getHeaders(), observe: 'response' }).pipe(retry(3)).toPromise();
+    return this.http.post(this.getBaseURL() + path, body, { headers: this.getHeaders(), observe: 'response' })
+      .toPromise();
   }
 
-  public getCurrentAgent(): Promise<any> {
-    return this.http.get(this.getCoreBaseURL() + '/currentagent', {headers: this.getHeaders()}).pipe(retry(3)).toPromise();
+  public getCurrentAgent(): Observable<any> {
+    return this.http.get(this.getCoreBaseURL() + '/currentagent', {headers: this.getHeaders()});
+    //return this.http.get(this.getCoreBaseURL() + '/auth/login', {headers: this.getHeaders()});
+  }
+
+  public getCurrentAgentLocal(): Observable<any> {
+    return this.http.get<any>(this.getBaseURL() + '/mainAgent', {headers: this.getHeaders()})
   }
 
   private getHeaders(): HttpHeaders {

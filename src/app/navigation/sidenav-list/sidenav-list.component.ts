@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { KeycloakService } from 'keycloak-angular';
 import { AuthGuardService } from 'src/app/shared/auth-guard/auth-guard.service';
+import { AuthenticationService } from 'src/app/shared/authentication/authentication.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -13,7 +14,10 @@ export class SidenavListComponent implements OnInit {
   @Output()
   public closeSidenav = new EventEmitter<void>();
 
-  constructor(public authGuardService: AuthGuardService, public keycloak: KeycloakService) { }
+  constructor(
+    public authGuardService: AuthGuardService,
+    public authService: AuthenticationService,
+    public keycloak: KeycloakService) {}
 
   ngOnInit(): void {}
 
@@ -22,7 +26,7 @@ export class SidenavListComponent implements OnInit {
   }
 
   logout() {
-    if (this.authGuardService.isAuthorized) {
+    if (this.authService.isAuthorized) {
       this.authGuardService.logoff();
       this.keycloak.logout(environment.redirectUrl);
     }

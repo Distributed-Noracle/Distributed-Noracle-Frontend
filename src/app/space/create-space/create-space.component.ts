@@ -17,10 +17,13 @@ export class CreateSpaceComponent {
   public question = new Question();
   public loadingCreateSpace = false;
 
+  public tooltipText = "If you set this space to private, only users with an invitation link are permitted to join the space."
+
   constructor(private spaceService: SpaceService, private questionService: QuestionService,
               private myspacesService: MyspacesService, private router: Router) {
     this.space.name = '';
     this.question.text = '';
+    this.space.private = false;
   }
 
   createSpace(): void {

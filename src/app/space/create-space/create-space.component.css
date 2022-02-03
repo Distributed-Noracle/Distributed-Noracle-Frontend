@@ -2,3 +2,8 @@
   width: 100%;
   padding: 10px;
 }
+
+mat-icon {
+  height: 100%;
+  vertical-align: bottom;
+}

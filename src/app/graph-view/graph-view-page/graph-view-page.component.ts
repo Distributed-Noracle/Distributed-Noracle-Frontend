@@ -1,35 +1,72 @@
-import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {GraphInteractionMode} from '../graph-view/graph-data-model/graph-interaction-mode.enum';
-import {ActivatedRoute, Router} from '@angular/router';
-import {Subscription} from 'rxjs';
+import {ActivatedRoute, NavigationExtras, Router} from '@angular/router';
+import {BehaviorSubject, Subscription} from 'rxjs';
 import {MyspacesService} from '../../shared/myspaces/myspaces.service';
 import { GraphViewService } from '../graph-view/graph-view.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Clipboard } from '@angular/cdk/clipboard';
+import { SpaceService } from 'src/app/shared/space/space.service';
+import { Space } from 'src/app/shared/rest-data-model/space';
+import { RecommendationService } from 'src/app/shared/recommendation/recommendation.service';
+import { RecommenderQuestion } from 'src/app/shared/rest-data-model/recommender-question';
+import { Question } from 'src/app/shared/rest-data-model/question';
+import { AgentService } from 'src/app/shared/agent/agent.service';
 
 @Component({
   selector: 'dnor-graph-view-page',
   templateUrl: './graph-view-page.component.html',
   styleUrls: ['./graph-view-page.component.css']
 })
-export class GraphViewPageComponent implements OnInit, OnDestroy {
+export class GraphViewPageComponent implements OnInit, OnDestroy, OnChanges {
   public subscriptionInProgress = false;
   public interactionMode = GraphInteractionMode.SelectAndNavigate;
   public height = 800;
   public width = 1100;
   public spaceId = '1';
+  public space: Space;
   public selectedQuestions;
   public spaceMembers = [];
   public loading = false;
+  public recommenderQuestions: RecommenderQuestion[];
+  public selectedRecommenderQuestion: [];
+  public recommendationsLoaded = false;
 
   private subscription: Subscription = new Subscription();
 
-  constructor(private activatedRoute: ActivatedRoute, private router: Router, private ref: ChangeDetectorRef,
-    private myspacesService: MyspacesService, private graphViewService: GraphViewService) {}
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    private ref: ChangeDetectorRef,
+    private myspacesService: MyspacesService,
+    private graphViewService: GraphViewService,
+    private snackBar: MatSnackBar,
+    private clipboard: Clipboard,
+    private spaceService: SpaceService,
+    private recommendationService: RecommendationService,
+    private agentService: AgentService) {}
+
+  ngOnChanges(changes: SimpleChanges): void {}
+
+  copyInviteUrl() {
+    let url = window.location.href;
+    url = url.substring(0, url.indexOf('/spaces')) + `/spaces/${this.space.spaceId}?pw=${this.space.spaceSecret}`;
+    this.clipboard.copy(url);
+    this.snackBar.open('Copied invitation link to clipboard. Paste to share with friends!', 'Ok');
+  }
 
   ngOnInit() {
     this.subscription.add(this.activatedRoute.params.subscribe((params) => {
       this.spaceId = params['spaceId'];
       this.myspacesService.getSubscribersObservable(this.spaceId).subscribe(subs => {
         this.spaceMembers = subs.map(sub => sub.name);
+      });
+      this.myspacesService.getMySpaces().then(res => {
+        if (res.find(s => s.space.spaceId === this.spaceId)) {
+          this.spaceService.getSpace(this.spaceId).then((space: Space) => {
+            this.space = space;
+          });
+        }
       });
     }));
     this.subscription.add(this.activatedRoute.queryParams.subscribe((queryParams) => {
@@ -38,11 +75,11 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
         this.subscriptionInProgress = true;
         this.myspacesService.subscribeToSpace(this.spaceId, pw).then(() => {
           const qp = queryParams['sq'] !== undefined ? {sq: queryParams['sq']} : {};
-          this.router.navigate([], {queryParams: qp, replaceUrl: true}).then(() =>
+          this.router.navigate([], {queryParams: qp, replaceUrl: true}).then(() => {
+            this.ngOnInit(); // reload component
             this.subscriptionInProgress = false
-          );
+          });
         });
-
       }
       const q = queryParams['sq'];
       if (q === undefined) {
@@ -51,12 +88,76 @@ export class GraphViewPageComponent implements OnInit, OnDestroy {
         this.selectedQuestions = JSON.parse(q);
       }
     }));
+    this.width = window.innerWidth * 0.99;
+    this.height = window.innerHeight * 0.92;
+
     this.subscription.add(this.graphViewService.loading.subscribe((loading) => {
       this.loading = loading;
       this.ref.detectChanges();
     }));
-    this.width = window.innerWidth * 0.99;
-    this.height = window.innerHeight * 0.91;
+
+    this.loadRecommendations();
+  }
+
+  loadRecommendations(): void {
+    this.recommendationsLoaded = false;
+    this.agentService.getAgent().then((agent) => {
+      this.recommendationService.getRecommendedQuestionsForSpace(agent.agentid, this.spaceId)
+        .then((res: RecommenderQuestion[]) => {
+        this.recommenderQuestions = res;
+      }).catch(() => {
+        console.error("error while getting recommendations...");
+      }).finally(() => {
+        this.recommendationsLoaded = true;
+      })
+    });
+  }
+
+  recClicked(rq: RecommenderQuestion): void {
+    //let questionIds = r.questionNeighbourIds;
+    let questionIds = [];
+    questionIds.push(rq.question.questionId);
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        sq: JSON.stringify(questionIds)
+      }
+    }
+    this.graphViewService.recommenderSubject.next(questionIds);
+    this.router.navigate(['/spaces', rq.question.spaceId], navigationExtras);
+  }
+
+  GetPastTime(rq: RecommenderQuestion): string {
+    // TODO: This is way to complicated!
+    let date = new Date(rq.question.timestampCreated);
+    let dateNow = new Date();
+
+    if (date.getFullYear() === dateNow.getFullYear()) {
+      if (date.getMonth() === dateNow.getMonth()) {
+        if (date.getDay() === dateNow.getDay()) {
+          if (date.getHours() === dateNow.getHours()) {
+            if (date.getMinutes() === dateNow.getMinutes()) {
+              // show seconds
+              return (dateNow.getSeconds() - date.getSeconds()) + ' second(s) ago';
+            } else {
+              // show minutes
+              return (dateNow.getMinutes() - date.getMinutes()) + ' minute(s) ago';
+            }
+          } else {
+            // show hours
+            return (dateNow.getHours() - date.getHours()) + ' hour(s) ago';
+          }
+        } else {
+          // show days
+          return (dateNow.getDay() - date.getDay()) + ' day(s) ago';
+        }
+      } else {
+        // show month
+        return (dateNow.getMonth() - date.getMonth()) + ' month(s) ago';
+      }
+    } else {
+      // show years
+      return (dateNow.getFullYear() - date.getFullYear()) + 'year(s) ago';
+    }
   }
 
   ngOnDestroy() {
