@@ -26,7 +26,7 @@ import {RecommendationService} from './recommendation/recommendation.service';
     MyspacesService,
     QuestionVoteService,
     RelationVoteService,
-    RecommendationService
+    RecommendationService,
   ]
 })
 export class SharedModule {

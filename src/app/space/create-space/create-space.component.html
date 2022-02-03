@@ -17,6 +17,12 @@
                   maxlength="140" required></textarea>
         </mat-form-field>
       </p>
+      <p fxLayout="row" fxLayoutGap="5px">
+        <mat-checkbox matInput id="space-private" name="space.private" [(ngModel)]="space.private">
+          Private
+        </mat-checkbox>
+        <mat-icon [matTooltip]="tooltipText">help_outline</mat-icon>
+      </p>
       <button type="submit" mat-raised-button color="primary" [disabled]="!creationForm.form.valid || this.loadingCreateSpace">Create</button>
     </form>
   </mat-card>

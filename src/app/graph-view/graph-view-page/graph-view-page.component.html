@@ -1,10 +1,33 @@
-<mat-progress-bar 
+<mat-progress-bar
   color="accent"
   style="width: 100%; position: fixed;"
   mode="indeterminate"
   *ngIf="this.loading">
 </mat-progress-bar>
-<div class="graph-view">
+<mat-card fxHide.xs class="recommendation-card">
+  <mat-card-header>
+    <mat-card-title>Recommended For You</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-spinner *ngIf="!this.recommendationsLoaded" style="margin: auto;"></mat-spinner>
+    <ng-container *ngIf="this.recommendationsLoaded">
+      <a class="recommendation-link "*ngFor="let r of recommenderQuestions" (click)="recClicked(r)">
+        <span style="padding-right: 4px; position: relative;">
+          <img class="img-avatar" src="../../../assets/default-avatar.png">
+        </span>
+        <span fxLayout="column">
+          <span fxLayout>
+            <span>{{r.authorName}}</span>
+            <span> · </span>
+            <span style="color: #7C7C7C;">{{GetPastTime(r)}}</span>
+          </span>
+          <span style="color: #7C7C7C;">{{r.question.text}}</span>
+        </span>
+      </a>
+    </ng-container>
+  </mat-card-content>
+</mat-card>
+<div class="graph-view" fxLayout="row" fxLayoutAlign="center">
   <div *ngIf="subscriptionInProgress">
     <p>Subscribing to space&hellip;</p>
     <mat-spinner></mat-spinner>
@@ -28,7 +51,7 @@
   </mat-radio-group>
 </mat-card>
 <div fxHide.xs class="memberList" *ngIf="!subscriptionInProgress">
-  <mat-accordion displayMode="flat" multi="true">
+  <mat-accordion displayMode="flat" multi="true" style="margin-bottom: 20px;">
     <mat-expansion-panel expanded="true" hideToggle>
       <mat-expansion-panel-header expandedHeight="30px" collapsedHeight="30px">
         <span class="bw">Participants</span>
@@ -43,69 +66,20 @@
         <span class="bw">Help</span>
       </mat-expansion-panel-header>
       <ul>
-        <li><span class="bw"><mat-icon style="font-weight: bold">chat_bubble_outline</mat-icon> selected / <mat-icon>chat_bubble_outline</mat-icon> deselected</span>
-        </li>
-        <li><span class="bw"><mat-icon style="color: green">chat_bubble_outline</mat-icon> rated positively / <mat-icon
-          style="color: rgb(255, 0, 0)">chat_bubble_outline</mat-icon> rated negatively</span></li>
-        <li><span class="bw"><span style="font-weight: bold">>>></span> follow-up question</span></li>
-        <li><span class="bw"><span style="font-weight: bold">――</span> related question</span></li>
-        <li><span class="bw">―――――――――――――――――――――</span></li>
-        <li><span class="bw">More questions? <a
-          href="mailto:noracle@dbis.rwth-aachen.de">noracle@dbis.rwth-aachen.de</a></span></li>
+          <li><span class="bw"><mat-icon style="font-weight: bold">chat_bubble_outline</mat-icon>selected</span></li>
+          <li><span class="bw"><mat-icon>chat_bubble_outline</mat-icon>deselected</span></li>
+          <li><span class="bw"><mat-icon style="color: green">chat_bubble_outline</mat-icon>rated positively</span></li>
+          <li><span class="bw"><mat-icon style="color: rgb(255, 0, 0)">chat_bubble_outline</mat-icon>rated negatively</span></li>
+          <li><span class="bw"><span style="font-weight: bold">>>></span>follow-up question</span></li>
+          <li><span class="bw"><span style="font-weight: bold">――</span>related question</span></li>
+          <li><span class="bw">―――――――――――――――――――――</span></li>
+          <li><span class="bw">More questions?</span></li>
+          <li><span class="bw"><a href="mailto:noracle@dbis.rwth-aachen.de">noracle@dbis.rwth-aachen.de</a></span></li>
       </ul>
     </mat-expansion-panel>
   </mat-accordion>
+  <button mat-button (click)="copyInviteUrl()" color="primary" style="margin: 8px 24px; padding: 0 !important;">
+    <b>SHARE</b>
+    <mat-icon class="share-icon" inline="true">share</mat-icon>
+  </button>
 </div>
-<!--<div class="container" fxLayout="row">-->
-  <!-- <div class="spaceContent" fxLayout="column" fxLayoutAlign="space-around center"> -->
-<!-- <div *ngIf="subscriptionInProgress">
-  <p>Subscribing to space&hellip;</p>
-  <mat-spinner></mat-spinner>
-</div>
-<dnor-graph-view *ngIf="!subscriptionInProgress"
-                  [spaceId]="spaceId"
-                  [width]="width"
-                  [height]="height"
-                  [selectedQuestions]="selectedQuestions"
-                  [interactionMode]="interactionMode"></dnor-graph-view>
-<mat-card style="display: inline-block">
-  <mat-radio-group *ngIf="!subscriptionInProgress"
-                    fxLayout="row" fxLayoutGap="20px" fxLayoutWrap [(ngModel)]="interactionMode">
-    <mat-radio-button color="primary" *ngFor="let m of getInteractionModes()" [value]="m">
-      {{getInteractionModeLabel(m)}}
-    </mat-radio-button>
-  </mat-radio-group>
-</mat-card> -->
-  <!-- </div> -->
-  <!-- <div class="spaceInfo"> -->
-<!-- <div class="memberList" *ngIf="!subscriptionInProgress">
-  <mat-accordion displayMode="flat" multi="true">
-    <mat-expansion-panel expanded="true">
-      <mat-expansion-panel-header expandedHeight="30px" collapsedHeight="30px">
-        <span class="bw">Participants</span>
-      </mat-expansion-panel-header>
-      <ul>
-        <li *ngFor="let m of this.spaceMembers"><span class="bw">{{m}}</span></li>
-      </ul>
-    </mat-expansion-panel>
-
-    <mat-expansion-panel>
-      <mat-expansion-panel-header expandedHeight="30px" collapsedHeight="30px">
-        <span class="bw">Help</span>
-      </mat-expansion-panel-header>
-      <ul>
-        <li><span class="bw"><mat-icon style="font-weight: bold">chat_bubble_outline</mat-icon> selected / <mat-icon>chat_bubble_outline</mat-icon> deselected</span>
-        </li>
-        <li><span class="bw"><mat-icon style="color: green">chat_bubble_outline</mat-icon> rated positively / <mat-icon
-          style="color: rgb(255, 0, 0)">chat_bubble_outline</mat-icon> rated negatively</span></li>
-        <li><span class="bw"><span style="font-weight: bold">>>></span> follow-up question</span></li>
-        <li><span class="bw"><span style="font-weight: bold">――</span> related question</span></li>
-        <li><span class="bw">―――――――――――――――――――――</span></li>
-        <li><span class="bw">More questions? <a
-          href="mailto:noracle@dbis.rwth-aachen.de">noracle@dbis.rwth-aachen.de</a></span></li>
-      </ul>
-    </mat-expansion-panel>
-  </mat-accordion>
-</div> -->
-  <!-- </div> -->
-<!-- </div> -->

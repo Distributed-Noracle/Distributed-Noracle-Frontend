@@ -1,76 +1,46 @@
-<div class="container" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="20px">
-  <h1 class="mat-h1 title">My Spaces</h1>
-  <mat-spinner *ngIf="!this.spacesLoaded"></mat-spinner>
-  <div *ngIf="this.spacesLoaded && this.spaces.length == 0">You have not yet subscribed to a space.</div>
+<div class="container" fxLayout="row">
+  <div class="main-container" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="20px">
+    <h1 class="mat-h1 title">My Spaces</h1>
+    <mat-spinner *ngIf="!this.spacesLoaded"></mat-spinner>
+    <div *ngIf="this.spacesLoaded && this.mySpaces.length == 0">You have not yet subscribed to a space.</div>
 
-  <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutAlign="center center" fxLayoutGap="15px">
-    <div *ngFor="let space of spaces">
-      <a mat-button color="primary" [routerLink]="['/spaces', space.space.spaceId]"
-      [queryParams]="{sq: getStringifiedParamArray(space.subscription)}">{{space.space.name}}</a>
-      <button mat-icon-button (click)="copyInviteUrl(space)" color="primary">
-        <mat-icon>share</mat-icon>
+    <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutAlign="center center" fxLayoutGap="15px">
+      <div *ngFor="let space of mySpaces">
+        <a class="space-link" mat-button color="primary" [routerLink]="['/spaces', space.space.spaceId]"
+        [queryParams]="{sq: getStringifiedParamArray(space.subscription)}">{{space.space.name}}</a>
+        <button mat-icon-button (click)="copyInviteUrl(space)" color="primary">
+          <mat-icon>share</mat-icon>
+        </button>
+      </div>
+    </div>
+    <button mat-raised-button color="primary" routerLink="/spaces/create">Create new Space</button>
+    <br>
+
+    <h1 class="mat-h1 title">Recommended For You</h1>
+    <mat-spinner *ngIf="!this.recommendationsLoaded"></mat-spinner>
+    <div *ngIf="this.recommendationsLoaded && this.recommenderQuestions.length == 0">
+      There are no recommendations for you at the moment :(
+    </div>
+    <div fxLayout.lt-lg="column" fxLayoutAlign="center center" fxLayoutGap="15px">
+      <button mat-button color="primary" *ngFor="let r of recommenderQuestions" (click)="recClicked(r)">
+        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
+          <mat-icon>star</mat-icon>
+          <div>
+            <div>{{r.question.text}}</div>
+            <div>Asked by {{r.authorName}}</div>
+            <div>{{getDateFormat(r.question.timestampCreated)}}</div>
+          </div>
+        </div>
       </button>
     </div>
   </div>
-  <button mat-raised-button color="primary" routerLink="/spaces/create">Create new Space</button>
-  <br>
-
-  <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
-    <h1 class="mat-h1 title">Recommended For You</h1>
-    <button mat-icon-button (click)="reloadRecommendations()">
-      <mat-icon matTooltip="Refresh Recommendations">refresh</mat-icon>
-    </button>
-  </div>
-  <mat-spinner *ngIf="!this.recommendationsLoaded"></mat-spinner>
-  <div *ngIf="this.recommendationsLoaded && this.recommenderQuestions.length == 0">
-    There are no recommendations for you at the moment :(
-  </div>
-  <div fxLayout.lt-md="column" fxLayoutAlign="center center" fxLayoutGap="15px">
-    <button mat-button color="primary" *ngFor="let r of recommenderQuestions" (click)="linkClicked(r)">
-      <div fxLayout="row" fxLayoutAlign="center center">
-        <mat-icon>star</mat-icon>
-        <div>
-          <div>{{r.question.text}}</div>
-          <div>Asked by {{r.authorName}}</div>
-          <div>{{r.question.timestampCreated}}</div>
-        </div>
+  <div class="side-container">
+    <h4>Public Spaces</h4>
+    <div class="public-spaces" fxLayout="column" fxLayoutGap="12px">
+      <div class="public-space" *ngFor="let s of publicSpaces">
+        <!--TODO: Show vote count for each space -->
+        <span class="public-space-relation-count">{{s.name.length}}</span>
+        <span class="public-space-link" (click)="publicSpaceClicked(s)">{{s.name}}</span>
       </div>
-    </button>
-  </div>
-  <!-- <mat-list role="list">
-    <mat-list-item role="listitem" *ngFor="let r of recommenderQuestions" (click)="linkClicked(r)">
-      <button mat-menu-item>
-        <mat-icon>star</mat-icon>
-        <span>{{r.question.text}} Asked by {{r.authorName}}, {{r.question.timestampCreated}}</span>
-      </button>
-    </mat-list-item>
-  </mat-list> -->
-  <!-- <mat-list>
-    <mat-list-item *ngFor="let space of spaces">
-      <a mat-button color="primary" [routerLink]="['/spaces', space.space.spaceId]"
-         [queryParams]="{sq: getStringifiedParamArray(space.subscription)}">{{space.space.name}}</a>
-      <button mat-icon-button (click)="copyInviteUrl(space)" color="primary">
-        <mat-icon>share</mat-icon>
-      </button> -->
-      <!-- <button mat-icon-button [matMenuTriggerFor]="menu" color="primary">
-        <mat-icon svgIcon="img:bot"></mat-icon>
-      </button>
-      <mat-menu #menu [overlapTrigger]="false">
-        <button mat-menu-item [matMenuTriggerFor]="menu2">
-            <mat-icon class="menuItem" svgIcon="img:add"></mat-icon>
-            <span>Add Bot</span>
-            <mat-menu #menu2 [overlapTrigger]="false">
-              <mat-list-item *ngFor="let bot of bots">
-                <a mat-menu-item (click)="addBot(space,bot)">
-                <mat-icon class="menuItem" svgIcon="{{getIcon(bot,space.space.spaceId)}}"></mat-icon>
-                <span>{{bot.name}}</span></a>
-              </mat-list-item>
-            </mat-menu>
-          </button>
-        <a mat-menu-item target="_blank" href="{{botWidgetUrl}}/widgets/train.html?unit={{space.space.spaceId}}">
-          <mat-icon class="menuItem" svgIcon="img:train"></mat-icon>
-          <span>Train Bot</span></a>
-      </mat-menu> -->
-    <!-- </mat-list-item>
-  </mat-list>-->
+    </div>
 </div>

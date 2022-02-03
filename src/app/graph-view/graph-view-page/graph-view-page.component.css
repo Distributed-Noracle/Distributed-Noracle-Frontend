@@ -13,6 +13,7 @@
     top: 80px;
     right: 10px;
     direction: rtl;
+    max-width: 290px;
 }
 
 .memberList ul {
@@ -40,4 +41,39 @@ mat-icon {
 .graph-view {
     width: 100%;
     height: 100%;
+}
+
+.mat-icon.share-icon {
+    height:32px !important;
+    width:32px !important;
+    font-size:32px !important;
+}
+
+.recommendation-card {
+    position: fixed;
+    max-width: 300px;
+    margin: 24px;
+}
+
+.example-header-image {
+    background-image: url('../../../assets/default-avatar.png');
+    background-size: cover;
+}
+
+.recommendation-link {
+    padding: 8px;
+    display: flex;
+    cursor: pointer;
+}
+
+.recommendation-link:hover {
+    background-color: #F8F8FF;
+}
+
+.img-avatar {
+    border-radius: 50%;
+    height: 32px;
+    width: 32px;
+    display: block;
+    object-fit: cover;
 }

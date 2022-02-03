@@ -1,16 +1,17 @@
 <mat-toolbar color="primary">
-  <div fxHide.gt-xs>
+  <div fxLayout="row" fxLayoutGap="20px" fxHide.gt-xs>
     <button mat-icon-button (click)="onToggleSidenav()">
       <mat-icon>menu</mat-icon>
     </button>
+    <div style="padding-top: 4px;">Noracle</div>
   </div>
   <div fxHide.xs>
     <a mat-button [routerLink]="['welcome']" routerLinkActive="router-link-active">Noracle</a>
   </div>
   <div fxFlex fxLayout="row" fxLayoutAlign="end" fxHide.xs>
-    <dnor-space-dropdown *ngIf="authGuardService.isAuthorized"></dnor-space-dropdown>
-    <a mat-button (click)="logout()" *ngIf="authGuardService.isAuthorized"><span>Logout</span></a>
-    <a mat-button [routerLink]="['login']" routerLinkActive="router-link-active" *ngIf="!authGuardService.isAuthorized">
+    <dnor-space-dropdown *ngIf="authService.isAuthorized"></dnor-space-dropdown>
+    <a mat-button (click)="logout()" *ngIf="authService.isAuthorized"><span>Logout</span></a>
+    <a mat-button [routerLink]="['login']" routerLinkActive="router-link-active" *ngIf="!authService.isAuthorized">
       <span>Login</span>
     </a>
   </div>

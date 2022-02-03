@@ -9,7 +9,8 @@ export class RelationVoteService {
   }
 
   public getRelationVotes(spaceId: string, relationId: string) {
-    return this.restHelperService.get(`/spaces/${spaceId}/relations/${relationId}/votes`).then((res: RelationVote[]) => {
+    return this.restHelperService.get(`/spaces/${spaceId}/relations/${relationId}/votes`)
+      .then((res: RelationVote[]) => {
       return res;
     });
   }

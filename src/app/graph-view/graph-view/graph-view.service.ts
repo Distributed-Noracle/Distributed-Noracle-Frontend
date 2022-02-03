@@ -29,9 +29,11 @@ export class GraphViewService {
   private observedQuestionIds: string[] = [];
   private updateSubject = new Subject<UpdateData>();
   private loadingSubject = new BehaviorSubject<boolean>(false);
+  public recommenderSubject = new BehaviorSubject<any>([]);
 
-  public loading = this.loadingSubject.asObservable();
   public update = this.updateSubject.asObservable();
+  public loading = this.loadingSubject.asObservable();
+  public recommending = this.recommenderSubject.asObservable();
 
   constructor(private questionService: QuestionService, private relationService: RelationService,
               private questionVoteService: QuestionVoteService, private relationVoteService: RelationVoteService,
@@ -310,7 +312,7 @@ export class GraphViewService {
   private schedulePolling() {
     if (!this.isPollScheduled) {
       this.isPollScheduled = true;
-      window.setTimeout(() => this.poll(), 20000);
+      window.setTimeout(() => this.poll(), 12000);
     }
   }
 

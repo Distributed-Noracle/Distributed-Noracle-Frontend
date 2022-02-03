@@ -9,7 +9,7 @@
   <a
     mat-list-item
     [routerLink]="['myspaces']"
-    *ngIf="authGuardService.isAuthorized"
+    *ngIf="authService.isAuthorized"
     (click)="onClose()">
     <mat-icon>workspaces</mat-icon>
     <span class="nav-caption">My Spaces</span>
@@ -17,12 +17,12 @@
   <a
     mat-list-item
     [routerLink]="['login']"
-    *ngIf="!authGuardService.isAuthorized"
+    *ngIf="!authService.isAuthorized"
     (click)="onClose()">
     <mat-icon>login</mat-icon>
     <span class="nav-caption">Login</span>
   </a>
-  <a mat-list-item *ngIf="authGuardService.isAuthorized" (click)="logout()">
+  <a mat-list-item *ngIf="authService.isAuthorized" (click)="logout()">
     <mat-icon>logout</mat-icon>
     <span class="nav-caption">Logout</span>
   </a>

@@ -15,8 +15,9 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ClipboardModule } from '@angular/cdk/clipboard';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
-
 
 @NgModule({
   imports: [
@@ -36,6 +37,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatMenuModule,
     MatProgressSpinnerModule,
     FlexLayoutModule,
+    ClipboardModule,
+    MatCheckboxModule,
     MatTooltipModule
   ],
   declarations: [CreateSpaceComponent, SubscribedSpacesOverviewComponent],
