@@ -30,3 +30,32 @@ div.content {
 .mat-drawer-container {
   background-color: white;
 }
+
+/* Style for splide JS - needs to be in styles.css */
+
+.splide__pagination__page.is-active {
+  background-color: #3F51B5 !important;
+}
+
+.slide {
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 24px;
+}
+
+.slide:hover {
+  cursor: pointer;
+}
+
+.arrow {
+  background: white !important;
+}
+
+.meta-info {
+  font-size: 14px;
+}

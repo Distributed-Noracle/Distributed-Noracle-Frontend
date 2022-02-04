@@ -6,8 +6,10 @@
 
     <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutAlign="center center" fxLayoutGap="15px">
       <div *ngFor="let space of mySpaces">
-        <a class="space-link" mat-button color="primary" [routerLink]="['/spaces', space.space.spaceId]"
-        [queryParams]="{sq: getStringifiedParamArray(space.subscription)}">{{space.space.name}}</a>
+        <!-- <a class="space-link" mat-button color="primary" [routerLink]="['/spaces', space.space.spaceId]"
+        [queryParams]="{sq: getStringifiedParamArray(space.subscription)}">{{space.space.name}}</a> -->
+        <span class="space-link" [routerLink]="['/spaces', space.space.spaceId]"
+        [queryParams]="{sq: getStringifiedParamArray(space.subscription)}">{{space.space.name}}</span>
         <button mat-icon-button (click)="copyInviteUrl(space)" color="primary">
           <mat-icon>share</mat-icon>
         </button>
@@ -18,7 +20,7 @@
 
     <h1 class="mat-h1 title">Recommended For You</h1>
     <mat-spinner *ngIf="!this.recommendationsLoaded"></mat-spinner>
-    <div *ngIf="this.recommendationsLoaded && this.recommenderQuestions.length == 0">
+    <!-- <div *ngIf="this.recommendationsLoaded && this.recommenderQuestions.length == 0">
       There are no recommendations for you at the moment :(
     </div>
     <div fxLayout.lt-lg="column" fxLayoutAlign="center center" fxLayoutGap="15px">
@@ -32,16 +34,28 @@
           </div>
         </div>
       </button>
+    </div> -->
+    <div class="splide">
+      <div class="splide__track">
+        <ul class="splide__list">
+          <!-- <li class="splide__slide">Slide 01</li>
+          <li class="splide__slide">Slide 02</li>
+          <li class="splide__slide">Slide 03</li> -->
+          <!-- <li class="splide__slide" *ngFor="let r of recommenderQuestions">
+            {{r.question.text}}
+          </li> -->
+        </ul>
+      </div>
     </div>
   </div>
   <div class="side-container">
     <h4>Public Spaces</h4>
-    <div *ngIf="this.publicSpaces.length === 0">There are no public spaces in your network yet.</div>
+    <mat-spinner *ngIf="!this.publicSpacesLoaded"></mat-spinner>
+    <div *ngIf="this.publicSpacesLoaded && this.publicSpaces.length === 0">There are no public spaces in your network.</div>
     <div class="public-spaces" fxLayout="column" fxLayoutGap="12px">
       <div class="public-space" *ngFor="let s of publicSpaces">
-        <!--TODO: Show vote count for each space -->
-        <span class="public-space-relation-count">{{s.name.length}}</span>
-        <span class="public-space-link" (click)="publicSpaceClicked(s)">{{s.name}}</span>
+        <mat-icon color="primary">chat_bubble_outline</mat-icon>
+        <span class="space-link" (click)="publicSpaceClicked(s)">{{s.name}}</span>
       </div>
     </div>
 </div>
