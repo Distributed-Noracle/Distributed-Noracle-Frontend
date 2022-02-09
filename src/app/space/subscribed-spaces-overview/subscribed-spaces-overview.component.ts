@@ -82,14 +82,29 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy, Aft
 
     this.spaceService.getPublicSpaces().then((spaces: Space[]) => {
       this.publicSpaces = spaces;
+    }).catch(() => {
+      console.error("error while getting public spaces...");
     }).finally(() => {
       this.publicSpacesLoaded = true;
     });
+
+    // For testing
+    // this.publicSpacesLoaded = true;
+    // let space = {
+    //   spaceId: '12345',
+    //   name: 'TestSpace Blabla',
+    //   spaceOwnerId: '12345',
+    //   spaceReaderGroupId: '12345',
+    //   spaceSecret: '12345',
+    //   private: true
+    // };
+    // for (let i = 0; i < 100; i++) {
+    //   this.publicSpaces.push(space);
+    // }
   }
 
   recommendationClicked(param: Node) {
     let ids: string = param.childNodes[0]['id'];
-    console.log(ids);
     let questionId = ids.substring(0, ids.indexOf('-'));
     let spaceId = ids.substring(ids.indexOf('-') + 1, ids.length);
 

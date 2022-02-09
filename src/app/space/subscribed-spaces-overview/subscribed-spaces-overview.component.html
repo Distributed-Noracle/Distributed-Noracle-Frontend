@@ -1,5 +1,5 @@
 <div class="container" fxLayout="row">
-  <div class="main-container" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="20px">
+  <div class="main-container" fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="20px">
     <h1 class="mat-h1 title">My Spaces</h1>
     <mat-spinner *ngIf="!this.spacesLoaded"></mat-spinner>
     <div *ngIf="this.spacesLoaded && this.mySpaces.length == 0">You have not yet subscribed to a space.</div>
@@ -20,10 +20,10 @@
 
     <h1 class="mat-h1 title">Recommended For You</h1>
     <mat-spinner *ngIf="!this.recommendationsLoaded"></mat-spinner>
-    <!-- <div *ngIf="this.recommendationsLoaded && this.recommenderQuestions.length == 0">
+    <div *ngIf="this.recommendationsLoaded && this.recommenderQuestions.length == 0">
       There are no recommendations for you at the moment :(
     </div>
-    <div fxLayout.lt-lg="column" fxLayoutAlign="center center" fxLayoutGap="15px">
+    <!--<div fxLayout.lt-lg="column" fxLayoutAlign="center center" fxLayoutGap="15px">
       <button mat-button color="primary" *ngFor="let r of recommenderQuestions" (click)="recClicked(r)">
         <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
           <mat-icon>star</mat-icon>
@@ -53,9 +53,9 @@
     <mat-spinner *ngIf="!this.publicSpacesLoaded"></mat-spinner>
     <div *ngIf="this.publicSpacesLoaded && this.publicSpaces.length === 0">There are no public spaces in your network.</div>
     <div class="public-spaces" fxLayout="column" fxLayoutGap="12px">
-      <div class="public-space" *ngFor="let s of publicSpaces">
+      <div class="public-space" *ngFor="let s of publicSpaces" (click)="publicSpaceClicked(s)">
         <mat-icon color="primary">chat_bubble_outline</mat-icon>
-        <span class="space-link" (click)="publicSpaceClicked(s)">{{s.name}}</span>
+        <span class="space-link">{{s.name}}</span>
       </div>
     </div>
 </div>

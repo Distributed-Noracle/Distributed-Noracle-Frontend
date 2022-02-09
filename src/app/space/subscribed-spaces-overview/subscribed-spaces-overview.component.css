@@ -15,13 +15,16 @@
   display: flex;
 }
 
+.public-space:hover {
+  cursor: pointer;
+}
+
 .side-container {
   width: 250px;
   margin-left: 20px;
 }
 
 .space-link {
-  /*#0074CC*/ /*#3F51B5*/
   color: #0053BB;
   margin-left: 10px;
   padding-top: 2px;
@@ -44,9 +47,4 @@
 
 .title {
   font-size: 32px;
-}
-
-.space-link {
-  padding: 0;
-  min-width: unset !important;
 }

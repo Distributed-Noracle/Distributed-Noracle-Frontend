@@ -38,10 +38,10 @@ div.content {
 }
 
 .slide {
-  height: 150px;
+  min-height: 100px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* justify-content: center; */
   align-items: center;
   text-align: center;
   font-family: 'Noto Sans', sans-serif;
