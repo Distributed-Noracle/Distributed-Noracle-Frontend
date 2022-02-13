@@ -133,7 +133,7 @@ export class GraphViewPageComponent implements OnInit, OnDestroy, OnChanges {
 
     if (date.getFullYear() === dateNow.getFullYear()) {
       if (date.getMonth() === dateNow.getMonth()) {
-        if (date.getDay() === dateNow.getDay()) {
+        if (date.getDate() === dateNow.getDate()) {
           if (date.getHours() === dateNow.getHours()) {
             if (date.getMinutes() === dateNow.getMinutes()) {
               // show seconds
@@ -148,7 +148,7 @@ export class GraphViewPageComponent implements OnInit, OnDestroy, OnChanges {
           }
         } else {
           // show days
-          return (dateNow.getDay() - date.getDay()) + ' day(s) ago';
+          return (dateNow.getDate() - date.getDate()) + ' day(s) ago';
         }
       } else {
         // show month
@@ -156,6 +156,11 @@ export class GraphViewPageComponent implements OnInit, OnDestroy, OnChanges {
       }
     } else {
       // show years
+      // year change
+      if (dateNow.getFullYear() - date.getFullYear() === 1) {
+        // show month
+        return (12 - date.getMonth() + date.getMonth()) + ' month(s) ago';
+      }
       return (dateNow.getFullYear() - date.getFullYear()) + 'year(s) ago';
     }
   }
