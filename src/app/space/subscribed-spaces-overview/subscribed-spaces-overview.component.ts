@@ -57,9 +57,17 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy, Aft
       }).finally(() => {
         this.recommendationsLoaded = true;
 
+        // a bit responsive design
+        let perPage = 3;
+        if (window.innerWidth <= 600) {
+          perPage = 1;
+        } else if (window.innerWidth <= 1200) {
+          perPage = 2;
+        }
+
         this.splide = new Splide( '.splide', {
           type   : 'loop',
-          perPage: 3,
+          perPage: perPage,
           perMove: 1,
           classes: {
             slide: 'splide__slide slide',
@@ -125,7 +133,7 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy, Aft
         this.addEventListener();
       }, 500);
     } else {
-      let nodeList: NodeList = this.elRef.nativeElement.querySelectorAll('li');
+      let nodeList: NodeList = this.elRef.nativeElement.querySelectorAll('.splide__slide');
       nodeList.forEach(n => n.addEventListener('click', () => {
         this.recommendationClicked(n);
       }));
