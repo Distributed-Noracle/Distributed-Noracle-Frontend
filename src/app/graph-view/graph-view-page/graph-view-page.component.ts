@@ -1,8 +1,8 @@
 import {ChangeDetectorRef, Component, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {GraphInteractionMode} from '../graph-view/graph-data-model/graph-interaction-mode.enum';
 import {ActivatedRoute, NavigationExtras, Router} from '@angular/router';
-import {BehaviorSubject, Subscription} from 'rxjs';
-import {MyspacesService} from '../../shared/myspaces/myspaces.service';
+import { Subscription}  from 'rxjs';
+import { MyspacesService } from '../../shared/myspaces/myspaces.service';
 import { GraphViewService } from '../graph-view/graph-view.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -10,7 +10,6 @@ import { SpaceService } from 'src/app/shared/space/space.service';
 import { Space } from 'src/app/shared/rest-data-model/space';
 import { RecommendationService } from 'src/app/shared/recommendation/recommendation.service';
 import { RecommenderQuestion } from 'src/app/shared/rest-data-model/recommender-question';
-import { Question } from 'src/app/shared/rest-data-model/question';
 import { AgentService } from 'src/app/shared/agent/agent.service';
 
 @Component({
@@ -56,6 +55,7 @@ export class GraphViewPageComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit() {
+    // TODO: This can be done way easier!
     this.subscription.add(this.activatedRoute.params.subscribe((params) => {
       this.spaceId = params['spaceId'];
       this.myspacesService.getSubscribersObservable(this.spaceId).subscribe(subs => {
@@ -73,11 +73,14 @@ export class GraphViewPageComponent implements OnInit, OnDestroy, OnChanges {
       const pw = queryParams['pw'];
       if (pw !== undefined) {
         this.subscriptionInProgress = true;
-        this.myspacesService.subscribeToSpace(this.spaceId, pw).then(() => {
+        this.myspacesService.subscribeToSpace(this.spaceId, pw).then((res) => {
+          this.space = res?.space;
           const qp = queryParams['sq'] !== undefined ? {sq: queryParams['sq']} : {};
           this.router.navigate([], {queryParams: qp, replaceUrl: true}).then(() => {
-            this.ngOnInit(); // reload component
             this.subscriptionInProgress = false
+            this.loadRecommendations().then(() => {
+              this.ngOnInit(); // reload component
+            })
           });
         });
       }
@@ -99,11 +102,12 @@ export class GraphViewPageComponent implements OnInit, OnDestroy, OnChanges {
     this.loadRecommendations();
   }
 
-  loadRecommendations(): void {
+  loadRecommendations(): Promise<any> {
     this.recommendationsLoaded = false;
-    this.agentService.getAgent().then((agent) => {
-      this.recommendationService.getRecommendedQuestionsForSpace(agent.agentid, this.spaceId)
+    return this.agentService.getAgent().then((agent) => {
+      return this.recommendationService.getRecommendedQuestionsForSpace(agent.agentid, this.spaceId)
         .then((res: RecommenderQuestion[]) => {
+          console.log(res);
         this.recommenderQuestions = res;
       }).catch(() => {
         console.error("error while getting recommendations...");

@@ -32,9 +32,6 @@ export class SpaceService {
   }
 
   public getSpaceSubscribers(spaceId: string): Promise<SpaceSubscriber[]> {
-    // return this.restHelperService.get(`/spaces/${id}/subscribers`).then((res: SpaceSubscriber[]) => {
-    //   return res;
-    // });
     return this.restHelperService.get(`/spaces/${spaceId}/subscribers`);
   }
 
