@@ -27,7 +27,7 @@ export class GraphViewPageComponent implements OnInit, OnDestroy, OnChanges {
   public selectedQuestions;
   public spaceMembers = [];
   public loading = false;
-  public recommenderQuestions: RecommenderQuestion[];
+  public recommenderQuestions: RecommenderQuestion[] = [];
   public selectedRecommenderQuestion: [];
   public recommendationsLoaded = false;
 
@@ -103,11 +103,13 @@ export class GraphViewPageComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   loadRecommendations(): Promise<any> {
+    if (this.recommenderQuestions.length > 0) {
+      return;
+    }
     this.recommendationsLoaded = false;
     return this.agentService.getAgent().then((agent) => {
       return this.recommendationService.getRecommendedQuestionsForSpace(agent.agentid, this.spaceId)
         .then((res: RecommenderQuestion[]) => {
-          console.log(res);
         this.recommenderQuestions = res;
       }).catch(() => {
         console.error("error while getting recommendations...");
