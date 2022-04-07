@@ -4,9 +4,9 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
 export const environment = {
-  production: true,
+  production: false,
   redirectUrl: 'http://localhost:4200/afterlogin',
   mobsosUrl: 'https://las2peer.tech4comp.dbis.rwth-aachen.de',
-  hostUrls: ['https://git.tech4comp.dbis.rwth-aachen.de'] // prod
-  //hostUrls: ['http://localhost:8080']
+  //hostUrls: ['https://git.tech4comp.dbis.rwth-aachen.de'] // prod
+  hostUrls: ['http://localhost:8080']
 };

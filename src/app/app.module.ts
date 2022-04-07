@@ -29,7 +29,7 @@ function initializeKeycloak(keycloak: KeycloakService): () => Promise<boolean> {
   return () =>
       keycloak.init({
           config: {
-              url: 'https://api.learning-layers.eu/auth',
+              url: 'https://api.learning-layers.eu/auth/realms/main',
               realm: 'main',
               clientId: '8b7837a0-0b49-4443-9a56-591f50531d0a',
           },
