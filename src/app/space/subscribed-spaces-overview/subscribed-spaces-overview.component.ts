@@ -21,7 +21,7 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy, Aft
   public mySpaces: { space: Space, subscription: SpaceSubscription }[];
   public spacesLoaded = false;
   public recommendationsLoaded = false;
-  public publicSpacesLoaded = false;
+  //public publicSpacesLoaded = false;
 
   public recommenderQuestions: RecommenderQuestion[] = [];
   public publicSpaces: Space[] = [];
@@ -88,13 +88,14 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy, Aft
       })
     });
 
-    this.spaceService.getPublicSpaces().then((spaces: Space[]) => {
+    // TODO: Activate when it is fixed
+    /*this.spaceService.getPublicSpaces().then((spaces: Space[]) => {
       this.publicSpaces = spaces;
     }).catch(() => {
       console.error("error while getting public spaces...");
     }).finally(() => {
       this.publicSpacesLoaded = true;
-    });
+    });*/
 
     // For testing
     // this.publicSpacesLoaded = true;
@@ -151,7 +152,9 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy, Aft
   getDateFormat(dateString: string): string {
     let date = new Date(dateString);
     let month = date.toLocaleString('en-GB', { month: 'short' });
-    return `${month}, ${date.getDay()}, ${date.getFullYear()}, ${date.getHours()}:${date.getMinutes()}`;
+    let hours = ("0" + date.getHours()).slice(-2);
+    let minutes = ("0" + date.getMinutes()).slice(-2);
+    return `${month}, ${date.getDate()}, ${date.getFullYear()}, ${hours}:${minutes}`;
   }
 
   // recClicked(r: RecommenderQuestion): void {
@@ -175,7 +178,9 @@ export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy, Aft
     let url = window.location.href;
     url = url.substring(0, url.indexOf('/myspaces')) + `/spaces/${myspace.space.spaceId}?pw=${myspace.space.spaceSecret}`;
     this.clipboard.copy(url);
-    this.snackBar.open('Copied invitation link to clipboard. Paste to share with friends!', 'Ok');
+    this.snackBar.open('Copied invitation link to clipboard. Paste to share with friends!', 'Ok', {
+      duration: 5000
+    });
   }
 
   getStringifiedParamArray(subscription: SpaceSubscription): string {

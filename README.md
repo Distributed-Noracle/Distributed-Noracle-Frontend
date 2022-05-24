@@ -3,9 +3,7 @@
 ## Usage
 ### Prerequisites
 - Have a recent version of [Node.js](https://nodejs.org/) installed
-- Make sure you have access to a running backend, by either:
-  - Deploying the [Noracle bundle](https://distributed-noracle.github.io/)
-  - Setting up an [own network](https://github.com/Distributed-Noracle/Distributed-Noracle-Backend)
+- Make sure you have access to a running [network](https://github.com/Distributed-Noracle/Distributed-Noracle-Backend)
 
 ### Setup
 1. Get the repository and navitage to the root folder

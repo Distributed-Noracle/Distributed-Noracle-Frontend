@@ -33,8 +33,6 @@ export class CreateSpaceComponent {
         this.router.navigate(['/spaces', space.spaceId], {queryParams: {sq: JSON.stringify([q.questionId])}});
         this.myspacesService.getMySpaces().then((s) => s);
       });
-    }).finally(() => {
-      this.loadingCreateSpace = false;
     });
   }
 

@@ -50,7 +50,8 @@
   </div>
   <div class="side-container">
     <h4>Public Spaces</h4>
-    <mat-spinner *ngIf="!this.publicSpacesLoaded"></mat-spinner>
+    <div>Public spaces are currently deactivated.</div>
+    <!--<mat-spinner *ngIf="!this.publicSpacesLoaded"></mat-spinner>
     <div *ngIf="this.publicSpacesLoaded && this.publicSpaces.length === 0">There are no public spaces in your network.</div>
     <div class="public-spaces" fxLayout="column" fxLayoutGap="12px">
       <div class="public-space" *ngFor="let s of publicSpaces" (click)="publicSpaceClicked(s)">
@@ -58,4 +59,5 @@
         <span class="space-link">{{s.name}}</span>
       </div>
     </div>
+  </div>-->
 </div>

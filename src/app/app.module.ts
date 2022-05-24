@@ -29,14 +29,15 @@ function initializeKeycloak(keycloak: KeycloakService): () => Promise<boolean> {
   return () =>
       keycloak.init({
           config: {
-              url: 'https://api.learning-layers.eu/auth/realms/main',
+              url: 'https://auth.las2peer.org/auth',
               realm: 'main',
               clientId: '8b7837a0-0b49-4443-9a56-591f50531d0a',
           },
           initOptions: {
               checkLoginIframe: true,
               checkLoginIframeInterval: 25,
-              enableLogging: false
+              enableLogging: false,
+              redirectUri: environment.redirectUrl
           },
           enableBearerInterceptor: true,
           loadUserProfileAtStartUp: true,

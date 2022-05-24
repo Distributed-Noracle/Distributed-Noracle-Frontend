@@ -31,8 +31,8 @@
     "classlist.js": "^1.1.20150312",
     "core-js": "^3.14.0",
     "d3": "^6.7.0",
-    "keycloak-angular": "^8.2.0",
-    "keycloak-js": "^13.0.1",
+    "keycloak-angular": "^9.1.0",
+    "keycloak-js": "^18.0.0",
     "rxjs": "6.6.7",
     "tslib": "^1.10.0",
     "zone.js": "~0.11.4"

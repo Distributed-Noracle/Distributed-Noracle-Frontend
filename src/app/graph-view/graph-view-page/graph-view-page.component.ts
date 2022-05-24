@@ -51,7 +51,9 @@ export class GraphViewPageComponent implements OnInit, OnDestroy, OnChanges {
     let url = window.location.href;
     url = url.substring(0, url.indexOf('/spaces')) + `/spaces/${this.space.spaceId}?pw=${this.space.spaceSecret}`;
     this.clipboard.copy(url);
-    this.snackBar.open('Copied invitation link to clipboard. Paste to share with friends!', 'Ok');
+    this.snackBar.open('Copied invitation link to clipboard. Paste to share with friends!', 'Ok', {
+      duration: 5000
+    });
   }
 
   ngOnInit() {
