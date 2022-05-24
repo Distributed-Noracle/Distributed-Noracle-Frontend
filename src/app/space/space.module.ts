@@ -13,7 +13,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { ClipboardModule } from '@angular/cdk/clipboard';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   imports: [
@@ -30,7 +34,12 @@ import { MatMenuModule } from '@angular/material/menu';
     MatCardModule,
     MatInputModule,
     MatListModule,
-    MatMenuModule
+    MatMenuModule,
+    MatProgressSpinnerModule,
+    FlexLayoutModule,
+    ClipboardModule,
+    MatCheckboxModule,
+    MatTooltipModule
   ],
   declarations: [CreateSpaceComponent, SubscribedSpacesOverviewComponent],
   exports: [CreateSpaceComponent, SubscribedSpacesOverviewComponent]

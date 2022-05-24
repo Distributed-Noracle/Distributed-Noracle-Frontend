@@ -13,7 +13,7 @@ export class AddChildNodeBehavior extends NodeInteractionBehavior {
 
   interactWith(node: GraphNode): Promise<any> {
     const dialogRef = this.dialog.open(CreateQuestionDialogComponent, {
-      width: '250px',
+      width: '300px',
       data: {
         title: 'Ask a Follow Up Question',
         message: 'Enter the question. Parent question is: ' + node.question.text,

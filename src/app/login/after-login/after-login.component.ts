@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {AuthGuardService} from '../../shared/auth-guard/auth-guard.service';
 import {Router} from '@angular/router';
 import {AgentService} from '../../shared/agent/agent.service';
 import { KeycloakService } from 'keycloak-angular';
+import { AuthenticationService } from 'src/app/shared/authentication/authentication.service';
 
 @Component({
   selector: 'dnor-after-login',
@@ -10,12 +10,12 @@ import { KeycloakService } from 'keycloak-angular';
 })
 export class AfterLoginComponent implements OnInit {
 
-  constructor(authGuardService: AuthGuardService, agentService: AgentService, router: Router, protected readonly keycloak: KeycloakService) {
+  constructor(authService: AuthenticationService, agentService: AgentService, router: Router, protected readonly keycloak: KeycloakService) {
     this.keycloak.isLoggedIn().then((loggedIn) => {
       if (loggedIn) {
         agentService.getAgent().then((agent) =>
-        agentService.putAgentName(agent.agentid, authGuardService.getUserName()));
-        const lastRouteRequested = authGuardService.getLastRouteRequested();
+        agentService.putAgentName(agent.agentid, authService.getUserName()));
+        const lastRouteRequested = authService.getLastRouteRequested();
         if (lastRouteRequested !== undefined) {
           router.navigate([lastRouteRequested.url], {
             queryParams: lastRouteRequested.queryParams,

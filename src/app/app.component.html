@@ -1,4 +1,11 @@
-<dnor-nav></dnor-nav>
-<div class="content">
-  <router-outlet></router-outlet>
-</div>
+<mat-sidenav-container>
+  <mat-sidenav #sidenav role="navigation">
+    <dnor-sidenav-list (closeSidenav)="sidenav.close()"></dnor-sidenav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <dnor-nav (sidenavToggle)="sidenav.toggle()"></dnor-nav>
+    <main>
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

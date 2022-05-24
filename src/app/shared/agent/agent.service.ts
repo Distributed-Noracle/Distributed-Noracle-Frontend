@@ -1,26 +1,32 @@
 import {Injectable} from '@angular/core';
 import {RestHelperService} from '../rest-helper/rest-helper.service';
 import {SpaceSubscription} from '../rest-data-model/spacesubscription';
+import { catchError, shareReplay } from 'rxjs/operators';
+import { EMPTY, Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class AgentService {
 
-  private cachedAgent;
+  private cachedAgent: {agentid: string};
+  private cache: Observable<any>
   private cachedAgentNames: Map<string, string> = new Map<string, string>();
 
   constructor(private restHelperService: RestHelperService) {
   }
 
-  public getAgent(): Promise<{ agentid: string }> {
-    if (this.cachedAgent !== undefined) {
-      return Promise.resolve(this.cachedAgent);
+  public getAgent(): Promise<any> {
+    if (this.cache) {
+      return this.cache.toPromise();
     } else {
-      return this.restHelperService.getCurrentAgent().then((res) => {
-        this.cachedAgent = res;
-        return this.cachedAgent;
-      }).catch(error => {
-        console.error(error);
-      })
+      this.cache = this.restHelperService.getCurrentAgentLocal().pipe(
+        shareReplay(1),
+        catchError(err => {
+          delete this.cache;
+          return EMPTY;
+        })
+      )
+      return this.cache.toPromise();
     }
   }
 
@@ -58,8 +64,13 @@ export class AgentService {
       .then((agent) => {
         return this.restHelperService.post(`/agents/${agent.agentid}/spacesubscriptions`, postData)
           .then(res => {
-            return this.restHelperService.getAbsoulte(res.headers.get('location'))
-              .then((res2) => res2.json() as SpaceSubscription);
+            // TODO: Hacky hack, needs to be fixed by the backend!
+            let location: string = res.headers.get('location');
+            if (environment.production) {
+              location = location.replace("http", "https");
+            }
+            return this.restHelperService.getAbsoulte(location)
+              .then((res2: SpaceSubscription) => res2);
           });
       });
   }

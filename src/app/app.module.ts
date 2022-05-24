@@ -17,23 +17,27 @@ import {SubscribedSpacesOverviewComponent} from './space/subscribed-spaces-overv
 import {CreateSpaceComponent} from './space/create-space/create-space.component';
 import {AfterLoginComponent} from './login/after-login/after-login.component';
 import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
+import {MatSidenavModule} from '@angular/material/sidenav';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 import { environment } from 'src/environments/environment';
 import { HttpRequestInterceptor } from './shared/http-request-interceptor/http-request-interceptor';
+import { AuthenticationService } from './shared/authentication/authentication.service';
 
 function initializeKeycloak(keycloak: KeycloakService): () => Promise<boolean> {
   return () =>
       keycloak.init({
           config: {
-              url: 'https://api.learning-layers.eu/auth',
+              url: 'https://auth.las2peer.org/auth',
               realm: 'main',
               clientId: '8b7837a0-0b49-4443-9a56-591f50531d0a',
           },
           initOptions: {
               checkLoginIframe: true,
               checkLoginIframeInterval: 25,
-              enableLogging: false
+              enableLogging: false,
+              redirectUri: environment.redirectUrl
           },
           enableBearerInterceptor: true,
           loadUserProfileAtStartUp: true,
@@ -54,16 +58,19 @@ function initializeKeycloak(keycloak: KeycloakService): () => Promise<boolean> {
     SpaceModule,
     GraphViewModule,
     RouterModule.forRoot([
-    { path: 'welcome', component: WelcomePageComponent },
-    { path: 'login', component: LoginPageComponent },
-    { path: 'afterlogin', component: AfterLoginComponent },
-    { path: 'myspaces', component: SubscribedSpacesOverviewComponent, canActivate: [AuthGuardService] },
-    { path: 'spaces/create', component: CreateSpaceComponent, canActivate: [AuthGuardService] },
-    { path: 'spaces/:spaceId', component: GraphViewPageComponent, canActivate: [AuthGuardService] },
-    { path: '**', redirectTo: 'welcome' }
-], { relativeLinkResolution: 'legacy' }),
+      { path: 'welcome', component: WelcomePageComponent },
+      { path: 'login', component: LoginPageComponent },
+      { path: 'afterlogin', component: AfterLoginComponent },
+      { path: 'myspaces', component: SubscribedSpacesOverviewComponent, canActivate: [AuthGuardService] },
+      { path: 'spaces/create', component: CreateSpaceComponent, canActivate: [AuthGuardService] },
+      { path: 'spaces/:spaceId', component: GraphViewPageComponent, canActivate: [AuthGuardService] },
+      { path: '**', redirectTo: 'welcome' }
+    ],
+    { relativeLinkResolution: 'legacy' }),
     HttpClientModule,
-    KeycloakAngularModule
+    KeycloakAngularModule,
+    MatSidenavModule,
+    MatProgressBarModule
   ],
   providers: [
     {
@@ -75,7 +82,8 @@ function initializeKeycloak(keycloak: KeycloakService): () => Promise<boolean> {
     { provide: HTTP_INTERCEPTORS,
       useClass: HttpRequestInterceptor,
       multi: true
-    }
+    },
+    AuthenticationService
   ],
   bootstrap: [AppComponent]
 })

@@ -1,7 +1,17 @@
+.container {
+    padding: 5px;
+}
+
 .banner {
     width: 240px;
 }
 
 .bannerContainer {
     text-align: right;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    width: auto;
 }

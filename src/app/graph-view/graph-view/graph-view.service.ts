@@ -3,7 +3,7 @@ import {Question} from '../../shared/rest-data-model/question';
 import {Relation} from '../../shared/rest-data-model/relation';
 import {QuestionService} from '../../shared/question/question.service';
 import {RelationService} from '../../shared/relation/relation.service';
-import {Subject, Observable} from 'rxjs';
+import {Subject, BehaviorSubject} from 'rxjs';
 import {MyspacesService} from '../../shared/myspaces/myspaces.service';
 import {Router} from '@angular/router';
 import {RelationType} from './graph-data-model/relation-type.enum';
@@ -27,7 +27,13 @@ export class GraphViewService {
   private spaceId = null;
   private isPollScheduled = false;
   private observedQuestionIds: string[] = [];
-  private update = new Subject<UpdateData>();
+  private updateSubject = new Subject<UpdateData>();
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+  public recommenderSubject = new BehaviorSubject<any>([]);
+
+  public update = this.updateSubject.asObservable();
+  public loading = this.loadingSubject.asObservable();
+  public recommending = this.recommenderSubject.asObservable();
 
   constructor(private questionService: QuestionService, private relationService: RelationService,
               private questionVoteService: QuestionVoteService, private relationVoteService: RelationVoteService,
@@ -38,10 +44,6 @@ export class GraphViewService {
   public initServiceForSpace(spaceId: string) {
     this.spaceId = spaceId;
     this.observedQuestionIds = [];
-  }
-
-  public getUpdateObservable(): Observable<UpdateData> {
-    return this.update.asObservable();
   }
 
   public registerQuestionForUpdate(questionId: string): boolean {
@@ -61,7 +63,8 @@ export class GraphViewService {
     return false;
   }
 
-  public addQuestionToParentAndRegisterForUpdate(question: Question, parentQuestionId: string) {
+  public addQuestionToParentAndRegisterForUpdate(question: Question, parentQuestionId: string): void {
+    this.loadingSubject.next(true);
     this.questionService.postQuestion(this.spaceId, question).then((q) => {
       const relation = new Relation();
       relation.firstQuestionId = parentQuestionId;
@@ -79,11 +82,14 @@ export class GraphViewService {
         this.updateSelectionRouteParams(q.questionId, true);
         this.registerQuestionForUpdate(q.questionId);
         this.notifyObservers();
+      }).finally(() => {
+        this.loadingSubject.next(false);
       });
     });
   }
 
   public updateQuestion(questionId: string, text: string) {
+    this.loadingSubject.next(true);
     const question = new Question();
     question.text = text;
     return this.questionService.putQuestion(this.spaceId, questionId, question).then((newQ) => {
@@ -91,10 +97,13 @@ export class GraphViewService {
       this.questions.push(newQ);
       this.notifyObservers();
       return newQ;
+    }).finally(() => {
+      this.loadingSubject.next(false);
     });
   }
 
   public updateRelation(relationId: string, relationType: string) {
+    this.loadingSubject.next(true);
     const relation = new Relation();
     relation.name = relationType;
     return this.relationService.putRelation(this.spaceId, relationId, relation).then((newR) => {
@@ -102,10 +111,13 @@ export class GraphViewService {
       this.relations.push(newR);
       this.notifyObservers();
       return newR;
+    }).finally(() => {
+      this.loadingSubject.next(false);
     });
   }
 
   public updateQuestionVote(questionId: string, agentId: string, vote: number) {
+    this.loadingSubject.next(true);
     const questionVote = new QuestionVote();
     questionVote.value = vote;
     return this.questionVoteService.putQuestionVote(this.spaceId, questionId, agentId, questionVote)
@@ -118,10 +130,13 @@ export class GraphViewService {
         qvArr.push(newQV);
         this.notifyObservers();
         return newQV;
+      }).finally(() => {
+        this.loadingSubject.next(false);
       });
   }
 
   public updateRelationVote(relationId: string, agentId: string, vote: number) {
+    this.loadingSubject.next(true);
     const relationVote = new RelationVote();
     relationVote.value = vote;
     return this.relationVoteService.putRelationVote(this.spaceId, relationId, agentId, relationVote)
@@ -134,22 +149,31 @@ export class GraphViewService {
         rvArr.push(newRV);
         this.notifyObservers();
         return newRV;
+      }).finally(() => {
+        this.loadingSubject.next(false);
       });
   }
 
   public addRelation(relation: Relation) {
-    this.relationService.postRelation(this.spaceId, relation).then((r) => {
+    this.loadingSubject.next(true);
+    this.relationService.postRelation(this.spaceId, relation).then((r: Relation) => {
       this.relations.push(r);
       this.relationVotes.set(r.relationId, []);
       this.relationAuthors.set(r.relationId, this.authGuardService.getUserName());
       this.notifyObservers();
+    }).finally(() => {
+      this.loadingSubject.next(false);
     });
   }
 
   public requestUpdate() {
     if (this.spaceId !== null) {
-      this.fetchAll(this.spaceId);
-      this.fetchSubscribers(this.spaceId);
+      this.loadingSubject.next(true);
+      this.fetchAll(this.spaceId).then(() => {
+        this.fetchSubscribers(this.spaceId).finally(() => {
+          this.loadingSubject.next(false);
+        })
+      });
     }
   }
 
@@ -202,7 +226,7 @@ export class GraphViewService {
     return this.relationAuthors.get(relationId);
   }
 
-  private fetchAll(spaceId: string) {
+  private fetchAll(spaceId: string): Promise<any> {
     // load all questions and all relations of the space
     const questionsAndRelationsPromise = Promise.all([
       this.questionService.getQuestionsOfSpace(spaceId).then((res: Question[]) => {
@@ -222,7 +246,7 @@ export class GraphViewService {
     ]);
 
     // when all questions and relations are loaded
-    questionsAndRelationsPromise.then(() => {
+    return questionsAndRelationsPromise.then(() => {
       if (this.spaceId === spaceId) {
         // load all related data for observed questions and relations
         const allRelatedDataPromise = Promise.all(this.questions.filter(
@@ -239,18 +263,18 @@ export class GraphViewService {
           this.schedulePolling();
         });
       }
-    });
+    })
   }
 
-  private fetchSubscribers(spaceId: string) {
-    this.myspacesService.getSpaceSubscribers(this.spaceId);
+  private fetchSubscribers(spaceId: string): Promise<any> {
+    return this.myspacesService.getSpaceSubscribers(this.spaceId);
   }
 
   private loadRelationRelatedData(spaceId: string, r: Relation): Promise<any> {
     return Promise.all([
       this.agentService.getAgentName(r.authorId)
         .then(ra => this.relationAuthors.set(r.relationId, ra))
-    ]);
+    ])
   }
 
   private loadQuestionRelatedData(spaceId: string, q: Question): Promise<any> {
@@ -273,7 +297,7 @@ export class GraphViewService {
       const votesForRelations = relationsForQuestion.map(r => this.getVotesForRelation(r.relationId));
       const authorsForRelations = relationsForQuestion.map(r => this.getAuthorForRelation(r.relationId));
       if (question !== undefined && relationsForQuestion !== undefined) {
-        this.update.next({
+        this.updateSubject.next({
           question: question,
           questionAuthor: questionAuthor,
           questionVotes: votesForQuestion !== undefined ? votesForQuestion : [],
@@ -288,7 +312,7 @@ export class GraphViewService {
   private schedulePolling() {
     if (!this.isPollScheduled) {
       this.isPollScheduled = true;
-      window.setTimeout(() => this.poll(), 5000);
+      window.setTimeout(() => this.poll(), 12000);
     }
   }
 

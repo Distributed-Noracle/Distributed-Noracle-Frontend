@@ -1,11 +1,11 @@
 <h1 mat-dialog-title>{{data.title}}</h1>
 <div mat-dialog-content>
   <p>{{data.message}}</p>
-  <mat-form-field>
+  <mat-form-field style="width: 100%;">
     <textarea matInput tabindex="1" [(ngModel)]="data.text"></textarea>
   </mat-form-field>
 </div>
 <div mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="data.text" tabindex="2">Ok</button>
-  <button mat-button (click)="onCancel()" tabindex="-1">Cancel</button>
+  <button mat-raised-button color="primary" [mat-dialog-close]="data.text" tabindex="2">Ok</button>
+  <button mat-raised-button (click)="onCancel()" tabindex="-1">Cancel</button>
 </div>

@@ -29,7 +29,7 @@ export class EditQuestionBehavior extends NodeInteractionBehavior {
       lastModified: new Date(node.question.timestampLastModified).toLocaleString(),
       inputHeading: `${authorName} (${node.question.timestampLastModified})`,
       votes: votes,
-      vote: myVote ? myVote.value : undefined
+      vote: myVote ? myVote.value : null
     };
 
     const dialogRef = this.dialog.open(InspectDialogComponent, {data: data});

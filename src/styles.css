@@ -1,5 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-@import "~@angular/material/prebuilt-themes/pink-bluegrey.css";
+@import "@angular/material/prebuilt-themes/indigo-pink.css";
 /*
 deeppurple-amber.css
 indigo-pink.css
@@ -7,12 +7,11 @@ pink-bluegrey.css
 purple-green.css
  */
 
-div.mat-form-field-underline {
-  background-color: gray;
-}
-
-label.mat-form-field-placeholder {
-  color: gray;
+ * , *:before, *:after{
+  box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+  -ms-box-sizing:border-box;
 }
 
 @-ms-viewport {
@@ -20,10 +19,47 @@ label.mat-form-field-placeholder {
 }
 
 body {
-  margin: 0px;
+  margin: 0 auto;
   font-family: Roboto,"Helvetica Neue",sans-serif;
 }
 
 div.content {
   margin: 8px;
+}
+
+.mat-drawer-container {
+  background-color: white;
+}
+
+/* Style for splide JS - needs to be in styles.css */
+
+.splide__pagination__page.is-active {
+  background-color: #3F51B5 !important;
+}
+
+.slide {
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  align-items: center;
+  text-align: center;
+  font-family: 'Noto Sans', sans-serif;
+  font-size: 24px;
+}
+
+.slide:hover {
+  cursor: pointer;
+}
+
+.arrow {
+  background: white !important;
+}
+
+.meta-info {
+  font-size: 14px;
+}
+
+.splide {
+  padding-bottom: 30px;
 }

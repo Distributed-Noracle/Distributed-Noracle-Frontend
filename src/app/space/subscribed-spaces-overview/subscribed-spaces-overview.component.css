@@ -1,3 +1,50 @@
-.menuItem{
-    margin-top: -15px;
+.container {
+  padding: 10px;
+  height: 100%;
+  margin: 0 auto;
+  max-width: 1264px;
+  width: 100%;
+  position: relative;
+}
+
+.main-container {
+  width: calc(100% - 250px - 20px);
+}
+
+.public-space {
+  display: flex;
+}
+
+.public-space:hover {
+  cursor: pointer;
+}
+
+.side-container {
+  width: 250px;
+  margin-left: 20px;
+}
+
+.space-link {
+  color: #0053BB;
+  margin-left: 10px;
+  padding-top: 2px;
+}
+
+.space-link:hover {
+  cursor: pointer;
+  color: #4F62C6;
+}
+
+@media (max-width: 780px) {
+  .main-container {
+    width: 100%;
+  }
+
+  .side-container {
+    display: none;
+  }
+}
+
+.title {
+  font-size: 32px;
 }

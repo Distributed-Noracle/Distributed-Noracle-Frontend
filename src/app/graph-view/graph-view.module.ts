@@ -21,6 +21,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @NgModule({
   imports: [
@@ -37,7 +38,8 @@ import { MatCardModule } from '@angular/material/card';
     SharedModule,
     MatIconModule,
     MatExpansionModule,
-    MatCardModule
+    MatCardModule,
+    MatProgressBarModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [

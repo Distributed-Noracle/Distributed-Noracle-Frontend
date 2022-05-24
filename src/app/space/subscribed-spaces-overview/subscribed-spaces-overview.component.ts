@@ -1,212 +1,186 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit} from '@angular/core';
 import {SpaceSubscription} from '../../shared/rest-data-model/spacesubscription';
 import {Subscription} from 'rxjs';
 import {Space} from '../../shared/rest-data-model/space';
 import {MyspacesService} from '../../shared/myspaces/myspaces.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {MatIconRegistry } from '@angular/material/icon';
-import {DomSanitizer} from '@angular/platform-browser';
-import {environment} from '../../../environments/environment';
-import {RestHelperService} from '../../shared/rest-helper/rest-helper.service';
+import { RecommenderQuestion } from 'src/app/shared/rest-data-model/recommender-question';
+import { NavigationExtras, Router } from '@angular/router';
+import { RecommendationService } from 'src/app/shared/recommendation/recommendation.service';
+import { AgentService } from 'src/app/shared/agent/agent.service';
+import { Clipboard } from '@angular/cdk/clipboard';
+import { SpaceService } from 'src/app/shared/space/space.service';
+import { Splide } from '@splidejs/splide';
 
 @Component({
   selector: 'dnor-subscribed-spaces-overview',
   templateUrl: './subscribed-spaces-overview.component.html',
   styleUrls: ['./subscribed-spaces-overview.component.css']
 })
-export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy {
-  public spaces: { space: Space, subscription: SpaceSubscription }[];
-  //public bots: {name: string, active: {}}[] = [];
-  //public botWidgetUrl: string;
-  private spaceSubscription: Subscription;
-  // private botUri: string;
+export class SubscribedSpacesOverviewComponent implements OnInit, OnDestroy, AfterViewInit {
+  public mySpaces: { space: Space, subscription: SpaceSubscription }[];
+  public spacesLoaded = false;
+  public recommendationsLoaded = false;
+  //public publicSpacesLoaded = false;
 
-  constructor(private myspacesService: MyspacesService, private snackBar: MatSnackBar,
-              private matIconRegistry: MatIconRegistry, private sanitizer: DomSanitizer, private rh: RestHelperService) {
-  }
+  public recommenderQuestions: RecommenderQuestion[] = [];
+  public publicSpaces: Space[] = [];
+
+  private spaceSubscription: Subscription;
+
+  private splide: Splide;
+
+  constructor(
+    private myspacesService: MyspacesService,
+    private snackBar: MatSnackBar,
+    private router: Router,
+    private recommendationService: RecommendationService,
+    private agentService: AgentService,
+    private clipboard: Clipboard,
+    private spaceService: SpaceService,
+    private elRef: ElementRef) {}
 
   ngOnInit() {
-    this.spaceSubscription =
-      this.myspacesService.getMySpacesObservable().subscribe((myspaces) => this.spaces = myspaces);
-    this.myspacesService.getMySpaces().then((s) => s);
-    this.matIconRegistry.addSvgIconInNamespace('img', 'bot',
-        this.sanitizer.bypassSecurityTrustResourceUrl('assets/bot.svg'));
-    this.matIconRegistry.addSvgIconInNamespace('img', 'add',
-        this.sanitizer.bypassSecurityTrustResourceUrl('assets/add.svg'));
-    this.matIconRegistry.addSvgIconInNamespace('img', 'train',
-        this.sanitizer.bypassSecurityTrustResourceUrl('assets/train.svg'));
-    this.matIconRegistry.addSvgIconInNamespace('img', 'play',
-        this.sanitizer.bypassSecurityTrustResourceUrl('assets/play.svg'));
-    this.matIconRegistry.addSvgIconInNamespace('img', 'pause',
-        this.sanitizer.bypassSecurityTrustResourceUrl('assets/pause.svg'));
-    //this.botWidgetUrl = this.rh.getHostURL() + '/fileservice/v2.2.5/files/sbf';
-    //this.botUri = this.rh.getHostURL() + '/SBFManager/bots/distributed-noracle';
+    this.spaceSubscription = this.myspacesService.getMySpacesObservable().subscribe((myspaces) => {
+      this.spacesLoaded = true;
+      this.mySpaces = myspaces
+    });
 
-    /*const xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
-    xmlhttp.open('GET', this.botUri);
-    xmlhttp.setRequestHeader('Accept', 'application/json');
-    xmlhttp.send();
-    const bots = this.bots;
-    xmlhttp.onreadystatechange = function(){
-       if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-          const botj = JSON.parse(this.responseText);
-          for (const bname of Object.keys(botj)) {
-            var b = {'name': bname, 'active': {}};
-            for (const uname of Object.keys(botj[bname]["active"])) {
-                const bs = botj[bname]["active"][uname] === true;
-                var bstatus = {};
-                bstatus['active'] = bs;
-                if(bs){
-                   bstatus['icon'] = 'img:pause';
-                }else{
-                   bstatus['icon'] = 'img:play';
-                }
-                b["active"][uname] = bstatus;
-            }
-            bots.push(b);
-          }
-       }
-    }; */
+    this.myspacesService.getMySpaces().then((s) => s);
+
+    this.agentService.getAgent().then((agent) => {
+      this.recommendationService.getRecommendedQuestions(agent.agentid)
+        .then((res: RecommenderQuestion[]) => {
+        this.recommenderQuestions = res;
+      }).catch(() => {
+        console.error("error while getting recommendations...");
+      }).finally(() => {
+        this.recommendationsLoaded = true;
+
+        // a bit responsive design
+        let perPage = 3;
+        if (window.innerWidth <= 600) {
+          perPage = 1;
+        } else if (window.innerWidth <= 1200) {
+          perPage = 2;
+        }
+
+        this.splide = new Splide( '.splide', {
+          type   : 'loop',
+          perPage: perPage,
+          perMove: 1,
+          classes: {
+            slide: 'splide__slide slide',
+            prev  : 'splide__arrow--prev arrow',
+            next  : 'splide__arrow--next arrow',
+          },
+          width: '100%'
+        } );
+
+        this.splide.mount();
+
+        for (let rq of this.recommenderQuestions) {
+          let addHTML = '<li><span id="' + rq.question.questionId + '-' + rq.question.spaceId + '">&ldquo;' + rq.question.text + '&rdquo;</span>';
+          addHTML += '<i class="meta-info">asked by ' + rq.authorName + '</i>';
+          addHTML += '<i class="meta-info">' + this.getDateFormat(rq.question.timestampCreated) +'</i></li>'
+          this.splide.add(addHTML);
+        }
+      })
+    });
+
+    // TODO: Activate when it is fixed
+    /*this.spaceService.getPublicSpaces().then((spaces: Space[]) => {
+      this.publicSpaces = spaces;
+    }).catch(() => {
+      console.error("error while getting public spaces...");
+    }).finally(() => {
+      this.publicSpacesLoaded = true;
+    });*/
+
+    // For testing
+    // this.publicSpacesLoaded = true;
+    // let space = {
+    //   spaceId: '12345',
+    //   name: 'TestSpace Blabla',
+    //   spaceOwnerId: '12345',
+    //   spaceReaderGroupId: '12345',
+    //   spaceSecret: '12345',
+    //   private: true
+    // };
+    // for (let i = 0; i < 100; i++) {
+    //   this.publicSpaces.push(space);
+    // }
+  }
+
+  recommendationClicked(param: Node) {
+    let ids: string = param.childNodes[0]['id'];
+    let questionId = ids.substring(0, ids.indexOf('-'));
+    let spaceId = ids.substring(ids.indexOf('-') + 1, ids.length);
+
+    let questionIds = [];
+    questionIds.push(questionId);
+    let navigationExtras: NavigationExtras = {
+      queryParams: {
+        sq: JSON.stringify(questionIds)
+      }
+    }
+    this.router.navigate(['/spaces', spaceId], navigationExtras);
+  }
+
+  addEventListener() {
+    if (!this.recommendationsLoaded)
+    {
+      setTimeout(() => {
+        this.addEventListener();
+      }, 500);
+    } else {
+      let nodeList: NodeList = this.elRef.nativeElement.querySelectorAll('.splide__slide');
+      nodeList.forEach(n => n.addEventListener('click', () => {
+        this.recommendationClicked(n);
+      }));
+    }
+  }
+
+  ngAfterViewInit(): void {
+    this.addEventListener();
   }
 
   ngOnDestroy() {
     this.spaceSubscription.unsubscribe();
   }
 
+  getDateFormat(dateString: string): string {
+    let date = new Date(dateString);
+    let month = date.toLocaleString('en-GB', { month: 'short' });
+    let hours = ("0" + date.getHours()).slice(-2);
+    let minutes = ("0" + date.getMinutes()).slice(-2);
+    return `${month}, ${date.getDate()}, ${date.getFullYear()}, ${hours}:${minutes}`;
+  }
+
+  // recClicked(r: RecommenderQuestion): void {
+  //   //let questionIds = r.questionNeighbourIds;
+  //   let questionIds = [];
+  //   questionIds.push(r.question.questionId);
+  //   let navigationExtras: NavigationExtras = {
+  //     queryParams: {
+  //       sq: JSON.stringify(questionIds)
+  //     }
+  //   }
+  //   this.router.navigate(['/spaces', r.question.spaceId], navigationExtras);
+  // }
+
+  publicSpaceClicked(s: Space): void {
+    // this.router.navigate(['/spaces', space.spaceId], {queryParams: {sq: JSON.stringify([q.questionId])}});
+    this.router.navigate(['/spaces', s.spaceId], {queryParams: {pw: s.spaceSecret}});
+  }
+
   copyInviteUrl(myspace: { space: Space, subscription: SpaceSubscription }) {
     let url = window.location.href;
     url = url.substring(0, url.indexOf('/myspaces')) + `/spaces/${myspace.space.spaceId}?pw=${myspace.space.spaceSecret}`;
-    const textArea = document.createElement('textarea');
-    // Place in top-left corner of screen regardless of scroll position.
-    textArea.style.position = 'fixed';
-    textArea.style.top = '0';
-    textArea.style.left = '0';
-    // Ensure it has a small width and height. Setting to 1px / 1em
-    // doesn't work as this gives a negative w/h on some browsers.
-    textArea.style.width = '2em';
-    textArea.style.height = '2em';
-    // We don't need padding, reducing the size if it does flash render.
-    textArea.style.padding = '0';
-    // Clean up any borders.
-    textArea.style.border = 'none';
-    textArea.style.outline = 'none';
-    textArea.style.boxShadow = 'none';
-    // Avoid flash of white box if rendered for any reason.
-    textArea.style.background = 'transparent';
-    textArea.value = url;
-    document.body.appendChild(textArea);
-    textArea.select();
-    try {
-      const successful = document.execCommand('copy');
-      if (successful) {
-        this.snackBar.open('Copied invitation link to clipboard. Paste to share with friends!', 'hide', {
-          duration: 2000,
-        });
-      } else {
-        this.copyFallback(url);
-      }
-    } catch (err) {
-      this.copyFallback(url);
-    }
-    document.body.removeChild(textArea);
-  }
-
-  getIcon(bot:{}, spaceId: String){
-      if(bot['active'][spaceId]==null){
-        return 'img:play';
-      }
-      return bot['active'][spaceId]['icon'];
-  }
-
-  /*addBot(myspace: { space: Space, subscription: SpaceSubscription }, botObject: {name: String, active: {}}) {
-    const bot = botObject.name;
-    var active = false;
-    if(botObject.active[myspace.space.spaceId]==null){
-        botObject['active'][myspace.space.spaceId] = {};
-    }else{
-        active = botObject['active'][myspace.space.spaceId]['active'];
-    }
-
-    if (active === false) {
-      let url = window.location.href;
-      url = url.substring(0, url.indexOf('/myspaces')) + `/spaces/${myspace.space.spaceId}?pw=${myspace.space.spaceSecret}`;
-      const textArea = document.createElement('textarea');
-      // Place in top-left corner of screen regardless of scroll position.
-      textArea.style.position = 'fixed';
-      textArea.style.top = '0';
-      textArea.style.left = '0';
-      // Ensure it has a small width and height. Setting to 1px / 1em
-      // doesn't work as this gives a negative w/h on some browsers.
-      textArea.style.width = '2em';
-      textArea.style.height = '2em';
-      // We don't need padding, reducing the size if it does flash render.
-      textArea.style.padding = '0';
-      // Clean up any borders.
-      textArea.style.border = 'none';
-      textArea.style.outline = 'none';
-      textArea.style.boxShadow = 'none';
-      // Avoid flash of white box if rendered for any reason.
-      textArea.style.background = 'transparent';
-      textArea.value = url;
-      document.body.appendChild(textArea);
-      textArea.select();
-
-      const xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
-      xmlhttp.open('POST', this.rh.getHostURL() + '/SBFManager/join/' + bot);
-      xmlhttp.setRequestHeader('Content-Type', 'application/json');
-      xmlhttp.send(JSON.stringify({basePath: environment.hostUrls[0] + '/distributed-noracle',
-        joinPath: 'agents/$botId/spacesubscriptions',
-        spaceId: myspace.space.spaceId, spaceSecret: myspace.space.spaceSecret}));
-      const snackBar = this.snackBar;
-      const bots = this.bots;
-      xmlhttp.onreadystatechange = function(){
-         if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-            snackBar.open('Bot added!', 'hide', {
-              duration: 2000,
-            });
-            bots.forEach(function(element) {
-              if (element.name === bot) {
-                element.active[myspace.space.spaceId]['icon'] = 'img:pause';
-                element.active[myspace.space.spaceId]['active'] = true;
-              }
-            });
-         }else if (xmlhttp.readyState === 4) {
-            snackBar.open('Bot could not be added!', 'hide', {
-              duration: 2000,
-            });
-         }
-      };
-
-      document.body.removeChild(textArea);
-    }else {
-      const botUri = this.botUri;
-
-      const snackBar = this.snackBar;
-      this.bots.forEach(element => {
-        if (element.name === bot) {
-          const xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
-            xmlhttp.open('DELETE', botUri + '/' + bot + '/' + myspace.space.spaceId);
-            xmlhttp.send();
-            xmlhttp.onreadystatechange = function(){
-               if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-                  snackBar.open('Bot paused!', 'hide', {
-                    duration: 2000,
-                  });
-                element.active[myspace.space.spaceId]['icon'] = 'img:play';
-                element.active[myspace.space.spaceId]['active'] = false;
-               }else if (xmlhttp.readyState === 4) {
-                  snackBar.open('Bot could not be paused!', 'hide', {
-                    duration: 2000,
-                  });
-               }
-            };
-        }
-      });
-    }
-  }*/
-
-  private copyFallback(url: string) {
-    window.prompt('Could not copy to clipboard automatically. Please copy the following invitation link manually:', url);
+    this.clipboard.copy(url);
+    this.snackBar.open('Copied invitation link to clipboard. Paste to share with friends!', 'Ok', {
+      duration: 5000
+    });
   }
 
   getStringifiedParamArray(subscription: SpaceSubscription): string {

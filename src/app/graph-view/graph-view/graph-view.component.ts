@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import {ForceLink, Simulation} from 'd3-force';
 import {GraphNode} from './graph-data-model/graph-node';
 import {Edge} from './graph-data-model/edge';
@@ -11,7 +11,7 @@ import {NodeInteractionBehavior} from './interaction-behaviors/node-interaction-
 import {AddChildNodeBehavior} from './interaction-behaviors/add-child-node-behavior';
 import {EditQuestionBehavior} from './interaction-behaviors/edit-question-behavior';
 import {AddRelationBehavior} from './interaction-behaviors/add-relation-behavior';
-import {Subscription} from 'rxjs';
+import {BehaviorSubject, Subscription} from 'rxjs';
 import {AgentService} from '../../shared/agent/agent.service';
 import {QuestionVoteService} from '../../shared/question-vote/question-vote.service';
 import {EdgeInteractionBehavior} from './interaction-behaviors/edge-interaction-behavior';
@@ -29,11 +29,11 @@ import { D3DragEvent, D3ZoomEvent } from 'd3';
 })
 export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
   @ViewChild('d3root') private d3Root: ElementRef;
-  @Input('height') public height = 800;
-  @Input('width') public width = 1100;
-  @Input('interactionMode') private interactionMode: GraphInteractionMode;
-  @Input('spaceId') private spaceId = 'dummy';
-  @Input('selectedQuestions') private selectedQuestions: string[];
+  @Input() height = 800;
+  @Input() width = 1100;
+  @Input() private interactionMode: GraphInteractionMode;
+  @Input() private spaceId = 'dummy';
+  @Input() private selectedQuestions: string[];
 
   private loadedSpaceId;
   private network: Network;
@@ -44,13 +44,22 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterVi
   private d3Sim: Simulation<GraphNode, Edge>;
   private activatedInteractionMode: GraphInteractionMode;
   private updateSubscription: Subscription;
+  private recommendingSubscription: Subscription;
 
 
   constructor(private graphViewService: GraphViewService, private agentService: AgentService, private dialog: MatDialog) {
     this.transform = d3.zoomIdentity;
   }
 
-  ngOnInit() {}
+  ngOnInit(): void {
+    this.recommendingSubscription = this.graphViewService.recommending.subscribe(questions => {
+      if (questions !== undefined && questions.length > 0) {
+        this.selectedQuestions = questions;
+        this.initData();
+        this.initVisualization();
+      }
+    });
+  }
 
   ngAfterViewInit(): void {
     this.canvas = this.d3Root.nativeElement;
@@ -59,30 +68,38 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterVi
     this.d3Sim = d3.forceSimulation() as Simulation<GraphNode, Edge>;
     this.d3Sim.force('link', d3.forceLink<GraphNode, Edge>().id((n, i, d) => n.id));
     this.d3Sim.force('charge', d3.forceManyBody());
+
     this.d3Sim.force('center', d3.forceCenter(this.width / 2, this.height / 2));
     this.d3Sim.force('collide', d3.forceCollide((node: GraphNode) => (node as GraphNode).radius * 1.2));
 
-    this.updateSubscription = this.graphViewService.getUpdateObservable().subscribe(updateData => this.processUpdate(updateData));
+    this.updateSubscription = this.graphViewService.update.subscribe(updateData => this.processUpdate(updateData));
     this.initData();
     this.initVisualization();
     this.updateInteractionMode();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.updateSubscription.unsubscribe();
+    this.recommendingSubscription.unsubscribe();
     this.graphViewService.initServiceForSpace(null);
   }
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges): void {
     if (this.d3Sim) {
+      if (changes['selectedQuestions']) {
+        this.selectedQuestions = changes['selectedQuestions'].currentValue;
+      }
+
       if (this.spaceId !== this.loadedSpaceId) {
         this.initData();
         this.initVisualization();
         this.updateInteractionMode();
       }
+
       this.network.getNodes().forEach((node) => {
         node.isSelected = (this.selectedQuestions.indexOf(node.id) !== -1);
       });
+      // visual update of selection
       this.updateInteractionMode();
     }
   }
@@ -123,7 +140,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterVi
     d3Sim.restart();
   }
 
-  private updateInteractionMode() {
+  private updateInteractionMode(): void {
     if (this.activatedInteractionMode === this.interactionMode) {
       // no change
       return;
@@ -188,6 +205,7 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterVi
           }
           event.subject.fx = null;
           event.subject.fy = null;
+          this.updateSimulation();
         })
       )
       .call(d3.zoom()
@@ -266,8 +284,8 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterVi
         .on('end', (event: D3DragEvent<any, any, any>) => {
           if (event.subject !== undefined && event.subject.question !== undefined) {
             const n = event.subject as GraphNode;
-            const dx = this.transform.invertX(event.x) - n.x;
-            const dy = this.transform.invertY(event.y) - n.y;
+            const dx = event.dx;
+            const dy = event.dy;
             if (Math.pow(n.radius, 2) > Math.pow(dx, 2) + Math.pow(dy, 2)) {
               nodeInteractionBehavior.interactWith(n).then(() => {
                 this.updateSimulation();
@@ -333,13 +351,13 @@ export class GraphViewComponent implements OnInit, OnChanges, OnDestroy, AfterVi
   private processUpdate(updateData: UpdateData) {
     const context = this.d3Root.nativeElement.getContext('2d');
     const isSelected = this.selectedQuestions !== undefined &&
-    this.selectedQuestions.findIndex((id) => id === updateData.question.questionId) !== -1;
+      this.selectedQuestions.findIndex((id) => id === updateData.question.questionId) !== -1;
     const seedQuestion = this.graphViewService.getSeedQuestion();
     const isSeed = (seedQuestion ? seedQuestion.questionId : null) === updateData.question.questionId;
     const node = new GraphNode(context, updateData.question.questionId,
-          updateData.question, updateData.questionAuthor, updateData.questionVotes,
-          updateData.relations, updateData.relationAuthors, updateData.relationVotes,
-          isSelected, isSeed);
+      updateData.question, updateData.questionAuthor, updateData.questionVotes,
+      updateData.relations, updateData.relationAuthors, updateData.relationVotes,
+      isSelected, isSeed);
     if (this.network.addOrUpdateNode(node)) {
       this.updateSimulation();
     }

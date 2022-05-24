@@ -7,4 +7,5 @@ export class Space {
   spaceOwnerId: string;
   spaceReaderGroupId: string;
   spaceSecret: string;
+  private: boolean;
 }
