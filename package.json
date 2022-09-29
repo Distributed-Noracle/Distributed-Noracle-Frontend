@@ -29,7 +29,7 @@
     "@types/geojson": "^7946.0.7",
     "classlist.js": "^1.1.20150312",
     "core-js": "^3.14.0",
-    "d3": "^6.7.0",
+    "d3": "^7.6.1",
     "keycloak-angular": "^8.2.0",
     "keycloak-js": "^13.0.1",
     "rxjs": "6.6.7",
